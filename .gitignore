@@ -1,28 +1,48 @@
-# Node modules
+# 👉 Node modules
 node_modules/
 
-# dotenv files
+# 👉 Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+*.log
+
+# 👉 dotenv env config
 .env
 .env.local
 .env.*.local
 
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+# 👉 Build output (Sass, frontend, etc.)
+frontend/dist/
+frontend/css/
+dist/
+build/
 
-# Editor folders
+# 👉 Test coverage reports
+coverage/
+
+# 👉 IDE/editor settings
 .vscode/
 .idea/
 
-# Mac system files
+# 👉 System files (macOS, Windows)
 .DS_Store
+Thumbs.db
 
-# Output builds
-/dist
-/build
-/frontend/dist
-
-# Docker
+# 👉 Docker
 docker-compose.override.yml
+*.pid
+*.seed
+*.bak
+
+# 👉 PostgreSQL local dump or config (if any)
+*.sql
+*.dump
+
+# 👉 Jest snapshot (optional)
+*.snap
+
+# 👉 OS/Node lockfiles
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
