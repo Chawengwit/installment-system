@@ -1,0 +1,36 @@
+{
+  "name": "installment-system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest",
+    "scss": "sass frontend/scss:frontend/dist --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chawengwit/Installment-System.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Chawengwit/Installment-System/issues"
+  },
+  "homepage": "https://github.com/Chawengwit/Installment-System#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.0",
+    "express": "^5.1.0",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "jest": "^30.0.3",
+    "nodemon": "^3.1.10",
+    "sass": "^1.89.2",
+    "supertest": "^7.1.1"
+  }
+}
