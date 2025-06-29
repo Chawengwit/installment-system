@@ -22,6 +22,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(pathToFrontend, '/public/index.html'));
 });
 
+app.get('/customers', (req, res) => {
+    res.sendFile(path.join(pathToFrontend, '/public/customers.html'));
+});
+
 // API routes
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK' });

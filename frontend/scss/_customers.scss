@@ -1,0 +1,95 @@
+.customer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.customer-card {
+    background-color: var(--color-white);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: var(--transition-fast);
+    cursor: pointer;
+}
+
+.customer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.customer-card_header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.customer-card_avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--color-gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-gray-600);
+    font-size: var(--font-size-lg);
+}
+
+.customer-card_info {
+    flex: 1;
+}
+
+.customer-card_name {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-gray-900);
+    margin-bottom: var(--spacing-xs);
+}
+
+.customer-card_phone {
+    color: var(--color-gray-600);
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.customer-card_status {
+    margin-left: auto;
+}
+
+.customer-card_details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.customer-card__stat {
+    text-align: center;
+}
+
+.customer-card_stat-label {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-500);
+    margin-bottom: var(--spacing-xs);
+}
+
+.customer-card_stat-value {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-gray-900);
+}
+
+.customer-card_stat-value.text-danger {
+    color: var(--color-danger);
+}
+
+.customer-card_actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
+}
