@@ -13,17 +13,20 @@ services:
 
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .                     # 🟢 ใช้ root เป็น context เพื่อเข้าถึง frontend ได้
+      dockerfile: backend/Dockerfile
     ports:
       - "3000:3000"
-    environment:
-      PORT: 3000
-      DATABASE_URL: postgres://postgres:1234@db:5432/installment_db  # ใช้ชื่อ service db แทน localhost
+    env_file:
+      - ./backend/.env
+    # environment:
+    #   PORT: PORT=3000
+    #   DATABASE_URL: postgres://postgres:1234@db:5432/installment_db
     depends_on:
       - db
     volumes:
-      - ./backend:/app
+      - ./backend:/app                # ⬅️ mount backend code
+      - ./frontend:/app/frontend      # ⬅️ mount frontend code เข้า container
     command: npm run dev
 
 volumes:

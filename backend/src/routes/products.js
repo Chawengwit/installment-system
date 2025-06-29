@@ -16,10 +16,16 @@ router.get('/', async (req, res) => {
 // POST /api/products
 router.post('/', async (req, res) => {
     const { name, price } = req.body;
+
+    // ✅ This is the validation part added
+    if (!name || !price) {
+        return res.status(400).json({ error: 'Name and price are required' });
+    }
+
     try {
         const result = await db.query(
-        'INSERT INTO products (name, price) VALUES ($1, $2) RETURNING *',
-        [name, price]
+            'INSERT INTO products (name, price) VALUES ($1, $2) RETURNING *',
+            [name, price]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {

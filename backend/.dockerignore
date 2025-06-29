@@ -1,0 +1,34 @@
+# Node modules
+**/node_modules
+
+# Logs
+npm-debug.log
+yarn-error.log
+
+# macOS system files
+.DS_Store
+
+# Git
+.git
+.gitignore
+
+# Env files
+**/.env
+
+# Tests & coverage
+**/coverage
+**/tests/__snapshots__/
+
+# IDE/editor
+.vscode
+.idea
+
+# Docker volumes
+pgdata
+
+# Cache or build outputs
+frontend/dist/*.map
+
+# ไม่ต้อง ignore frontend เพราะเราจะ mount มันเข้าด้วย volume
+# และเราก็ไม่ได้ COPY มันตอน build
+# ❌ อย่าใส่ `frontend/` ในนี้ ถ้าคุณ mount volume เข้า `/app/frontend`
