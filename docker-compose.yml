@@ -2,10 +2,12 @@ services:
   db:
     image: postgres:15
     restart: always
+    env_file:
+      - ./backend/.env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: installment_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -13,20 +15,17 @@ services:
 
   backend:
     build:
-      context: .                     # 🟢 ใช้ root เป็น context เพื่อเข้าถึง frontend ได้
+      context: .  # ใช้ root context เพื่อเข้าถึงทั้ง backend และ frontend
       dockerfile: backend/Dockerfile
     ports:
       - "3000:3000"
     env_file:
       - ./backend/.env
-    # environment:
-    #   PORT: PORT=3000
-    #   DATABASE_URL: postgres://postgres:1234@db:5432/installment_db
     depends_on:
       - db
     volumes:
-      - ./backend:/app                # ⬅️ mount backend code
-      - ./frontend:/app/frontend      # ⬅️ mount frontend code เข้า container
+      - ./backend:/app
+      - ./frontend:/app/frontend
     command: npm run dev
 
 volumes:
