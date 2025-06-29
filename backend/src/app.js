@@ -22,10 +22,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(pathToFrontend, '/public/index.html'));
 });
 
-app.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(pathToFrontend, 'public/dashboard.html'));
-});
-
 // API routes
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK' });
