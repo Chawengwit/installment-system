@@ -19,42 +19,42 @@
             <!-- Header -->
             <header class="page-header">
                 <div>
-                    <h1 class="page-header_title">Customer Management</h1>
-                    <p class="page-header_subtitle">Manage your customers and their installment plans</p>
+                    <h1 class="page-header_title">ลูกค้า</h1>
+                    <p class="page-header_subtitle">การจัดการลูกค้าและแผนการผ่อนชำระ</p>
                 </div>
                 <button class="btn btn-primary" onclick="openModal('add-customer-modal')">
-                    <i class="fas fa-plus"></i> Add Customer
+                    <i class="fas fa-plus"></i> เพิ่มลูกค้า
                 </button>
             </header>
 
             <!-- Search and Filters -->
             <section class="search-section">
                 <div class="search-bar">
-                    <div class="search-bar__input-group">
-                        <i class="fas fa-search search-bar__icon"></i>
-                        <input type="text" class="search-bar__input" placeholder="Search customers by name or phone..." id="customer-search">
+                    <div class="search-bar_input-group">
+                        <i class="fas fa-search search-bar_icon"></i>
+                        <input type="text" class="search-bar_input" placeholder="Search customers by name or phone..." id="customer-search">
                     </div>
-                    <button class="btn btn-secondary search-bar__filter-btn" onclick="toggleFilters()">
-                        <i class="fas fa-filter"></i> Filters
+                    <button class="btn btn-secondary search-bar_filter-btn" onclick="toggleFilters()">
+                        <i class="fas fa-filter"></i> ตัวกรอง
                     </button>
                 </div>
                 
                 <div class="filters" id="filters-panel" style="display: none;">
                     <div class="filters_group">
-                        <label class="filters_label">Payment Status</label>
+                        <label class="filters_label">สถานะการชำระเงิน</label>
                         <select class="filters_select" onchange="applyFilters()">
-                            <option value="">All Status</option>
-                            <option value="current">Current</option>
-                            <option value="overdue">Overdue</option>
-                            <option value="completed">Completed</option>
+                            <option value="">สถานะทั้งหมด</option>
+                            <option value="current">ปัจจุบัน</option>
+                            <option value="overdue">เกินกำหนด</option>
+                            <option value="completed">สมบูรณ์</option>
                         </select>
                     </div>
                     <div class="filters_group">
-                        <label class="filters_label">Sort By</label>
+                        <label class="filters_label">เรียงตาม</label>
                         <select class="filters_select" onchange="applyFilters()">
-                            <option value="name">Name</option>
-                            <option value="date">Date Added</option>
-                            <option value="amount">Total Amount</option>
+                            <option value="name">ชื่อ</option>
+                            <option value="date">วันที่เพิ่ม</option>
+                            <option value="amount">จำนวนเงินทั้งหมด</option>
                         </select>
                     </div>
                 </div>
@@ -74,32 +74,32 @@
                                 <p class="customer-card_phone">+66 23-123-4567</p>
                             </div>
                             <div class="customer-card_status">
-                                <span class="badge badge-success">Current</span>
+                                <span class="badge badge-success">ปัจจุบัน</span>
                             </div>
                         </div>
                         <div class="customer-card_details">
                             <div class="customer-card_stat">
-                                <span class="customer-card_stat-label">Active Plans</span>
+                                <span class="customer-card_stat-label">แผนงานที่ใช้งานอยู่</span>
                                 <span class="customer-card_stat-value">2</span>
                             </div>
                             <div class="customer-card_stat">
-                                <span class="customer-card_stat-label">Total Amount</span>
+                                <span class="customer-card_stat-label">จำนวนเงินทั้งหมด</span>
                                 <span class="customer-card_stat-value">$2,450</span>
                             </div>
                             <div class="customer-card_stat">
-                                <span class="customer-card_stat-label">Next Payment</span>
+                                <span class="customer-card_stat-label">การชำระเงินครั้งต่อไป</span>
                                 <span class="customer-card_stat-value">Dec 15</span>
                             </div>
                         </div>
                         <div class="customer-card_actions">
                             <button class="btn btn-small btn-primary" onclick="viewCustomer(1)">
-                                <i class="fas fa-eye"></i> View
+                                <i class="fas fa-eye"></i> ดู
                             </button>
                             <button class="btn btn-small btn-secondary" onclick="editCustomer(1)">
-                                <i class="fas fa-edit"></i> Edit
+                                <i class="fas fa-edit"></i> แก้ไข
                             </button>
                             <button class="btn btn-small btn-info" onclick="sendReminder(1)">
-                                <i class="fas fa-bell"></i> Remind
+                                <i class="fas fa-bell"></i> เตือน
                             </button>
                         </div>
                     </div>
@@ -200,7 +200,7 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form class="form" id="add-customer-form" onsubmit="handleAddCustomer(event)">
+            <form class="form customer-detail" id="add-customer-form" onsubmit="handleAddCustomer(event)">
                 <div class="form_group">
                     <label class="form_label">Full Name *</label>
                     <input type="text" class="form_input" name="name" required>
@@ -236,19 +236,19 @@
                 </button>
             </div>
             <div class="customer-detail">
-                <div class="customer-detail__info">
-                    <div class="customer-detail__avatar">
+                <div class="customer-detail_info">
+                    <div class="customer-detail_avatar">
                         <i class="fas fa-user"></i>
                     </div>
-                    <div class="customer-detail__data">
-                        <h4 class="customer-detail__name" id="detail-customer-name">John Smith</h4>
-                        <p class="customer-detail__contact" id="detail-customer-phone">+66 23-123-4567</p>
-                        <p class="customer-detail__address" id="detail-customer-address">123 Main St, City, State 12345</p>
+                    <div class="customer-detail_data">
+                        <h4 class="customer-detail_name" id="detail-customer-name">John Smith</h4>
+                        <p class="customer-detail_contact" id="detail-customer-phone">+66 23-123-4567</p>
+                        <p class="customer-detail_address" id="detail-customer-address">123 Main St, City, State 12345</p>
                     </div>
                 </div>
                 
                 <div class="installment-history">
-                    <h5 class="installment-history__title">Installment History</h5>
+                    <h5 class="installment-history_title">Installment History</h5>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
@@ -266,9 +266,9 @@
                                     <td>$1,200</td>
                                     <td>
                                         <div class="progress">
-                                            <div class="progress__bar" style="width: 60%"></div>
+                                            <div class="progress_bar" style="width: 60%"></div>
                                         </div>
-                                        <span class="progress__text">6/10 payments</span>
+                                        <span class="progress_text">6/10 payments</span>
                                     </td>
                                     <td><span class="badge badge-success">Current</span></td>
                                     <td>
@@ -280,9 +280,9 @@
                                     <td>$1,250</td>
                                     <td>
                                         <div class="progress">
-                                            <div class="progress__bar" style="width: 25%"></div>
+                                            <div class="progress_bar" style="width: 25%"></div>
                                         </div>
-                                        <span class="progress__text">3/12 payments</span>
+                                        <span class="progress_text">3/12 payments</span>
                                     </td>
                                     <td><span class="badge badge-success">Current</span></td>
                                     <td>
