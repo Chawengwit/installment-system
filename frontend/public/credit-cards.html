@@ -102,7 +102,7 @@
                             <option value="inactive">Inactive</option>
                             <option value="high-usage">High Usage</option>
                         </select>
-                        <button class="btn btn--outline btn--small" onclick="toggleView()">
+                        <button class="btn btn-outline btn-small" onclick="toggleView()">
                             <i class="fas fa-th-large"></i> Grid View
                         </button>
                     </div>
@@ -313,40 +313,40 @@
 
     <!-- Add Card Modal -->
     <div class="modal" id="add-card-modal">
-        <div class="modal__overlay" onclick="closeModal('add-card-modal')"></div>
-        <div class="modal__content">
-            <div class="modal__header">
-                <h3 class="modal__title">Add New Credit Card</h3>
-                <button class="modal__close" onclick="closeModal('add-card-modal')">
+        <div class="modal_overlay" onclick="closeModal('add-card-modal')"></div>
+        <div class="modal_content">
+            <div class="modal_header">
+                <h3 class="modal_title">Add New Credit Card</h3>
+                <button class="modal_close" onclick="closeModal('add-card-modal')">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form class="form" id="add-card-form" onsubmit="handleAddCard(event)">
-                <div class="form__group">
+            <form class="form customer-detail" id="add-card-form" onsubmit="handleAddCard(event)">
+                <div class="form_group">
                     <label class="form_label">Card Name *</label>
                     <input type="text" class="form_input" name="cardName" placeholder="e.g., KBank Visa Business" required>
                 </div>
-                <div class="form__group">
+                <div class="form_group">
                     <label class="form_label">Card Number *</label>
                     <input type="text" class="form_input" name="cardNumber" placeholder="**** **** **** 1234" maxlength="19" required>
                 </div>
                 <div class="form__row">
-                    <div class="form__group">
+                    <div class="form_group">
                         <label class="form_label">Expiry Date *</label>
                         <input type="text" class="form_input" name="expiryDate" placeholder="MM/YY" maxlength="5" required>
                     </div>
-                    <div class="form__group">
+                    <div class="form_group">
                         <label class="form_label">CVV *</label>
                         <input type="text" class="form_input" name="cvv" placeholder="123" maxlength="4" required>
                     </div>
                 </div>
-                <div class="form__group">
+                <div class="form_group">
                     <label class="form_label">Credit Limit ($) *</label>
                     <input type="number" class="form_input" name="creditLimit" placeholder="25000.00" step="0.01" min="0" required>
                 </div>
-                <div class="form__group">
+                <div class="form_group">
                     <label class="form_label">Card Type *</label>
-                    <select class="form__select" name="cardType" required>
+                    <select class="form_select" name="cardType" required>
                         <option value="">Select card type...</option>
                         <option value="visa">Visa</option>
                         <option value="mastercard">MasterCard</option>
@@ -354,42 +354,42 @@
                         <option value="discover">Discover</option>
                     </select>
                 </div>
-                <div class="form__group">
+                <div class="form_group">
                     <label class="form_label">Card Holder Name</label>
                     <input type="text" class="form_input" name="cardHolder" placeholder="Business Account">
                 </div>
-                <div class="form__actions">
-                    <button type="button" class="btn btn--secondary" onclick="closeModal('add-card-modal')">Cancel</button>
-                    <button type="submit" class="btn btn--primary">Add Card</button>
+                <div class="form_actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('add-card-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Card</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Card Details Modal -->
-    <div class="modal modal--large" id="card-details-modal">
-        <div class="modal__overlay" onclick="closeModal('card-details-modal')"></div>
-        <div class="modal__content">
-            <div class="modal__header">
-                <h3 class="modal__title">Card Transaction History</h3>
-                <button class="modal__close" onclick="closeModal('card-details-modal')">
+    <div class="modal modal-large" id="card-details-modal">
+        <div class="modal_overlay" onclick="closeModal('card-details-modal')"></div>
+        <div class="modal_content">
+            <div class="modal_header">
+                <h3 class="modal_title">Card Transaction History</h3>
+                <button class="modal_close" onclick="closeModal('card-details-modal')">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="card-details-content">
                 <div class="card-summary">
-                    <div class="card-summary__info">
-                        <h4 class="card-summary__name" id="modal-card-name">KBank Visa</h4>
-                        <p class="card-summary__number" id="modal-card-number">**** **** **** 1234</p>
+                    <div class="card-summary_info">
+                        <h4 class="card-summary_name" id="modal-card-name">KBank Visa</h4>
+                        <p class="card-summary_number" id="modal-card-number">**** **** **** 1234</p>
                     </div>
-                    <div class="card-summary__stats">
-                        <div class="card-summary__stat">
-                            <span class="card-summary__stat-label">Available</span>
-                            <span class="card-summary__stat-value" id="modal-card-available">$15,000</span>
+                    <div class="card-summary_stats">
+                        <div class="card-summary_stat">
+                            <span class="card-summary_stat-label">Available</span>
+                            <span class="card-summary_stat-value" id="modal-card-available">$15,000</span>
                         </div>
-                        <div class="card-summary__stat">
-                            <span class="card-summary__stat-label">Used</span>
-                            <span class="card-summary__stat-value" id="modal-card-used">$10,000</span>
+                        <div class="card-summary_stat">
+                            <span class="card-summary_stat-label">Used</span>
+                            <span class="card-summary_stat-value" id="modal-card-used">$10,000</span>
                         </div>
                     </div>
                 </div>
@@ -432,30 +432,30 @@
                                 <td>Dec 15, 2023</td>
                                 <td>John Smith</td>
                                 <td>iPhone 14 Pro</td>
-                                <td class="amount amount--debit">-$1,200.00</td>
-                                <td><span class="badge badge--success">Completed</span></td>
+                                <td class="amount amount-debit">-$1,200.00</td>
+                                <td><span class="badge badge-success">Completed</span></td>
                                 <td>
-                                    <button class="btn btn--small btn--outline">View</button>
+                                    <button class="btn btn-small btn-outline">View</button>
                                 </td>
                             </tr>
                             <tr>
                                 <td>Dec 10, 2023</td>
                                 <td>Sarah Johnson</td>
                                 <td>MacBook Air</td>
-                                <td class="amount amount--debit">-$1,250.00</td>
-                                <td><span class="badge badge--success">Completed</span></td>
+                                <td class="amount amount-debit">-$1,250.00</td>
+                                <td><span class="badge badge-success">Completed</span></td>
                                 <td>
-                                    <button class="btn btn--small btn--outline">View</button>
+                                    <button class="btn btn-small btn-outline">View</button>
                                 </td>
                             </tr>
                             <tr>
                                 <td>Dec 5, 2023</td>
                                 <td>Payment</td>
                                 <td>Monthly Payment</td>
-                                <td class="amount amount--credit">+$2,500.00</td>
-                                <td><span class="badge badge--info">Payment</span></td>
+                                <td class="amount amount-credit">+$2,500.00</td>
+                                <td><span class="badge badge-info">Payment</span></td>
                                 <td>
-                                    <button class="btn btn--small btn--outline">View</button>
+                                    <button class="btn btn-small btn-outline">View</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -464,9 +464,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Notification Container -->
-    <div class="notification-container" id="notification-container"></div>
 
     <script src="js/credit-cards.js"></script>
 </body>
