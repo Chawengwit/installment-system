@@ -26,6 +26,10 @@ app.get('/customers', (req, res) => {
     res.sendFile(path.join(pathToFrontend, '/public/customers.html'));
 });
 
+app.get('/credit-cards', (req, res) => {
+    res.sendFile(path.join(pathToFrontend, '/public/credit-cards.html'));
+});
+
 // API routes
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK' });
