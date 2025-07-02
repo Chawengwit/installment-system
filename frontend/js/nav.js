@@ -4,7 +4,7 @@ $(function() {
         // Set the active link on initial load
         const initialPath = window.location.pathname;
         const initialPage = (initialPath === "/" || initialPath === "/index.html") ? "/dashboard" : initialPath;
-        $(`.navbar_link[href="${initialPage}"]`).addClass("active");
+        $(`.navbar_link[href="${initialPage}"]`).addClass("navbar_link--active");
 
         // Add click handler for navigation links
         $(".navbar_link").on("click", function(e) {
@@ -19,7 +19,7 @@ $(function() {
 
         // Add click handler for the navbar toggle
         $("#navbar-toggle").on("click", function() {
-            $("#navbar-menu").toggleClass("is-active");
+            $("#navbar-menu").toggleClass("active");
         });
     });
 
@@ -41,8 +41,8 @@ $(function() {
                     $mainContent.html('<h2>Page Not Found</h2><p>Sorry, the page you are looking for does not exist.</p>');
                 }
                 // Update the active link in the navigation
-                $(".navbar_link").removeClass("active");
-                $(`.navbar_link[href="${page}"]`).addClass("active");
+                $(".navbar_link").removeClass("navbar_link--active");
+                $(`.navbar_link[href="${page}"]`).addClass("navbar_link--active");
 
                 // Fade in the new content
                 $mainContent.fadeIn(200);
