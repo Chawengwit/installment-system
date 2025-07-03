@@ -174,37 +174,6 @@ function checkCardBalance(cardId) {
     }, 1500);
 }
 
-function handleAddCard(e) {
-    e.preventDefault();
-
-    const formData = new FormData(e.target);
-    const cardData = {
-        name: formData.get("name"),
-        number: formData.get("number"),
-        limit: formData.get("limit"),
-        type: formData.get("type"),
-    };
-
-    // Show loading state
-    const submitBtn = $(e.target).find('button[type="submit"]');
-    const originalText = submitBtn.text();
-    submitBtn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Adding...');
-
-    // Simulate API call
-    setTimeout(() => {
-        window.AppUtils.showNotification("Credit card added successfully!", "success");
-        window.AppUtils.closeModal("add-card-modal");
-
-        // Reset button
-        submitBtn.prop("disabled", false).text(originalText);
-
-        // Refresh card list if on credit cards page
-        if (window.location.pathname.includes("credit-cards")) { // Updated path check
-        console.log("Refreshing credit card list...");
-        }
-    }, 1500);
-}
-
 function viewCardDetails(cardId) {
     console.log("Viewing card details:", cardId);
     window.AppUtils.openModal("card-details-modal");

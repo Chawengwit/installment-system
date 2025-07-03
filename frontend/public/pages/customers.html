@@ -1,179 +1,182 @@
 <!-- Main Content -->
-<main class="main-content">
-    <div class="container">
-        <!-- Header -->
-        <header class="page-header">
-            <div>
-                <h1 class="page-header_title">ลูกค้า</h1>
-                <p class="page-header_subtitle">การจัดการลูกค้าและแผนการผ่อนชำระ</p>
+<div class="container">
+    <!-- Header -->
+    <header class="page-header">
+        <div>
+            <h1 class="page-header_title">ลูกค้า</h1>
+            <p class="page-header_subtitle">การจัดการลูกค้าและแผนการผ่อนชำระ</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('add-customer-modal')">
+            <i class="fas fa-plus"></i> เพิ่มลูกค้า
+        </button>
+    </header>
+
+    <!-- Search and Filters -->
+    <section class="search-section">
+        <div class="search-bar">
+            <div class="search-bar_input-group">
+                <i class="fas fa-search search-bar_icon"></i>
+                <input type="text" class="search-bar_input" placeholder="Search customers by name or phone..." id="customer-search">
             </div>
-            <button class="btn btn-primary" onclick="openModal('add-customer-modal')">
-                <i class="fas fa-plus"></i> เพิ่มลูกค้า
+            <button class="btn btn-secondary search-bar_filter-btn" onclick="toggleFilters()">
+                <i class="fas fa-filter"></i> ตัวกรอง
             </button>
-        </header>
-
-        <!-- Search and Filters -->
-        <section class="search-section">
-            <div class="search-bar">
-                <div class="search-bar_input-group">
-                    <i class="fas fa-search search-bar_icon"></i>
-                    <input type="text" class="search-bar_input" placeholder="Search customers by name or phone..." id="customer-search">
-                </div>
-                <button class="btn btn-secondary search-bar_filter-btn" onclick="toggleFilters()">
-                    <i class="fas fa-filter"></i> ตัวกรอง
-                </button>
+        </div>
+        
+        <div class="filters" id="filters-panel" style="display: none;">
+            <div class="filters_group">
+                <label class="filters_label">สถานะการชำระเงิน</label>
+                <select class="filters_select" onchange="applyFilters()">
+                    <option value="">สถานะทั้งหมด</option>
+                    <option value="current">ปัจจุบัน</option>
+                    <option value="overdue">เกินกำหนด</option>
+                    <option value="completed">สมบูรณ์</option>
+                </select>
             </div>
-            
-            <div class="filters" id="filters-panel" style="display: none;">
-                <div class="filters_group">
-                    <label class="filters_label">สถานะการชำระเงิน</label>
-                    <select class="filters_select" onchange="applyFilters()">
-                        <option value="">สถานะทั้งหมด</option>
-                        <option value="current">ปัจจุบัน</option>
-                        <option value="overdue">เกินกำหนด</option>
-                        <option value="completed">สมบูรณ์</option>
-                    </select>
-                </div>
-                <div class="filters_group">
-                    <label class="filters_label">เรียงตาม</label>
-                    <select class="filters_select" onchange="applyFilters()">
-                        <option value="name">ชื่อ</option>
-                        <option value="date">วันที่เพิ่ม</option>
-                        <option value="amount">จำนวนเงินทั้งหมด</option>
-                    </select>
-                </div>
+            <div class="filters_group">
+                <label class="filters_label">เรียงตาม</label>
+                <select class="filters_select" onchange="applyFilters()">
+                    <option value="name">ชื่อ</option>
+                    <option value="date">วันที่เพิ่ม</option>
+                    <option value="amount">จำนวนเงินทั้งหมด</option>
+                </select>
             </div>
-        </section>
+        </div>
 
-        <!-- Customer List -->
-        <section class="customer-list">
-            <div class="customer-grid" id="customer-grid">
-                <!-- Customer Card 1 -->
-                <div class="customer-card" data-customer-id="1">
-                    <div class="customer-card_header">
-                        <div class="customer-card_avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="customer-card_info">
-                            <h3 class="customer-card_name">John Smith</h3>
-                            <p class="customer-card_phone">+66 23-123-4567</p>
-                        </div>
-                        <div class="customer-card_status">
-                            <span class="badge badge-success">ปัจจุบัน</span>
-                        </div>
+        <button class="btn btn-outline btn-secondary" onclick="toggleView()">
+            <i class="fas fa-th-large"></i> Grid View
+        </button>
+
+    </section>
+
+    <!-- Customer List -->
+    <section class="customer-list">
+        <div class="customer-grid" id="customer-grid">
+            <!-- Customer Card 1 -->
+            <div class="customer-card" data-customer-id="1">
+                <div class="customer-card_header">
+                    <div class="customer-card_avatar">
+                        <i class="fas fa-user"></i>
                     </div>
-                    <div class="customer-card_details">
-                        <div class="customer-card_stat">
-                            <span class="customer-card_stat-label">แผนงานที่ใช้งานอยู่</span>
-                            <span class="customer-card_stat-value">2</span>
-                        </div>
-                        <div class="customer-card_stat">
-                            <span class="customer-card_stat-label">จำนวนเงินทั้งหมด</span>
-                            <span class="customer-card_stat-value">$2,450</span>
-                        </div>
-                        <div class="customer-card_stat">
-                            <span class="customer-card_stat-label">การชำระเงินครั้งต่อไป</span>
-                            <span class="customer-card_stat-value">Dec 15</span>
-                        </div>
+                    <div class="customer-card_info">
+                        <h3 class="customer-card_name">John Smith</h3>
+                        <p class="customer-card_phone">+66 23-123-4567</p>
                     </div>
-                    <div class="customer-card_actions">
-                        <button class="btn btn-small btn-primary" onclick="viewCustomer(1)">
-                            <i class="fas fa-eye"></i> ดู
-                        </button>
-                        <button class="btn btn-small btn-secondary" onclick="editCustomer(1)">
-                            <i class="fas fa-edit"></i> แก้ไข
-                        </button>
-                        <button class="btn btn-small btn-info" onclick="sendReminder(1)">
-                            <i class="fas fa-bell"></i> เตือน
-                        </button>
+                    <div class="customer-card_status">
+                        <span class="badge badge-success">ปัจจุบัน</span>
                     </div>
                 </div>
-
-                <!-- Customer Card 2 -->
-                <div class="customer-card" data-customer-id="2">
-                    <div class="customer-card_header">
-                        <div class="customer-card_avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="customer-card_info">
-                            <h3 class="customer-card_name">Sarah Johnson</h3>
-                            <p class="customer-card_phone">+66 23-987-6543</p>
-                        </div>
-                        <div class="customer-card_status">
-                            <span class="badge badge-warning">Overdue</span>
-                        </div>
+                <div class="customer-card_details">
+                    <div class="customer-card_stat">
+                        <span class="customer-card_stat-label">แผนงานที่ใช้งานอยู่</span>
+                        <span class="customer-card_stat-value">2</span>
                     </div>
-                    <div class="customer-card_details">
-                        <div class="customer-card_stat">
-                            <span class="customer-card_stat-label">Active Plans</span>
-                            <span class="customer-card_stat-value">1</span>
-                        </div>
-                        <div class="customer-card_stat">
-                            <span class="customer-card_stat-label">Total Amount</span>
-                            <span class="customer-card_stat-value">$1,200</span>
-                        </div>
-                        <div class="customer-card_stat">
-                            <span class="customer-card_stat-label">Overdue</span>
-                            <span class="customer-card_stat-value text-danger">$320</span>
-                        </div>
+                    <div class="customer-card_stat">
+                        <span class="customer-card_stat-label">จำนวนเงินทั้งหมด</span>
+                        <span class="customer-card_stat-value">$2,450</span>
                     </div>
-                    <div class="customer-card_actions">
-                        <button class="btn btn-small btn-primary" onclick="viewCustomer(2)">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                        <button class="btn btn-small btn-secondary" onclick="editCustomer(2)">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="btn btn-small btn-warning" onclick="sendUrgentReminder(2)">
-                            <i class="fas fa-exclamation-triangle"></i> Urgent
-                        </button>
+                    <div class="customer-card_stat">
+                        <span class="customer-card_stat-label">การชำระเงินครั้งต่อไป</span>
+                        <span class="customer-card_stat-value">Dec 15</span>
                     </div>
                 </div>
-
-                <!-- Customer Card 3 -->
-                <div class="customer-card" data-customer-id="3">
-                    <div class="customer-card_header">
-                        <div class="customer-card_avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="customer-card_info">
-                            <h3 class="customer-card_name">Mike Davis</h3>
-                            <p class="customer-card_phone">+66 23-456-7890</p>
-                        </div>
-                        <div class="customer-card_status">
-                            <span class="badge badge-info">Completed</span>
-                        </div>
-                    </div>
-                    <div class="customer-card_details">
-                        <div class="customer-card_stat">
-                            <span class="customer-card_stat-label">Completed Plans</span>
-                            <span class="customer-card_stat-value">3</span>
-                        </div>
-                        <div class="customer-card_stat">
-                            <span class="customer-card_stat-label">Total Paid</span>
-                            <span class="customer-card_stat-value">$5,670</span>
-                        </div>
-                        <div class="customer-card_stat">
-                            <span class="customer-card_stat-label">Last Payment</span>
-                            <span class="customer-card_stat-value">Nov 28</span>
-                        </div>
-                    </div>
-                    <div class="customer-card_actions">
-                        <button class="btn btn-small btn-primary" onclick="viewCustomer(3)">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                        <button class="btn btn-small btn-secondary" onclick="editCustomer(3)">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="btn btn-small btn-success" onclick="createNewPlan(3)">
-                            <i class="fas fa-plus"></i> New Plan
-                        </button>
-                    </div>
+                <div class="customer-card_actions">
+                    <button class="btn btn-small btn-primary" onclick="viewCustomer(1)">
+                        <i class="fas fa-eye"></i> ดู
+                    </button>
+                    <button class="btn btn-small btn-secondary" onclick="editCustomer(1)">
+                        <i class="fas fa-edit"></i> แก้ไข
+                    </button>
+                    <button class="btn btn-small btn-info" onclick="sendReminder(1)">
+                        <i class="fas fa-bell"></i> เตือน
+                    </button>
                 </div>
             </div>
-        </section>
-    </div>
-</main>
+
+            <!-- Customer Card 2 -->
+            <div class="customer-card" data-customer-id="2">
+                <div class="customer-card_header">
+                    <div class="customer-card_avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="customer-card_info">
+                        <h3 class="customer-card_name">Sarah Johnson</h3>
+                        <p class="customer-card_phone">+66 23-987-6543</p>
+                    </div>
+                    <div class="customer-card_status">
+                        <span class="badge badge-warning">Overdue</span>
+                    </div>
+                </div>
+                <div class="customer-card_details">
+                    <div class="customer-card_stat">
+                        <span class="customer-card_stat-label">Active Plans</span>
+                        <span class="customer-card_stat-value">1</span>
+                    </div>
+                    <div class="customer-card_stat">
+                        <span class="customer-card_stat-label">Total Amount</span>
+                        <span class="customer-card_stat-value">$1,200</span>
+                    </div>
+                    <div class="customer-card_stat">
+                        <span class="customer-card_stat-label">Overdue</span>
+                        <span class="customer-card_stat-value text-danger">$320</span>
+                    </div>
+                </div>
+                <div class="customer-card_actions">
+                    <button class="btn btn-small btn-primary" onclick="viewCustomer(2)">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="btn btn-small btn-secondary" onclick="editCustomer(2)">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-small btn-warning" onclick="sendUrgentReminder(2)">
+                        <i class="fas fa-exclamation-triangle"></i> Urgent
+                    </button>
+                </div>
+            </div>
+
+            <!-- Customer Card 3 -->
+            <div class="customer-card" data-customer-id="3">
+                <div class="customer-card_header">
+                    <div class="customer-card_avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="customer-card_info">
+                        <h3 class="customer-card_name">Mike Davis</h3>
+                        <p class="customer-card_phone">+66 23-456-7890</p>
+                    </div>
+                    <div class="customer-card_status">
+                        <span class="badge badge-info">Completed</span>
+                    </div>
+                </div>
+                <div class="customer-card_details">
+                    <div class="customer-card_stat">
+                        <span class="customer-card_stat-label">Completed Plans</span>
+                        <span class="customer-card_stat-value">3</span>
+                    </div>
+                    <div class="customer-card_stat">
+                        <span class="customer-card_stat-label">Total Paid</span>
+                        <span class="customer-card_stat-value">$5,670</span>
+                    </div>
+                    <div class="customer-card_stat">
+                        <span class="customer-card_stat-label">Last Payment</span>
+                        <span class="customer-card_stat-value">Nov 28</span>
+                    </div>
+                </div>
+                <div class="customer-card_actions">
+                    <button class="btn btn-small btn-primary" onclick="viewCustomer(3)">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="btn btn-small btn-secondary" onclick="editCustomer(3)">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-small btn-success" onclick="createNewPlan(3)">
+                        <i class="fas fa-plus"></i> New Plan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
 
 <!-- Add Customer Modal -->
 <div class="modal" id="add-customer-modal">
