@@ -43,9 +43,9 @@ function setupModals() {
     // Close modal with Escape key
     $(document).on("keydown", (e) => {
         if (e.key === "Escape") {
-        $(".modal.active").each(function () {
-            closeModal($(this).attr("id"));
-        });
+            $(".modal.active").each(function () {
+                closeModal($(this).attr("id"));
+            });
         }
     });
 }
