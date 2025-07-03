@@ -9,7 +9,8 @@ router.get([
     '/',
     '/dashboard',
     '/customers',
-    '/credit-cards'
+    '/credit-cards',
+    '/installments'
 ], (req, res) => {
     res.sendFile(path.join(pathToFrontend, '/public/index.html'));
 });
