@@ -1,301 +1,299 @@
 <!-- Main Content -->
-<main class="main-content">
-    <div class="container">
-        <!-- Header -->
-        <header class="page-header">
-            <div>
-                <h1 class="page-header_title">Credit Card Management</h1>
-                <p class="page-header_subtitle">Manage your business credit cards and monitor usage</p>
-            </div>
-            <div class="page-header_actions">
-                <button class="btn btn-secondary" onclick="exportCardData()">
-                    <i class="fas fa-download"></i> Export Data
-                </button>
-                <button class="btn btn-primary" onclick="openModal('add-card-modal')">
-                    <i class="fas fa-plus"></i> Add Card
-                </button>
-            </div>
-        </header>
+<div class="container">
+    <!-- Header -->
+    <header class="page-header">
+        <div>
+            <h1 class="page-header_title">Credit Card Management</h1>
+            <p class="page-header_subtitle">Manage your business credit cards and monitor usage</p>
+        </div>
+        <div class="page-header_actions">
+            <button class="btn btn-secondary" onclick="exportCardData()">
+                <i class="fas fa-download"></i> Export Data
+            </button>
+            <button class="btn btn-primary" onclick="openModal('add-card-modal')">
+                <i class="fas fa-plus"></i> Add Card
+            </button>
+        </div>
+    </header>
 
-        <!-- Credit Card Overview -->
-        <section class="card-overview">
-            <div class="overview-stats">
-                <div class="overview-stat overview-stat--primary">
-                    <div class="overview-stat_icon">
-                        <i class="fas fa-credit-card"></i>
+    <!-- Credit Card Overview -->
+    <section class="card-overview">
+        <div class="overview-stats">
+            <div class="overview-stat overview-stat--primary">
+                <div class="overview-stat_icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="overview-stat_content">
+                    <h3 class="overview-stat_number">5</h3>
+                    <p class="overview-stat_label">Total Cards</p>
+                    <span class="overview-stat_change overview-stat_change-positive">
+                        <i class="fas fa-arrow-up"></i> +1 this month
+                    </span>
+                </div>
+            </div>
+            
+            <div class="overview-stat overview-stat-success">
+                <div class="overview-stat_icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="overview-stat_content">
+                    <h3 class="overview-stat_number">$85,500</h3>
+                    <p class="overview-stat_label">Total Limit</p>
+                    <span class="overview-stat_change overview-stat_change--neutral">
+                        <i class="fas fa-minus"></i> No change
+                    </span>
+                </div>
+            </div>
+            
+            <div class="overview-stat overview-stat-warning">
+                <div class="overview-stat_icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="overview-stat_content">
+                    <h3 class="overview-stat_number">$40,270</h3>
+                    <p class="overview-stat_label">Used Amount</p>
+                    <span class="overview-stat_change overview-stat_change-negative">
+                        <i class="fas fa-arrow-down"></i> -$2,500 this month
+                    </span>
+                </div>
+            </div>
+            
+            <div class="overview-stat overview-stat-info">
+                <div class="overview-stat_icon">
+                    <i class="fas fa-piggy-bank"></i>
+                </div>
+                <div class="overview-stat_content">
+                    <h3 class="overview-stat_number">$45,230</h3>
+                    <p class="overview-stat_label">Available</p>
+                    <div class="overview-stat_progress">
+                        <div class="progress-mini">
+                            <div class="progress-mini_bar" style="width: 53%"></div>
+                        </div>
+                        <span class="overview-stat_percentage">53% available</span>
                     </div>
-                    <div class="overview-stat_content">
-                        <h3 class="overview-stat_number">5</h3>
-                        <p class="overview-stat_label">Total Cards</p>
-                        <span class="overview-stat_change overview-stat_change-positive">
-                            <i class="fas fa-arrow-up"></i> +1 this month
-                        </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Credit Cards List -->
+    <section class="credit-cards-section">
+        <div class="section-header">
+            <h2 class="section-title">Your Credit Cards</h2>
+            <div class="section-filters">
+                <select class="filter-select" onchange="filterCards(this.value)">
+                    <option value="all">All Cards</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="high-usage">High Usage</option>
+                </select>
+                <!-- <button class="btn btn-outline btn-secondary" onclick="toggleView()">
+                    <i class="fas fa-th-large"></i> Grid View
+                </button> -->
+            </div>
+        </div>
+
+        <div class="credit-cards-grid" id="cards-container">
+            <!-- Credit Card 1 -->
+            <div class="credit-card credit-card-visa" data-card-id="1">
+                <div class="credit-card_header">
+                    <div class="credit-card_brand">
+                        <i class="fab fa-cc-visa"></i>
+                        <span>KBank Visa</span>
+                    </div>
+                    <div class="credit-card_actions">
+                        <button class="credit-card_action" onclick="editCard(1)" title="Edit Card">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="credit-card_action" onclick="viewCardDetails(1)" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="credit-card_action" onclick="cardMenu(1)" title="More Options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
                     </div>
                 </div>
                 
-                <div class="overview-stat overview-stat-success">
-                    <div class="overview-stat_icon">
-                        <i class="fas fa-dollar-sign"></i>
+                <div class="credit-card_number">
+                    **** **** **** 1234
+                </div>
+
+                <div class="credit-card_holder">
+                    <span class="credit-card_holder-label">Card Holder</span>
+                    <span class="credit-card_holder-name">Business Account</span>
+                </div>
+                
+                <div class="credit-card_details">
+                    <div class="credit-card_detail">
+                        <span class="credit-card_detail-label">Limit</span>
+                        <span class="credit-card_detail-value">$25,000</span>
                     </div>
-                    <div class="overview-stat_content">
-                        <h3 class="overview-stat_number">$85,500</h3>
-                        <p class="overview-stat_label">Total Limit</p>
-                        <span class="overview-stat_change overview-stat_change--neutral">
-                            <i class="fas fa-minus"></i> No change
-                        </span>
+                    <div class="credit-card_detail">
+                        <span class="credit-card_detail-label">Used</span>
+                        <span class="credit-card_detail-value">$10,000</span>
+                    </div>
+                    <div class="credit-card_detail">
+                        <span class="credit-card_detail-label">Available</span>
+                        <span class="credit-card_detail-value credit-card_detail-value-available">$15,000</span>
                     </div>
                 </div>
                 
-                <div class="overview-stat overview-stat-warning">
-                    <div class="overview-stat_icon">
-                        <i class="fas fa-chart-line"></i>
+                <div class="credit-card_usage">
+                    <div class="credit-card_usage-header">
+                        <span class="credit-card_usage-label">Usage</span>
+                        <span class="credit-card_usage-percentage">40%</span>
                     </div>
-                    <div class="overview-stat_content">
-                        <h3 class="overview-stat_number">$40,270</h3>
-                        <p class="overview-stat_label">Used Amount</p>
-                        <span class="overview-stat_change overview-stat_change-negative">
-                            <i class="fas fa-arrow-down"></i> -$2,500 this month
-                        </span>
+                    <div class="progress-card">
+                        <div class="progress-card_bar" style="width: 40%"></div>
+                    </div>
+                </div>
+
+                <div class="credit-card_footer">
+                    <div class="credit-card_status">
+                        <span class="status-indicator status-indicator-active"></span>
+                        <span class="credit-card_status-text">Active</span>
+                    </div>
+                    <div class="credit-card_expiry">
+                        <span class="credit-card_expiry-label">Expires</span>
+                        <span class="credit-card_expiry-date">12/26</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credit Card 2 -->
+            <div class="credit-card credit-card-mastercard" data-card-id="2">
+                <div class="credit-card_header">
+                    <div class="credit-card_brand">
+                        <i class="fab fa-cc-mastercard"></i>
+                        <span>SCB MasterCard</span>
+                    </div>
+                    <div class="credit-card_actions">
+                        <button class="credit-card_action" onclick="editCard(2)" title="Edit Card">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="credit-card_action" onclick="viewCardDetails(2)" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="credit-card_action" onclick="cardMenu(2)" title="More Options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
                     </div>
                 </div>
                 
-                <div class="overview-stat overview-stat-info">
-                    <div class="overview-stat_icon">
-                        <i class="fas fa-piggy-bank"></i>
+                <div class="credit-card_number">
+                    **** **** **** 5678
+                </div>
+
+                <div class="credit-card_holder">
+                    <span class="credit-card_holder-label">Card Holder</span>
+                    <span class="credit-card_holder-name">Business Account</span>
+                </div>
+                
+                <div class="credit-card_details">
+                    <div class="credit-card_detail">
+                        <span class="credit-card_detail-label">Limit</span>
+                        <span class="credit-card_detail-value">$15,000</span>
                     </div>
-                    <div class="overview-stat_content">
-                        <h3 class="overview-stat_number">$45,230</h3>
-                        <p class="overview-stat_label">Available</p>
-                        <div class="overview-stat_progress">
-                            <div class="progress-mini">
-                                <div class="progress-mini_bar" style="width: 53%"></div>
-                            </div>
-                            <span class="overview-stat_percentage">53% available</span>
-                        </div>
+                    <div class="credit-card_detail">
+                        <span class="credit-card_detail-label">Used</span>
+                        <span class="credit-card_detail-value">$6,500</span>
+                    </div>
+                    <div class="credit-card_detail">
+                        <span class="credit-card_detail-label">Available</span>
+                        <span class="credit-card_detail-value credit-card_detail-value-available">$8,500</span>
+                    </div>
+                </div>
+                
+                <div class="credit-card_usage">
+                    <div class="credit-card_usage-header">
+                        <span class="credit-card_usage-label">Usage</span>
+                        <span class="credit-card_usage-percentage">43%</span>
+                    </div>
+                    <div class="progress-card">
+                        <div class="progress-card_bar" style="width: 43%"></div>
+                    </div>
+                </div>
+
+                <div class="credit-card_footer">
+                    <div class="credit-card_status">
+                        <span class="status-indicator status-indicator-active"></span>
+                        <span class="credit-card_status-text">Active</span>
+                    </div>
+                    <div class="credit-card_expiry">
+                        <span class="credit-card_expiry-label">Expires</span>
+                        <span class="credit-card_expiry-date">08/25</span>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Credit Cards List -->
-        <section class="credit-cards-section">
-            <div class="section-header">
-                <h2 class="section-title">Your Credit Cards</h2>
-                <div class="section-filters">
-                    <select class="filter-select" onchange="filterCards(this.value)">
-                        <option value="all">All Cards</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                        <option value="high-usage">High Usage</option>
-                    </select>
-                    <button class="btn btn-outline btn-small" onclick="toggleView()">
-                        <i class="fas fa-th-large"></i> Grid View
-                    </button>
+            <!-- Credit Card 3 -->
+            <div class="credit-card credit-card-platinum" data-card-id="3">
+                <div class="credit-card_header">
+                    <div class="credit-card_brand">
+                        <i class="fab fa-cc-visa"></i>
+                        <span>Visa Platinum</span>
+                    </div>
+                    <div class="credit-card_actions">
+                        <button class="credit-card_action" onclick="editCard(3)" title="Edit Card">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="credit-card_action" onclick="viewCardDetails(3)" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="credit-card_action" onclick="cardMenu(3)" title="More Options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
+                
+                <div class="credit-card_number">
+                    **** **** **** 9012
+                </div>
 
-            <div class="credit-cards-grid" id="cards-container">
-                <!-- Credit Card 1 -->
-                <div class="credit-card credit-card-visa" data-card-id="1">
-                    <div class="credit-card_header">
-                        <div class="credit-card_brand">
-                            <i class="fab fa-cc-visa"></i>
-                            <span>KBank Visa</span>
-                        </div>
-                        <div class="credit-card_actions">
-                            <button class="credit-card_action" onclick="editCard(1)" title="Edit Card">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="credit-card_action" onclick="viewCardDetails(1)" title="View Details">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="credit-card_action" onclick="cardMenu(1)" title="More Options">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                        </div>
+                <div class="credit-card_holder">
+                    <span class="credit-card_holder-label">Card Holder</span>
+                    <span class="credit-card_holder-name">Premium Account</span>
+                </div>
+                
+                <div class="credit-card_details">
+                    <div class="credit-card_detail">
+                        <span class="credit-card_detail-label">Limit</span>
+                        <span class="credit-card_detail-value">$30,000</span>
                     </div>
-                    
-                    <div class="credit-card_number">
-                        **** **** **** 1234
+                    <div class="credit-card_detail">
+                        <span class="credit-card_detail-label">Used</span>
+                        <span class="credit-card_detail-value">$8,000</span>
                     </div>
-
-                    <div class="credit-card_holder">
-                        <span class="credit-card_holder-label">Card Holder</span>
-                        <span class="credit-card_holder-name">Business Account</span>
+                    <div class="credit-card_detail">
+                        <span class="credit-card_detail-label">Available</span>
+                        <span class="credit-card_detail-value credit-card_detail-value-available">$22,000</span>
                     </div>
-                    
-                    <div class="credit-card_details">
-                        <div class="credit-card_detail">
-                            <span class="credit-card_detail-label">Limit</span>
-                            <span class="credit-card_detail-value">$25,000</span>
-                        </div>
-                        <div class="credit-card_detail">
-                            <span class="credit-card_detail-label">Used</span>
-                            <span class="credit-card_detail-value">$10,000</span>
-                        </div>
-                        <div class="credit-card_detail">
-                            <span class="credit-card_detail-label">Available</span>
-                            <span class="credit-card_detail-value credit-card_detail-value-available">$15,000</span>
-                        </div>
+                </div>
+                
+                <div class="credit-card_usage">
+                    <div class="credit-card_usage-header">
+                        <span class="credit-card_usage-label">Usage</span>
+                        <span class="credit-card_usage-percentage">27%</span>
                     </div>
-                    
-                    <div class="credit-card_usage">
-                        <div class="credit-card_usage-header">
-                            <span class="credit-card_usage-label">Usage</span>
-                            <span class="credit-card_usage-percentage">40%</span>
-                        </div>
-                        <div class="progress-card">
-                            <div class="progress-card_bar" style="width: 40%"></div>
-                        </div>
-                    </div>
-
-                    <div class="credit-card_footer">
-                        <div class="credit-card_status">
-                            <span class="status-indicator status-indicator-active"></span>
-                            <span class="credit-card_status-text">Active</span>
-                        </div>
-                        <div class="credit-card_expiry">
-                            <span class="credit-card_expiry-label">Expires</span>
-                            <span class="credit-card_expiry-date">12/26</span>
-                        </div>
+                    <div class="progress-card">
+                        <div class="progress-card_bar" style="width: 27%"></div>
                     </div>
                 </div>
 
-                <!-- Credit Card 2 -->
-                <div class="credit-card credit-card-mastercard" data-card-id="2">
-                    <div class="credit-card_header">
-                        <div class="credit-card_brand">
-                            <i class="fab fa-cc-mastercard"></i>
-                            <span>SCB MasterCard</span>
-                        </div>
-                        <div class="credit-card_actions">
-                            <button class="credit-card_action" onclick="editCard(2)" title="Edit Card">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="credit-card_action" onclick="viewCardDetails(2)" title="View Details">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="credit-card_action" onclick="cardMenu(2)" title="More Options">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                        </div>
+                <div class="credit-card_footer">
+                    <div class="credit-card_status">
+                        <span class="status-indicator status-indicator-active"></span>
+                        <span class="credit-card_status-text">Active</span>
                     </div>
-                    
-                    <div class="credit-card_number">
-                        **** **** **** 5678
-                    </div>
-
-                    <div class="credit-card_holder">
-                        <span class="credit-card_holder-label">Card Holder</span>
-                        <span class="credit-card_holder-name">Business Account</span>
-                    </div>
-                    
-                    <div class="credit-card_details">
-                        <div class="credit-card_detail">
-                            <span class="credit-card_detail-label">Limit</span>
-                            <span class="credit-card_detail-value">$15,000</span>
-                        </div>
-                        <div class="credit-card_detail">
-                            <span class="credit-card_detail-label">Used</span>
-                            <span class="credit-card_detail-value">$6,500</span>
-                        </div>
-                        <div class="credit-card_detail">
-                            <span class="credit-card_detail-label">Available</span>
-                            <span class="credit-card_detail-value credit-card_detail-value-available">$8,500</span>
-                        </div>
-                    </div>
-                    
-                    <div class="credit-card_usage">
-                        <div class="credit-card_usage-header">
-                            <span class="credit-card_usage-label">Usage</span>
-                            <span class="credit-card_usage-percentage">43%</span>
-                        </div>
-                        <div class="progress-card">
-                            <div class="progress-card_bar" style="width: 43%"></div>
-                        </div>
-                    </div>
-
-                    <div class="credit-card_footer">
-                        <div class="credit-card_status">
-                            <span class="status-indicator status-indicator-active"></span>
-                            <span class="credit-card_status-text">Active</span>
-                        </div>
-                        <div class="credit-card_expiry">
-                            <span class="credit-card_expiry-label">Expires</span>
-                            <span class="credit-card_expiry-date">08/25</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Credit Card 3 -->
-                <div class="credit-card credit-card-platinum" data-card-id="3">
-                    <div class="credit-card_header">
-                        <div class="credit-card_brand">
-                            <i class="fab fa-cc-visa"></i>
-                            <span>Visa Platinum</span>
-                        </div>
-                        <div class="credit-card_actions">
-                            <button class="credit-card_action" onclick="editCard(3)" title="Edit Card">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="credit-card_action" onclick="viewCardDetails(3)" title="View Details">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="credit-card_action" onclick="cardMenu(3)" title="More Options">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="credit-card_number">
-                        **** **** **** 9012
-                    </div>
-
-                    <div class="credit-card_holder">
-                        <span class="credit-card_holder-label">Card Holder</span>
-                        <span class="credit-card_holder-name">Premium Account</span>
-                    </div>
-                    
-                    <div class="credit-card_details">
-                        <div class="credit-card_detail">
-                            <span class="credit-card_detail-label">Limit</span>
-                            <span class="credit-card_detail-value">$30,000</span>
-                        </div>
-                        <div class="credit-card_detail">
-                            <span class="credit-card_detail-label">Used</span>
-                            <span class="credit-card_detail-value">$8,000</span>
-                        </div>
-                        <div class="credit-card_detail">
-                            <span class="credit-card_detail-label">Available</span>
-                            <span class="credit-card_detail-value credit-card_detail-value-available">$22,000</span>
-                        </div>
-                    </div>
-                    
-                    <div class="credit-card_usage">
-                        <div class="credit-card_usage-header">
-                            <span class="credit-card_usage-label">Usage</span>
-                            <span class="credit-card_usage-percentage">27%</span>
-                        </div>
-                        <div class="progress-card">
-                            <div class="progress-card_bar" style="width: 27%"></div>
-                        </div>
-                    </div>
-
-                    <div class="credit-card_footer">
-                        <div class="credit-card_status">
-                            <span class="status-indicator status-indicator-active"></span>
-                            <span class="credit-card_status-text">Active</span>
-                        </div>
-                        <div class="credit-card_expiry">
-                            <span class="credit-card_expiry-label">Expires</span>
-                            <span class="credit-card_expiry-date">03/27</span>
-                        </div>
+                    <div class="credit-card_expiry">
+                        <span class="credit-card_expiry-label">Expires</span>
+                        <span class="credit-card_expiry-date">03/27</span>
                     </div>
                 </div>
             </div>
-        </section>
-    </div>
-</main>
+        </div>
+    </section>
+</div>
 
 <!-- Add Card Modal -->
 <div class="modal" id="add-card-modal">

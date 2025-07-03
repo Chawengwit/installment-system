@@ -197,4 +197,53 @@ function exportCustomerData(format = "excel") {
     }, 2000)
 }
 
+// Customer functions
+function handleAddCustomer(e) {
+    e.preventDefault()
+
+    const formData = new FormData(e.target)
+    const customerData = {
+        name: formData.get("name"),
+        phone: formData.get("phone"),
+        address: formData.get("address"),
+        idCard: formData.get("idCard"),
+    }
+
+    // Show loading state
+    const submitBtn = $(e.target).find('button[type="submit"]')
+    const originalText = submitBtn.text()
+    submitBtn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Adding...')
+
+    // Simulate API call
+    setTimeout(() => {
+        showNotification("Customer added successfully!", "success")
+        closeModal("add-customer-modal")
+
+        // Reset button
+        submitBtn.prop("disabled", false).text(originalText)
+
+        // Add customer to list if on customers page
+        if (window.location.pathname.includes("customers.html")) {
+            addCustomerToList(customerData)
+        }
+    }, 1500);
+}
+
+function viewCustomer(customerId) {
+    // In a real app, you would fetch customer data from API
+    console.log("Viewing customer:", customerId)
+    openModal("customer-detail-modal")
+}
+
+function editCustomer(customerId) {
+    console.log("Editing customer:", customerId);
+    showNotification("Opening edit form...", "info");
+}
+
+
+function sendUrgentReminder(customerId) {
+    console.log("Sending urgent reminder to customer:", customerId)
+    showNotification("Urgent reminder sent!", "warning");
+}
+
 

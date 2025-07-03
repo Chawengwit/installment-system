@@ -24,7 +24,7 @@ function setupEventListeners() {
     });
 
     // Form submissions
-    $("#add-customer-form").on("submit", handleAddCustomer);
+    // $("#add-customer-form").on("submit", handleAddCustomer);
     $("#add-card-form").on("submit", handleAddCard);
     $("#installment-plan-form").on("submit", handleCreatePlan);
 
@@ -50,6 +50,13 @@ function setupModals() {
     });
 }
 
+function setupNavigation() {
+    // Highlight active navigation item based on current page
+    const currentPage = window.location.pathname.split("/").pop() || "index.html";
+    $(".navbar__link").removeClass("navbar__link--active");
+    $(`.navbar__link[href="${currentPage}"]`).addClass("navbar__link--active");
+}
+
 // Modal functions
 function openModal(modalId) {
     $(`#${modalId}`).addClass("active");
@@ -66,8 +73,6 @@ function closeModal(modalId) {
         form[0].reset();
     }
 }
-
-// Customer functions
 
 // Installment plan functions
 function handleCreatePlan(e) {
@@ -105,4 +110,75 @@ function resetPlanForm() {
     $("#calculation-summary").hide();
 }
 
+function handleAddCard(e) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const cardData = {
+        name: formData.get("name"),
+        number: formData.get("number"),
+        limit: formData.get("limit"),
+        type: formData.get("type"),
+    };
+
+    // Show loading state
+    const submitBtn = $(e.target).find('button[type="submit"]');
+    const originalText = submitBtn.text();
+    submitBtn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Adding...');
+
+    // Simulate API call
+    setTimeout(() => {
+        window.AppUtils.showNotification("Credit card added successfully!", "success");
+        window.AppUtils.closeModal("add-card-modal");
+
+        // Reset button
+        submitBtn.prop("disabled", false).text(originalText);
+
+        // Refresh card list if on credit cards page
+        if (window.location.pathname.includes("credit-cards")) { // Updated path check
+        console.log("Refreshing credit card list...");
+        }
+    }, 1500);
+}
+
+function handleCustomerSearch(e) {
+    const searchTerm = e.target.value.toLowerCase()
+
+    $(".customer-card").each(function () {
+        const customerName = $(this).find(".customer-card__name").text().toLowerCase();
+        const customerPhone = $(this).find(".customer-card__phone").text().toLowerCase();
+
+        if (customerName.includes(searchTerm) || customerPhone.includes(searchTerm)) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+}
+
 // Filter functions
+function toggleFilters() {
+    $("#filters-panel").slideToggle()
+}
+
+function viewPlan(planId) {
+    console.log("Viewing plan:", planId)
+    showNotification("Opening installment plan details...", "info");
+}
+
+function createNewPlan(customerId) {
+    console.log("Creating new plan for customer:", customerId)
+    window.location.href = "installments.html";
+}
+
+function exportCardData(){
+    console.log("Export data setup");
+}
+
+function cardMenu(){
+    console.log("Card menu setup");
+}
+
+function toggleView(){
+    console.log("Toggle View mode");
+}
