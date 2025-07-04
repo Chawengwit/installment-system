@@ -27,25 +27,25 @@
         position: relative;
 
         &.progress-indicator_step-active {
-            .progress-indicator__circle {
+            .progress-indicator_circle {
                 background-color: var(--color-primary);
                 color: var(--color-white);
                 transform: scale(1.1);
             }
 
-            .progress-indicator__label {
+            .progress-indicator_label {
                 color: var(--color-primary);
                 font-weight: 600;
             }
         }
 
         &.progress-indicator_step-completed {
-            .progress-indicator__circle {
+            .progress-indicator_circle {
                 background-color: var(--color-success);
                 color: var(--color-white);
             }
 
-            .progress-indicator__label {
+            .progress-indicator_label {
                 color: var(--color-success);
             }
         }
@@ -234,7 +234,7 @@
     margin: 0 auto;
 }
 
-.form__row {
+.form_row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-lg);
@@ -312,11 +312,11 @@
     .payment-method_radio {
         display: none;
 
-        &:checked+.payment-method__label {
+        &:checked+.payment-method_label {
             border-color: var(--color-primary);
             background-color: rgba(37, 99, 235, 0.05);
 
-            .payment-method__check {
+            .payment-method_check {
                 opacity: 1;
                 transform: scale(1);
             }
