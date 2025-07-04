@@ -18,10 +18,10 @@ function setupCardInteractions() {
 
         $card
         .on("mouseenter", function () {
-            $(this).find(".credit-card__actions").css("opacity", "1");
+            $(this).find(".credit-card_actions").css("opacity", "1");
         })
         .on("mouseleave", function () {
-            $(this).find(".credit-card__actions").css("opacity", "0.7");
+            $(this).find(".credit-card_actions").css("opacity", "0.7");
         });
     });
 
@@ -83,7 +83,7 @@ function showFieldError($field, message) {
 }
 
 function animateProgressBars() {
-    $(".progress__bar").each(function () {
+    $(".progress_bar").each(function () {
         const $bar = $(this);
         const width = $bar.css("width");
 
@@ -117,10 +117,10 @@ function updateCardStatistics() {
     const totalAvailable = totalLimit - totalUsed;
 
     // Update overview stats
-    $(".overview-stat").eq(0).find(".overview-stat__number").text(cardCount);
-    $(".overview-stat").eq(1).find(".overview-stat__number").text(window.AppUtils.formatCurrency(totalLimit));
-    $(".overview-stat").eq(2).find(".overview-stat__number").text(window.AppUtils.formatCurrency(totalUsed));
-    $(".overview-stat").eq(3).find(".overview-stat__number").text(window.AppUtils.formatCurrency(totalAvailable));
+    $(".overview-stat").eq(0).find(".overview-stat_number").text(cardCount);
+    $(".overview-stat").eq(1).find(".overview-stat_number").text(window.AppUtils.formatCurrency(totalLimit));
+    $(".overview-stat").eq(2).find(".overview-stat_number").text(window.AppUtils.formatCurrency(totalUsed));
+    $(".overview-stat").eq(3).find(".overview-stat_number").text(window.AppUtils.formatCurrency(totalAvailable));
 }
 
 function editCard(cardId) {

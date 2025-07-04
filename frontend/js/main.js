@@ -24,7 +24,7 @@ function setupEventListeners() {
     });
 
     // Form submissions
-    // $("#add-customer-form").on("submit", handleAddCustomer);
+    
     $("#add-card-form").on("submit", handleAddCard);
     $("#installment-plan-form").on("submit", handleCreatePlan);
 
@@ -35,7 +35,7 @@ function setupEventListeners() {
 // Setup modals
 function setupModals() {
     // Close modal when clicking overlay
-    $(".modal__overlay").on("click", function () {
+    $(".modal_overlay").on("click", function () {
         const modalId = $(this).closest(".modal").attr("id");
         closeModal(modalId);
     });
@@ -104,8 +104,8 @@ function handleCreatePlan(e) {
 
 function resetPlanForm() {
     currentStep = 1;
-    $(".form-step").removeClass("form-step--active");
-    $("#step-1").addClass("form-step--active");
+    $(".form-step").removeClass("form-step-active");
+    $("#step-1").addClass("form-step-active");
     $("#installment-plan-form")[0].reset();
     $("#calculation-summary").hide();
 }
@@ -145,8 +145,8 @@ function handleCustomerSearch(e) {
     const searchTerm = e.target.value.toLowerCase()
 
     $(".customer-card").each(function () {
-        const customerName = $(this).find(".customer-card__name").text().toLowerCase();
-        const customerPhone = $(this).find(".customer-card__phone").text().toLowerCase();
+        const customerName = $(this).find(".customer-card_name").text().toLowerCase();
+        const customerPhone = $(this).find(".customer-card_phone").text().toLowerCase();
 
         if (customerName.includes(searchTerm) || customerPhone.includes(searchTerm)) {
             $(this).show();
@@ -158,7 +158,7 @@ function handleCustomerSearch(e) {
 
 // Filter functions
 function toggleFilters() {
-    $("#filters-panel").slideToggle()
+    $("#filters-panel").slideToggle();
 }
 
 function viewPlan(planId) {

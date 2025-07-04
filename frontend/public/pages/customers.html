@@ -3,11 +3,11 @@
     <!-- Header -->
     <header class="page-header">
         <div>
-            <h1 class="page-header_title">ลูกค้า</h1>
-            <p class="page-header_subtitle">การจัดการลูกค้าและแผนการผ่อนชำระ</p>
+            <h1 class="page-header_title">Customers</h1>
+            <p class="page-header_subtitle">Manage customers</p>
         </div>
         <button class="btn btn-primary" onclick="openModal('add-customer-modal')">
-            <i class="fas fa-plus"></i> เพิ่มลูกค้า
+            <i class="fas fa-plus"></i> Create Customer
         </button>
     </header>
 
@@ -19,34 +19,29 @@
                 <input type="text" class="search-bar_input" placeholder="Search customers by name or phone..." id="customer-search">
             </div>
             <button class="btn btn-secondary search-bar_filter-btn" onclick="toggleFilters()">
-                <i class="fas fa-filter"></i> ตัวกรอง
+                <i class="fas fa-filter"></i> Filter
             </button>
         </div>
         
-        <div class="filters" id="filters-panel" style="display: none;">
+        <div class="filters" id="filters-panel">
             <div class="filters_group">
-                <label class="filters_label">สถานะการชำระเงิน</label>
+                <label class="filters_label">Status</label>
                 <select class="filters_select" onchange="applyFilters()">
-                    <option value="">สถานะทั้งหมด</option>
-                    <option value="current">ปัจจุบัน</option>
-                    <option value="overdue">เกินกำหนด</option>
-                    <option value="completed">สมบูรณ์</option>
+                    <option value="all">All</option>
+                    <option value="current">Current</option>
+                    <option value="overdue">Overdue</option>
+                    <option value="completed">Completed</option>
                 </select>
             </div>
             <div class="filters_group">
-                <label class="filters_label">เรียงตาม</label>
+                <label class="filters_label">Sort</label>
                 <select class="filters_select" onchange="applyFilters()">
-                    <option value="name">ชื่อ</option>
-                    <option value="date">วันที่เพิ่ม</option>
-                    <option value="amount">จำนวนเงินทั้งหมด</option>
+                    <option value="name">Name</option>
+                    <option value="date">Create Date</option>
+                    <option value="amount">Amount</option>
                 </select>
             </div>
         </div>
-
-        <button class="btn btn-outline btn-secondary" onclick="toggleView()">
-            <i class="fas fa-th-large"></i> Grid View
-        </button>
-
     </section>
 
     <!-- Customer List -->
@@ -63,32 +58,32 @@
                         <p class="customer-card_phone">+66 23-123-4567</p>
                     </div>
                     <div class="customer-card_status">
-                        <span class="badge badge-success">ปัจจุบัน</span>
+                        <span class="badge badge-success">Current</span>
                     </div>
                 </div>
                 <div class="customer-card_details">
                     <div class="customer-card_stat">
-                        <span class="customer-card_stat-label">แผนงานที่ใช้งานอยู่</span>
+                        <span class="customer-card_stat-label">Active Plans</span>
                         <span class="customer-card_stat-value">2</span>
                     </div>
                     <div class="customer-card_stat">
-                        <span class="customer-card_stat-label">จำนวนเงินทั้งหมด</span>
+                        <span class="customer-card_stat-label">Total Amount</span>
                         <span class="customer-card_stat-value">$2,450</span>
                     </div>
                     <div class="customer-card_stat">
-                        <span class="customer-card_stat-label">การชำระเงินครั้งต่อไป</span>
+                        <span class="customer-card_stat-label">Overdue</span>
                         <span class="customer-card_stat-value">Dec 15</span>
                     </div>
                 </div>
                 <div class="customer-card_actions">
                     <button class="btn btn-small btn-primary" onclick="viewCustomer(1)">
-                        <i class="fas fa-eye"></i> ดู
+                        <i class="fas fa-eye"></i> View
                     </button>
                     <button class="btn btn-small btn-secondary" onclick="editCustomer(1)">
-                        <i class="fas fa-edit"></i> แก้ไข
+                        <i class="fas fa-edit"></i> Edit
                     </button>
                     <button class="btn btn-small btn-info" onclick="sendReminder(1)">
-                        <i class="fas fa-bell"></i> เตือน
+                        <i class="fas fa-bell"></i> Warn
                     </button>
                 </div>
             </div>
@@ -104,7 +99,7 @@
                         <p class="customer-card_phone">+66 23-987-6543</p>
                     </div>
                     <div class="customer-card_status">
-                        <span class="badge badge-warning">Overdue</span>
+                        <span class="badge badge--warning">Overdue</span>
                     </div>
                 </div>
                 <div class="customer-card_details">
@@ -145,7 +140,7 @@
                         <p class="customer-card_phone">+66 23-456-7890</p>
                     </div>
                     <div class="customer-card_status">
-                        <span class="badge badge-info">Completed</span>
+                        <span class="badge badge--info">Completed</span>
                     </div>
                 </div>
                 <div class="customer-card_details">
@@ -182,13 +177,16 @@
 <div class="modal" id="add-customer-modal">
     <div class="modal_overlay" onclick="closeModal('add-customer-modal')"></div>
     <div class="modal_content">
+        <div class="loading-overlay">
+            <div class="loading-spinner"></div>
+        </div>
         <div class="modal_header">
             <h3 class="modal_title">Add New Customer</h3>
             <button class="modal_close" onclick="closeModal('add-customer-modal')">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <form class="form customer-detail" id="add-customer-form" onsubmit="handleAddCustomer(event)">
+        <form class="form customer-detail" id="add-customer-form">
             <div class="form_group">
                 <label class="form_label">Full Name *</label>
                 <input type="text" class="form_input" name="name" required>

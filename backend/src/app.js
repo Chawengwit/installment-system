@@ -16,6 +16,7 @@ app.use(express.json());
 // Correct frontend path
 const pathToFrontend = path.join(__dirname, '../frontend');
 
+app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.static(path.join(pathToFrontend, 'public')));
 app.use('/js', express.static(path.join(pathToFrontend, 'js')));
 app.use('/dist', express.static(path.join(pathToFrontend, 'dist')));
