@@ -1,5 +1,3 @@
-
-
 // Customer management specific functionality
 setupCustomerManagement()
 
@@ -12,6 +10,9 @@ function setupCustomerManagement() {
 
     // Setup customer detail modal
     setupCustomerDetailModal()
+
+    // Add event listener for the form
+    $("#add-customer-form").on("submit", handleAddCustomer);
 }
 
 function setupAdvancedSearch() {
@@ -72,8 +73,8 @@ function filterCustomers(searchTerm) {
 
     $(".customer-card").each(function () {
         const $card = $(this)
-        const name = $card.find(".customer-card__name").text().toLowerCase()
-        const phone = $card.find(".customer-card__phone").text().toLowerCase()
+        const name = $card.find(".customer-card_name").text().toLowerCase()
+        const phone = $card.find(".customer-card_phone").text().toLowerCase()
 
         const matches = name.includes(searchTerm) || phone.includes(searchTerm)
 
@@ -121,8 +122,8 @@ function applyFilters() {
         $visibleCards.sort((a, b) => {
         switch (sortBy) {
             case "name":
-            const nameA = $(a).find(".customer-card__name").text()
-            const nameB = $(b).find(".customer-card__name").text()
+            const nameA = $(a).find(".customer-card_name").text()
+            const nameB = $(b).find(".customer-card_name").text()
             return nameA.localeCompare(nameB)
 
             case "date":
@@ -131,10 +132,10 @@ function applyFilters() {
 
             case "amount":
             const amountA = Number.parseFloat(
-                $(a).find(".customer-card__stat-value").eq(1).text().replace("$", "").replace(",", ""),
+                $(a).find(".customer-card_stat-value").eq(1).text().replace("$", "").replace(",", ""),
             )
             const amountB = Number.parseFloat(
-                $(b).find(".customer-card__stat-value").eq(1).text().replace("$", "").replace(",", ""),
+                $(b).find(".customer-card_stat-value").eq(1).text().replace("$", "").replace(",", ""),
             )
             return amountB - amountA
 
@@ -197,38 +198,6 @@ function exportCustomerData(format = "excel") {
     }, 2000)
 }
 
-// Customer functions
-function handleAddCustomer(e) {
-    e.preventDefault()
-
-    const formData = new FormData(e.target)
-    const customerData = {
-        name: formData.get("name"),
-        phone: formData.get("phone"),
-        address: formData.get("address"),
-        idCard: formData.get("idCard"),
-    }
-
-    // Show loading state
-    const submitBtn = $(e.target).find('button[type="submit"]')
-    const originalText = submitBtn.text()
-    submitBtn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Adding...')
-
-    // Simulate API call
-    setTimeout(() => {
-        showNotification("Customer added successfully!", "success")
-        closeModal("add-customer-modal")
-
-        // Reset button
-        submitBtn.prop("disabled", false).text(originalText)
-
-        // Add customer to list if on customers page
-        if (window.location.pathname.includes("customers.html")) {
-            addCustomerToList(customerData)
-        }
-    }, 1500);
-}
-
 function viewCustomer(customerId) {
     // In a real app, you would fetch customer data from API
     console.log("Viewing customer:", customerId)
@@ -246,4 +215,83 @@ function sendUrgentReminder(customerId) {
     showNotification("Urgent reminder sent!", "warning");
 }
 
+async function handleAddCustomer(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const loadingOverlay = $('#add-customer-modal .loading-overlay');
 
+    try {
+        loadingOverlay.show();
+        const response = await fetch('/api/customers', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to create customer');
+        }
+
+        const newCustomer = await response.json();
+
+        // Handle success
+        window.AppUtils.closeModal('add-customer-modal');
+        window.AppUtils.showNotification('Customer added successfully!', 'success');
+        // Optionally, refresh the customer list or add the new customer to the grid
+        addCustomerToGrid(newCustomer);
+        form.reset();
+
+    } catch (error) {
+        console.error('Error adding customer:', error);
+        window.AppUtils.showNotification(error.message, 'error');
+    } finally {
+        loadingOverlay.hide();
+    }
+}
+
+function addCustomerToGrid(customer) {
+    const customerGrid = document.getElementById('customer-grid');
+    const newCustomerCard = `
+        <div class="customer-card" data-customer-id="${customer.id}">
+            <div class="customer-card_header">
+                <div class="customer-card_avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="customer-card_info">
+                    <h3 class="customer-card_name">${customer.name}</h3>
+                    <p class="customer-card_phone">${customer.phone}</p>
+                </div>
+                <div class="customer-card_status">
+                    <span class="badge badge-success">Current</span>
+                </div>
+            </div>
+            <div class="customer-card_details">
+                <div class="customer-card_stat">
+                    <span class="customer-card_stat-label">Active Plans</span>
+                    <span class="customer-card_stat-value">0</span>
+                </div>
+                <div class="customer-card_stat">
+                    <span class="customer-card_stat-label">Total Amount</span>
+                    <span class="customer-card_stat-value">$0</span>
+                </div>
+                <div class="customer-card_stat">
+                    <span class="customer-card_stat-label">Overdue</span>
+                    <span class="customer-card_stat-value">N/A</span>
+                </div>
+            </div>
+            <div class="customer-card_actions">
+                <button class="btn btn-small btn-primary" onclick="viewCustomer(${customer.id})">
+                    <i class="fas fa-eye"></i> View
+                </button>
+                <button class="btn btn-small btn-secondary" onclick="editCustomer(${customer.id})">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-small btn-info" onclick="sendReminder(${customer.id})">
+                    <i class="fas fa-bell"></i> Warn
+                </button>
+            </div>
+        </div>
+    `;
+    customerGrid.insertAdjacentHTML('afterbegin', newCustomerCard);
+}

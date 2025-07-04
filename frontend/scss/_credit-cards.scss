@@ -111,43 +111,4 @@
         letter-spacing: 0.1em;
         margin-bottom: var(--spacing-lg);
     }
-
-    .credit-card_details {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: var(--spacing-md);
-        margin-bottom: var(--spacing-lg);
-    }
-
-    .credit-card_detail {
-        .credit-card_detail-label {
-            display: block;
-            font-size: var(--font-size-xs);
-            opacity: 0.8;
-            margin-bottom: var(--spacing-xs);
-        }
-
-        .credit-card_detail-value {
-            font-weight: 600;
-            font-size: var(--font-size-sm);
-
-            &.text-success {
-                color: #10b981;
-            }
-        }
-    }
-
-    .credit-card_usage {
-        .progress {
-            background-color: rgba(255, 255, 255, 0.2);
-
-            .progress-card_bar {
-                background-color: var(--color-white);
-            }
-        }
-
-        .progress_text {
-            color: rgba(255, 255, 255, 0.8);
-        }
-    }
 }
