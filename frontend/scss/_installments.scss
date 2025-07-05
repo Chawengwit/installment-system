@@ -644,14 +644,17 @@
 }
 
 .search-section{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    .search-bar{
-        width: 100%;
-        margin-bottom: unset;
+    &.installment-page{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        .search-bar{
+            width: 100%;
+            margin-bottom: unset;
+        }
     }
+
 }
 
 .form_select {
