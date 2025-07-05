@@ -38,22 +38,22 @@ function setupCustomerCards() {
 
         // Add click to view functionality
         $card.on("click", (e) => {
-        // Don't trigger if clicking on buttons
-        if (!$(e.target).closest("button").length) {
-            const customerId = $card.data("customer-id") || 1
-            console.log("Viewing customer:", customerId)
-            window.AppUtils.openModal("customer-detail-modal")
-        }
+            // Don't trigger if clicking on buttons
+            if (!$(e.target).closest("button").length) {
+                const customerId = $card.data("customer-id") || 1
+                console.log("Viewing customer:", customerId)
+                window.AppUtils.openModal("customer-detail-modal")
+            }
         })
 
         // Add keyboard navigation
         $card.attr("tabindex", "0").on("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault()
-            const customerId = $card.data("customer-id") || 1
-            console.log("Viewing customer:", customerId)
-            window.AppUtils.openModal("customer-detail-modal")
-        }
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault()
+                const customerId = $card.data("customer-id") || 1
+                console.log("Viewing customer:", customerId)
+                window.AppUtils.openModal("customer-detail-modal")
+            }
         })
     })
 }
@@ -63,7 +63,7 @@ function setupCustomerDetailModal() {
     $(".table tbody tr").on("click", function () {
         const planId = $(this).data("plan-id")
         if (planId) {
-        viewInstallmentPlan(planId)
+            viewInstallmentPlan(planId)
         }
     })
 }
@@ -79,10 +79,10 @@ function filterCustomers(searchTerm) {
         const matches = name.includes(searchTerm) || phone.includes(searchTerm)
 
         if (matches) {
-        $card.show()
-        visibleCount++
+            $card.show()
+            visibleCount++
         } else {
-        $card.hide()
+            $card.hide()
         }
     })
 
@@ -213,6 +213,10 @@ function editCustomer(customerId) {
 function sendUrgentReminder(customerId) {
     console.log("Sending urgent reminder to customer:", customerId)
     showNotification("Urgent reminder sent!", "warning");
+}
+
+function toggleFilters() {
+    $("#filters-panel").slideToggle(200);
 }
 
 async function handleAddCustomer(event) {
