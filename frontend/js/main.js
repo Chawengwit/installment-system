@@ -53,8 +53,8 @@ function setupModals() {
 function setupNavigation() {
     // Highlight active navigation item based on current page
     const currentPage = window.location.pathname.split("/").pop() || "index.html";
-    $(".navbar__link").removeClass("navbar__link--active");
-    $(`.navbar__link[href="${currentPage}"]`).addClass("navbar__link--active");
+    $(".navbar_link").removeClass("navbar_link--active");
+    $(`.navbar_link[href="${currentPage}"]`).addClass("navbar_link--active");
 }
 
 // Modal functions

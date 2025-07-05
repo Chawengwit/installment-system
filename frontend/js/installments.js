@@ -1,5 +1,5 @@
 // Dummy data for demonstration (will eventually come from a backend API)
-const installmentsData = [
+var installmentsData = [
     { id: 1, customer: 'John Doe', product: 'Laptop', amount: 1200, dueDate: '2024-07-15', status: 'active' },
     { id: 2, customer: 'Jane Smith', product: 'Smartphone', amount: 800, dueDate: '2024-07-20', status: 'pending' },
     { id: 3, customer: 'Peter Jones', product: 'Smart TV', amount: 1500, dueDate: '2024-07-25', status: 'completed' },

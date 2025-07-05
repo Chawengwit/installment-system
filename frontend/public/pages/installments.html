@@ -5,46 +5,36 @@
         <div>
             <h1 class="page-header_title">Existing Installment Plans</h1>
             <p class="page-header_subtitle">Manage and view all active and completed installment plans</p>
-        </div>
+        </div>  
         <div class="page-header_actions">
-            <button class="btn btn-primary" onclick="resetForm()">
-                <i class="fas fa-refresh"></i> Reset Form
-            </button>
+            <a class="btn btn-primary" href="/installments-create">
+                <i class="fas fa-plus"></i> Create Installment
+            </a>
         </div>
     </header>
 
     <!-- New section for displaying existing installments -->
-    <section class="existing-installments-section">
-        <!-- <header class="page-header">
-            <div>
-                <h1 class="page-header_title">Existing Installment Plans</h1>
-                <p class="page-header_subtitle">Manage and view all active and completed installment plans</p>
+    <section class="search-section">
+        <div class="search-bar">
+            <div class="search-bar_input-group">
+                <i class="fas fa-search search-bar_icon"></i>
+                <input type="text" class="search-bar_input" 
+                        placeholder="Search by customer or product..." id="installment-search">
             </div>
-        </header> -->
-
-        <section class="search-section">
-            <div class="search-bar">
-                <div class="search-bar_input-group">
-                    <i class="fas fa-search search-bar_icon"></i>
-                    <input type="text" class="search-bar_input" 
-                            placeholder="Search by customer or product..." id="installment-search">
-                </div>
-                <div class="form_group">
-                    <select class="form_select" id="installment-status-filter">
-                        <option value="all">All Statuses</option>
-                        <option value="active">Active</option>
-                        <option value="pending">Pending</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                </div>
+            <div class="form_group">
+                <select class="form_select" id="installment-status-filter">
+                    <option value="all">All Statuses</option>
+                    <option value="active">Active</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                </select>
             </div>
-        </section>
-
-
-        <div id="installments-list" class="installments-grid">
-            <!-- Installment cards will be loaded here by JavaScript -->
         </div>
     </section>
+
+    <div id="installments-list" class="installments-grid">
+        <!-- Installment cards will be loaded here by JavaScript -->
+    </div>
 </div>
 
 <script src="js/installments.js"></script>
