@@ -1,3 +1,4 @@
+// Modal functions
 function openModal(modalId) {
     $(`#${modalId}`).addClass("active");
     $("body").css("overflow", "hidden");

@@ -38,22 +38,22 @@ function setupCustomerCards() {
 
         // Add click to view functionality
         $card.on("click", (e) => {
-        // Don't trigger if clicking on buttons
-        if (!$(e.target).closest("button").length) {
-            const customerId = $card.data("customer-id") || 1
-            console.log("Viewing customer:", customerId)
-            window.AppUtils.openModal("customer-detail-modal")
-        }
+            // Don't trigger if clicking on buttons
+            if (!$(e.target).closest("button").length) {
+                const customerId = $card.data("customer-id") || 1
+                console.log("Viewing customer:", customerId)
+                window.AppUtils.openModal("customer-detail-modal")
+            }
         })
 
         // Add keyboard navigation
         $card.attr("tabindex", "0").on("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault()
-            const customerId = $card.data("customer-id") || 1
-            console.log("Viewing customer:", customerId)
-            window.AppUtils.openModal("customer-detail-modal")
-        }
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault()
+                const customerId = $card.data("customer-id") || 1
+                console.log("Viewing customer:", customerId)
+                window.AppUtils.openModal("customer-detail-modal")
+            }
         })
     })
 }

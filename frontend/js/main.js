@@ -56,23 +56,6 @@ function setupNavigation() {
     $(`.navbar_link[href="${currentPage}"]`).addClass("navbar_link--active");
 }
 
-// Modal functions
-function openModal(modalId) {
-    $(`#${modalId}`).addClass("active");
-    $("body").css("overflow", "hidden");
-}
-
-function closeModal(modalId) {
-    $(`#${modalId}`).removeClass("active");
-    $("body").css("overflow", "auto");
-
-    // Reset form if it exists
-    const form = $(`#${modalId} form`);
-    if (form.length) {
-        form[0].reset();
-    }
-}
-
 // Installment plan functions
 function handleCreatePlan(e) {
     e.preventDefault();
