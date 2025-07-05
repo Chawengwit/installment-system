@@ -215,6 +215,10 @@ function sendUrgentReminder(customerId) {
     showNotification("Urgent reminder sent!", "warning");
 }
 
+function toggleFilters() {
+    $("#filters-panel").slideToggle(200);
+}
+
 async function handleAddCustomer(event) {
     event.preventDefault();
     const form = event.target;
