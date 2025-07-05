@@ -98,7 +98,7 @@ function viewInstallmentDetails(installmentId) {
         $('#detail-amount').text(`${installment.amount}`);
         $('#detail-dueDate').text(installment.dueDate);
         $('#detail-status').text(installment.status);
-        window.AppUtils.openModal('installment-details-modal');
+        // window.AppUtils.openModal('installment-details-modal'); // TODO
     }
 }
 
@@ -106,7 +106,7 @@ function editInstallment(installmentId) {
     console.log('Editing installment:', installmentId);
     window.AppUtils.showNotification(`Editing Installment #${installmentId}`, 'info');
     // In a real app, this would populate the add/edit modal with existing data
-    window.AppUtils.openModal('installment-add-modal');
+    // window.AppUtils.openModal('installment-add-modal'); // TODO
 }
 
 function viewAllPlans() {
