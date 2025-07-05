@@ -19,40 +19,50 @@
     <!-- Progress Indicator -->
     <section class="progress-indicator">
         <div class="progress-indicator_container">
+
             <div class="progress-indicator_step progress-indicator_step-active" data-step="1">
-                <div class="progress-indicator_circle">
-                    <i class="fas fa-user"></i>
-                </div>
-                <span class="progress-indicator_label">Customer</span>
-            </div>
-            <div class="progress-indicator_line"></div>
-            <div class="progress-indicator_step" data-step="2">
                 <div class="progress-indicator_circle">
                     <i class="fas fa-box"></i>
                 </div>
                 <span class="progress-indicator_label">Product</span>
             </div>
+
             <div class="progress-indicator_line"></div>
-            <div class="progress-indicator_step" data-step="3">
-                <div class="progress-indicator_circle">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <span class="progress-indicator_label">Payment</span>
-            </div>
-            <div class="progress-indicator_line"></div>
-            <div class="progress-indicator_step" data-step="4">
+
+            <div class="progress-indicator_step" data-step="2">
                 <div class="progress-indicator_circle">
                     <i class="fas fa-calendar"></i>
                 </div>
                 <span class="progress-indicator_label">Terms</span>
             </div>
+
             <div class="progress-indicator_line"></div>
+
+            <div class="progress-indicator_step" data-step="3">
+                <div class="progress-indicator_circle">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="progress-indicator_label">Customer</span>
+            </div>
+
+            <div class="progress-indicator_line"></div>
+
+            <div class="progress-indicator_step" data-step="4">
+                <div class="progress-indicator_circle">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <span class="progress-indicator_label">Payment</span>
+            </div>
+
+            <div class="progress-indicator_line"></div>
+
             <div class="progress-indicator_step" data-step="5">
                 <div class="progress-indicator_circle">
                     <i class="fas fa-check"></i>
                 </div>
                 <span class="progress-indicator_label">Review</span>
             </div>
+
         </div>
     </section>
 
@@ -60,86 +70,12 @@
     <section class="plan-form-section">
         <div class="plan-form-container">
             <form class="plan-form" id="installment-plan-form">
-                <!-- Step 1: Customer Selection -->
-                <div class="form-step form-step-active" id="step-1">
+
+                <!-- Step 1: Product Details -->
+                <div class="form-step" id="step-1">
                     <div class="form-step_header">
                         <h3 class="form-step_title">
                             <span class="form-step_number">1</span>
-                            Select Customer
-                        </h3>
-                        <p class="form-step_description">Choose an existing customer or add a new one</p>
-                    </div>
-                    
-                    <div class="customer-selection">
-                        <div class="search-bar">
-                            <!-- <label class="form_label">Search Customer</label> -->
-                            <div class="search-bar_input-group">
-                                <i class="fas fa-search search-bar_icon"></i>
-                                <input type="text" class="search-bar_input" 
-                                        placeholder="Search by name or phone..." id="customer-search-input">
-                            </div>
-                        </div>
-
-                        <div class="customer-options">
-                            <div class="customer-option" data-customer-id="1">
-                                <div class="customer-option_avatar">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div class="customer-option_info">
-                                    <h4 class="customer-option_name">John Smith</h4>
-                                    <p class="customer-option_details">+1 (555) 123-4567 • 2 active plans</p>
-                                </div>
-                                <div class="customer-option_status">
-                                    <span class="badge badge-success">Good Standing</span>
-                                </div>
-                            </div>
-
-                            <div class="customer-option" data-customer-id="2">
-                                <div class="customer-option_avatar">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div class="customer-option_info">
-                                    <h4 class="customer-option_name">Sarah Johnson</h4>
-                                    <p class="customer-option_details">+1 (555) 987-6543 • 1 active plan</p>
-                                </div>
-                                <div class="customer-option_status">
-                                    <span class="badge badge-warning">Payment Due</span>
-                                </div>
-                            </div>
-
-                            <div class="customer-option" data-customer-id="3">
-                                <div class="customer-option_avatar">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div class="customer-option_info">
-                                    <h4 class="customer-option_name">Mike Davis</h4>
-                                    <p class="customer-option_details">+1 (555) 456-7890 • No active plans</p>
-                                </div>
-                                <div class="customer-option_status">
-                                    <span class="badge badge-info">Available</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- <div class="add-customer-option">
-                            <button type="button" class="btn btn-outline btn-full-width" onclick="openModal('add-customer-modal')">
-                                <i class="fas fa-plus"></i> Add New Customer
-                            </button>
-                        </div> -->
-                    </div>
-                    
-                    <div class="form_actions">
-                        <button type="button" class="btn btn-primary" onclick="nextStep(2)" disabled id="step-1-next">
-                            Next <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Step 2: Product Details -->
-                <div class="form-step" id="step-2">
-                    <div class="form-step_header">
-                        <h3 class="form-step_title">
-                            <span class="form-step_number">2</span>
                             Product Details
                         </h3>
                         <p class="form-step_description">Enter the product information and pricing</p>
@@ -205,121 +141,17 @@
                     </div>
                     
                     <div class="form_actions">
-                        <button type="button" class="btn btn-secondary" onclick="prevStep(1)">
-                            <i class="fas fa-arrow-left"></i> Previous
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="nextStep(3)">
+                        <button type="button" class="btn btn-primary" onclick="nextStep(2)" id="step-1-next">
                             Next <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Step 3: Payment Method -->
-                <div class="form-step" id="step-3">
+                <!-- Step 2: Installment Terms -->
+                <div class="form-step" id="step-2">
                     <div class="form-step_header">
                         <h3 class="form-step_title">
-                            <span class="form-step_number">3</span>
-                            Payment Method
-                        </h3>
-                        <p class="form-step_description">Choose how the customer will make payments</p>
-                    </div>
-                    
-                    <div class="payment-methods">
-                        <div class="payment-method">
-                            <input type="radio" id="cash" name="payment-method" value="cash" class="payment-method_radio">
-                            <label for="cash" class="payment-method_label">
-                                <div class="payment-method_icon">
-                                    <i class="fas fa-money-bill-wave"></i>
-                                </div>
-                                <div class="payment-method_content">
-                                    <span class="payment-method_title">Cash Payment</span>
-                                    <span class="payment-method_description">Customer pays in cash at your location</span>
-                                </div>
-                                <div class="payment-method_check">
-                                    <i class="fas fa-check"></i>
-                                </div>
-                            </label>
-                        </div>
-                        
-                        <div class="payment-method">
-                            <input type="radio" id="credit-card" name="payment-method" value="credit-card" class="payment-method_radio">
-                            <label for="credit-card" class="payment-method_label">
-                                <div class="payment-method_icon">
-                                    <i class="fas fa-credit-card"></i>
-                                </div>
-                                <div class="payment-method_content">
-                                    <span class="payment-method_title">Credit Card</span>
-                                    <span class="payment-method_description">Automatic charges to customer's credit card</span>
-                                </div>
-                                <div class="payment-method_check">
-                                    <i class="fas fa-check"></i>
-                                </div>
-                            </label>
-                        </div>
-
-                        <div class="payment-method">
-                            <input type="radio" id="bank-transfer" name="payment-method" value="bank-transfer" class="payment-method_radio">
-                            <label for="bank-transfer" class="payment-method_label">
-                                <div class="payment-method_icon">
-                                    <i class="fas fa-university"></i>
-                                </div>
-                                <div class="payment-method_content">
-                                    <span class="payment-method_title">Bank Transfer</span>
-                                    <span class="payment-method_description">Customer transfers money to your account</span>
-                                </div>
-                                <div class="payment-method_check">
-                                    <i class="fas fa-check"></i>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="form_group credit-card-details" id="credit-card-select" style="display: none;">
-                        <label class="form_label">Select Credit Card</label>
-                        <div class="card-selection">
-                            <div class="card-option" data-card-id="1">
-                                <div class="card-option_brand">
-                                    <i class="fab fa-cc-visa"></i>
-                                </div>
-                                <div class="card-option_info">
-                                    <span class="card-option_name">KBank Visa</span>
-                                    <span class="card-option_number">**** **** **** 1234</span>
-                                </div>
-                                <div class="card-option_limit">
-                                    <span class="card-option_available">$15,000 available</span>
-                                </div>
-                            </div>
-
-                            <div class="card-option" data-card-id="2">
-                                <div class="card-option_brand">
-                                    <i class="fab fa-cc-mastercard"></i>
-                                </div>
-                                <div class="card-option_info">
-                                    <span class="card-option_name">SCB MasterCard</span>
-                                    <span class="card-option_number">**** **** **** 5678</span>
-                                </div>
-                                <div class="card-option_limit">
-                                    <span class="card-option_available">$8,500 available</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form_actions">
-                        <button type="button" class="btn btn-secondary" onclick="prevStep(2)">
-                            <i class="fas fa-arrow-left"></i> Previous
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="nextStep(4)">
-                            Next <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Step 4: Installment Terms -->
-                <div class="form-step" id="step-4">
-                    <div class="form-step_header">
-                        <h3 class="form-step_title">
-                            <span class="form-step_number">4</span>
+                            <span class="form-step_number">2</span>
                             Installment Terms
                         </h3>
                         <p class="form-step_description">Configure the payment schedule and terms</p>
@@ -411,10 +243,187 @@
                     </div>
                     
                     <div class="form_actions">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep(1)">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep(3)" id="step-2-next">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Customer Selection -->
+                <div class="form-step" id="step-3">
+                    <div class="form-step_header">
+                        <h3 class="form-step_title">
+                            <span class="form-step_number">3</span>
+                            Select Customer
+                        </h3>
+                        <p class="form-step_description">Choose an existing customer or add a new one</p>
+                    </div>
+                    
+                    <div class="customer-selection">
+                        <div class="search-bar not-label">
+                            <div class="search-bar_input-group">
+                                <i class="fas fa-search search-bar_icon"></i>
+                                <input type="text" class="search-bar_input" placeholder="Search by name or phone..." id="customer-search-input">
+                            </div>
+                        </div>
+
+                        <div class="customer-options">
+                            <div class="customer-option" data-customer-id="1">
+                                <div class="customer-option_avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="customer-option_info">
+                                    <h4 class="customer-option_name">John Smith</h4>
+                                    <p class="customer-option_details">+1 (555) 123-4567 • 2 active plans</p>
+                                </div>
+                                <div class="customer-option_status">
+                                    <span class="badge badge-success">Good Standing</span>
+                                </div>
+                            </div>
+
+                            <div class="customer-option" data-customer-id="2">
+                                <div class="customer-option_avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="customer-option_info">
+                                    <h4 class="customer-option_name">Sarah Johnson</h4>
+                                    <p class="customer-option_details">+1 (555) 987-6543 • 1 active plan</p>
+                                </div>
+                                <div class="customer-option_status">
+                                    <span class="badge badge-warning">Payment Due</span>
+                                </div>
+                            </div>
+
+                            <div class="customer-option" data-customer-id="3">
+                                <div class="customer-option_avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="customer-option_info">
+                                    <h4 class="customer-option_name">Mike Davis</h4>
+                                    <p class="customer-option_details">+1 (555) 456-7890 • No active plans</p>
+                                </div>
+                                <div class="customer-option_status">
+                                    <span class="badge badge-info">Available</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="add-customer-option">
+                            <button type="button" class="btn btn-outline btn-full-width" onclick="openModal('add-customer-modal')">
+                                <i class="fas fa-plus"></i> Add New Customer
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form_actions">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep(2)">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep(4)" disabled id="step-3-next">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Payment Method -->
+                <div class="form-step form-step-active" id="step-4">
+                    <div class="form-step_header">
+                        <h3 class="form-step_title">
+                            <span class="form-step_number">4</span>
+                            Payment Method
+                        </h3>
+                        <p class="form-step_description">Choose how the customer will make payments</p>
+                    </div>
+                    
+                    <div class="payment-methods">
+                        <div class="payment-method">
+                            <input type="radio" id="cash" name="payment-method" value="cash" class="payment-method_radio">
+                            <label for="cash" class="payment-method_label">
+                                <div class="payment-method_icon">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div class="payment-method_content">
+                                    <span class="payment-method_title">Cash Payment</span>
+                                    <span class="payment-method_description">Customer pays in cash at your location</span>
+                                </div>
+                                <div class="payment-method_check">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="payment-method">
+                            <input type="radio" id="credit-card" name="payment-method" value="credit-card" class="payment-method_radio">
+                            <label for="credit-card" class="payment-method_label">
+                                <div class="payment-method_icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <div class="payment-method_content">
+                                    <span class="payment-method_title">Credit Card</span>
+                                    <span class="payment-method_description">Automatic charges to customer's credit card</span>
+                                </div>
+                                <div class="payment-method_check">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="payment-method">
+                            <input type="radio" id="bank-transfer" name="payment-method" value="bank-transfer" class="payment-method_radio">
+                            <label for="bank-transfer" class="payment-method_label">
+                                <div class="payment-method_icon">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <div class="payment-method_content">
+                                    <span class="payment-method_title">Bank Transfer</span>
+                                    <span class="payment-method_description">Customer transfers money to your account</span>
+                                </div>
+                                <div class="payment-method_check">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form_group credit-card-details" id="credit-card-select" style="display: none;">
+                        <label class="form_label">Select Credit Card</label>
+                        <div class="card-selection">
+                            <div class="card-option" data-card-id="1">
+                                <div class="card-option_brand">
+                                    <i class="fab fa-cc-visa"></i>
+                                </div>
+                                <div class="card-option_info">
+                                    <span class="card-option_name">KBank Visa</span>
+                                    <span class="card-option_number">**** **** **** 1234</span>
+                                </div>
+                                <div class="card-option_limit">
+                                    <span class="card-option_available">$15,000 available</span>
+                                </div>
+                            </div>
+
+                            <div class="card-option" data-card-id="2">
+                                <div class="card-option_brand">
+                                    <i class="fab fa-cc-mastercard"></i>
+                                </div>
+                                <div class="card-option_info">
+                                    <span class="card-option_name">SCB MasterCard</span>
+                                    <span class="card-option_number">**** **** **** 5678</span>
+                                </div>
+                                <div class="card-option_limit">
+                                    <span class="card-option_available">$8,500 available</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form_actions">
                         <button type="button" class="btn btn-secondary" onclick="prevStep(3)">
                             <i class="fas fa-arrow-left"></i> Previous
                         </button>
-                        <button type="button" class="btn btn-primary" onclick="nextStep(5)">
+                        <button type="button" class="btn btn-primary" onclick="nextStep(5)" id="step-4-next">
                             Review <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
@@ -496,7 +505,7 @@
                         <button type="button" class="btn btn-secondary" onclick="prevStep(4)">
                             <i class="fas fa-arrow-left"></i> Previous
                         </button>
-                        <button type="submit" class="btn btn-success btn-large">
+                        <button type="submit" class="btn btn-success" id="step-5-submit">
                             <i class="fas fa-check"></i> Create Installment Plan
                         </button>
                     </div>
