@@ -63,7 +63,7 @@ function setupCustomerDetailModal() {
     $(".table tbody tr").on("click", function () {
         const planId = $(this).data("plan-id")
         if (planId) {
-        viewInstallmentPlan(planId)
+            viewInstallmentPlan(planId)
         }
     })
 }
@@ -79,10 +79,10 @@ function filterCustomers(searchTerm) {
         const matches = name.includes(searchTerm) || phone.includes(searchTerm)
 
         if (matches) {
-        $card.show()
-        visibleCount++
+            $card.show()
+            visibleCount++
         } else {
-        $card.hide()
+            $card.hide()
         }
     })
 
