@@ -641,15 +641,17 @@
 
 .existing-installments-section{
     margin-top: var(--spacing-lg);
-    // .search-section{
-    //     display: flex;
-    //     justify-content: space-between;
-    //     align-items: center;
-    //     .search-bar{
-    //         width: 75%;
-    //     }
-    // }
+}
 
+.search-section{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    .search-bar{
+        width: 100%;
+        margin-bottom: unset;
+    }
 }
 
 .form_select {

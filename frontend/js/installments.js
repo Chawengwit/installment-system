@@ -111,8 +111,8 @@ function editInstallment(installmentId) {
 
 function viewAllPlans() {
     console.log('Navigating to view all plans...');
-    window.AppUtils.showNotification('Redirecting to all installment plans page (not yet implemented)', 'info');
-    // In a real app, you would navigate to a different page or section
+    window.AppUtils.showNotification('Displaying all installment plans.', 'info');
+    toggleInstallmentSections(false); // Show existing plans, hide create form
 }
 
 function resetForm() {
@@ -124,9 +124,33 @@ function resetForm() {
     $('.progress-indicator_step[data-step="1"]').addClass('progress-indicator_step-active');
     $('.form-step').removeClass('form-step-active');
     $('#step-1').addClass('form-step-active');
+    toggleInstallmentSections(true); // Show create form, hide existing plans
+}
+
+function showCreateInstallmentForm() {
+    console.log('Showing create installment form...');
+    toggleInstallmentSections(true); // Show create form, hide existing plans
+}
+
+function toggleInstallmentSections(showCreateForm) {
+    const $createFormSection = $('.plan-form-section');
+    const $existingPlansSection = $('.existing-installments-section');
+
+    if (showCreateForm) {
+        $existingPlansSection.fadeOut(200, function() {
+            $createFormSection.fadeIn(200);
+        });
+    } else {
+        $createFormSection.fadeOut(200, function() {
+            $existingPlansSection.fadeIn(200);
+            displayInstallments(); // Refresh list when showing existing plans
+        });
+    }
 }
 
 // Initial setup on document ready
 $(document).ready(function() {
     setupInstallmentsPage();
+    // Initially show the create form and hide the existing plans section
+    $('.existing-installments-section').hide();
 });

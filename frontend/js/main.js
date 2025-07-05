@@ -19,12 +19,11 @@ function setupEventListeners() {
     // Close mobile menu when clicking outside
     $(document).on("click", (e) => {
         if (!$(e.target).closest(".navbar").length) {
-        $("#navbar-menu").removeClass("active");
+            $("#navbar-menu").removeClass("active");
         }
     });
 
     // Form submissions
-    
     $("#add-card-form").on("submit", handleAddCard);
     $("#installment-plan-form").on("submit", handleCreatePlan);
 
