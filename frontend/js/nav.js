@@ -39,19 +39,6 @@ $(function() {
             $mainContent.load(`/pages${page}.html`, function(response, status, xhr) {
                 if (status == "error") {
                     $mainContent.html('<h2>Page Not Found</h2><p>Sorry, the page you are looking for does not exist.</p>');
-                } else if (page === "/customers") {
-                    if (!window.customersScriptLoaded) {
-                        $.getScript('/js/customers.js', function() {
-                            window.customersScriptLoaded = true;
-                            if (typeof window.initCustomersPage === 'function') {
-                                window.initCustomersPage();
-                            }
-                        });
-                    } else {
-                        if (typeof window.initCustomersPage === 'function') {
-                            window.initCustomersPage();
-                        }
-                    }
                 }
                 // Update the active link in the navigation
                 $(".navbar_link").removeClass("navbar_link--active");
