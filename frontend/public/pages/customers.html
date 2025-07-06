@@ -68,7 +68,7 @@
                             <th>Phone</th>
                             <th>Active Plans</th>
                             <th>Total Amount</th>
-                            <th>Actions</th>
+                            <th class="text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="customer-table-body">
@@ -155,30 +155,30 @@
                         </thead>
                         <tbody id="installment-history-body">
                             <tr>
-                                <td>iPhone 14 Pro</td>
-                                <td>$1,200</td>
-                                <td>
+                                <td data-label="Product">iPhone 14 Pro</td>
+                                <td data-label="Amount">$1,200</td>
+                                <td data-label="Progress">
                                     <div class="progress">
                                         <div class="progress_bar" style="width: 60%"></div>
                                     </div>
                                     <span class="progress_text">6/10 payments</span>
                                 </td>
-                                <td><span class="badge badge-success">Current</span></td>
-                                <td>
+                                <td data-label="Status"><span class="badge badge-success">Current</span></td>
+                                <td class="table-actions" data-label="Actions">
                                     <button class="btn btn-small btn-primary" onclick="viewPlan(1)">View</button>
                                 </td>
                             </tr>
                             <tr>
-                                <td>MacBook Air</td>
-                                <td>$1,250</td>
-                                <td>
+                                <td data-label="Product">MacBook Air</td>
+                                <td data-label="Amount">$1,250</td>
+                                <td data-label="Progress">
                                     <div class="progress">
                                         <div class="progress_bar" style="width: 25%"></div>
                                     </div>
                                     <span class="progress_text">3/12 payments</span>
                                 </td>
-                                <td><span class="badge badge-success">Current</span></td>
-                                <td>
+                                <td data-label="Status"><span class="badge badge-success">Current</span></td>
+                                <td class="table-actions" data-label="Actions">
                                     <button class="btn btn-small btn-primary" onclick="viewPlan(2)">View</button>
                                 </td>
                             </tr>
