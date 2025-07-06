@@ -78,8 +78,8 @@ function renderCustomers(customers) {
             <tr data-customer-id="${customer.id}">
                 <td>${customer.name}</td>
                 <td>${customer.phone}</td>
-                <td>${customer.address || 'N/A'}</td>
-                <td>${new Date(customer.created_at).toLocaleDateString()}</td>
+                <td>0</td>
+                <td>$0</td>
                 <td>
                     <button class="btn btn-small btn-primary" onclick="viewCustomer(${customer.id})">
                         <i class="fas fa-eye"></i>
