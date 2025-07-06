@@ -97,7 +97,7 @@ function renderCustomers(customers) {
     });
 }
 
-let isCardView = true; // Default view
+var isCardView = true; // Default view
 
 function toggleView() {
     isCardView = !isCardView;
