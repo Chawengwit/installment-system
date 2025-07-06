@@ -157,15 +157,27 @@ function toggleInstallmentSections(showCreateForm) {
 }
 
 function prevStep(step) {
-    $(".form-step").removeClass("form-step-active")
-    $(`#step-${step}`).addClass("form-step-active")
+    // Form step
+    $(".form-step").removeClass("form-step-active");
+    $(`#step-${step}`).addClass("form-step-active");
+
+    // Progress indicator
+    $(".progress-indicator_step").removeClass("progress-indicator_step-active");
+    $(`.progress-indicator_step[data-step="${step}"]`).addClass("progress-indicator_step-active");
+
     currentStep = step;
 }
 
 function nextStep(step) {
     if (validateCurrentStep()) {
-        $(".form-step").removeClass("form-step-active")
-        $(`#step-${step}`).addClass("form-step-active")
+        // Form step
+        $(".form-step").removeClass("form-step-active");
+        $(`#step-${step}`).addClass("form-step-active");
+
+        // Progress indicator
+        $(".progress-indicator_step").removeClass("progress-indicator_step-active");
+        $(`.progress-indicator_step[data-step="${step}"]`).addClass("progress-indicator_step-active");
+
         currentStep = step;
 
         // Update review section if going to step 5
@@ -203,43 +215,43 @@ function validateCurrentStep() {
     // Step-specific validation
     switch (currentStep) {
         case 1:
-        if (!$("#customer-select").val()) {
-            $("#customer-select").addClass("error")
-            isValid = false
-        }
+            const price = Number.parseFloat($("#product-price").val());
+            if (price <= 0) {
+                $("#product-price").addClass("error");
+                $("#product-price").after('<span class="error-message">Price must be greater than 0</span>');
+                isValid = false;
+            }
         break
 
         case 2:
-        const price = Number.parseFloat($("#product-price").val())
-        if (price <= 0) {
-            $("#product-price").addClass("error")
-            $("#product-price").after('<span class="error-message">Price must be greater than 0</span>')
-            isValid = false
-        }
+            if (!$("#installment-months").val()) {
+                $("#installment-months").addClass("error");
+                isValid = false;
+            }
         break
 
         case 3:
-        if (!$('input[name="payment-method"]:checked').val()) {
-            $(".payment-methods").after('<span class="error-message">Please select a payment method</span>')
-            isValid = false
-        }
-
-        if ($('input[name="payment-method"]:checked').val() === "credit-card" && !$("#card-select").val()) {
-            $("#card-select").addClass("error")
-            isValid = false
-        }
+            if (!$("#customer-select").val()) {
+                $("#customer-select").addClass("error");
+                isValid = false;
+            }
         break
 
         case 4:
-        if (!$("#installment-months").val()) {
-            $("#installment-months").addClass("error")
-            isValid = false
-        }
+            if (!$('input[name="payment-method"]:checked').val()) {
+                $(".payment-methods").after('<span class="error-message">Please select a payment method</span>');
+                isValid = false;
+            }
+
+            if ($('input[name="payment-method"]:checked').val() === "credit-card" && !$("#card-select").val()) {
+                $("#card-select").addClass("error");
+                isValid = false;
+            }
         break
     }
 
     if (!isValid) {
-        showNotification("Please fill in all required fields", "warning")
+        showNotification("Please fill in all required fields", "warning");
     }
 
     return isValid

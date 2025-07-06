@@ -82,27 +82,14 @@
                     </div>
                     
                     <div class="product-details">
-                        <div class="form_row">
-                            <div class="form_group">
-                                <label class="form_label">Product Category</label>
-                                <select class="form_select" id="product-category">
-                                    <option value="">Select category...</option>
-                                    <option value="electronics">Electronics</option>
-                                    <option value="appliances">Home Appliances</option>
-                                    <option value="furniture">Furniture</option>
-                                    <option value="automotive">Automotive</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <div class="form_group">
-                                <label class="form_label">Product Brand</label>
-                                <input type="text" class="form_input" id="product-brand" placeholder="e.g., Apple, Samsung">
-                            </div>
-                        </div>
-
                         <div class="form_group">
                             <label class="form_label">Product Name *</label>
                             <input type="text" class="form_input" id="product-name" placeholder="e.g., iPhone 14 Pro Max 256GB" required>
+                        </div>
+
+                        <div class="form_group">
+                            <label class="form_label">Serial Number *</label>
+                            <input type="text" class="form_input" id="product-name" placeholder="e.g., SNA00001" required>
                         </div>
                         
                         <div class="form_row">
@@ -124,7 +111,7 @@
 
                         <div class="form_group">
                             <label class="form_label">Product Description</label>
-                            <textarea class="form__textarea" id="product-description" rows="3" placeholder="Additional details about the product..."></textarea>
+                            <textarea class="form_textarea" id="product-description" rows="3" placeholder="Additional details about the product..."></textarea>
                         </div>
 
                         <div class="form_group">
@@ -322,7 +309,7 @@
                         <button type="button" class="btn btn-secondary" onclick="prevStep(2)">
                             <i class="fas fa-arrow-left"></i> Previous
                         </button>
-                        <button type="button" class="btn btn-primary" onclick="nextStep(4)" disabled id="step-3-next">
+                        <button type="button" class="btn btn-primary" onclick="nextStep(4)" id="step-3-next">
                             Next <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
