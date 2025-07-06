@@ -61,8 +61,8 @@ function renderCustomers(customers) {
                     <button class="btn btn-small btn-secondary" onclick="editCustomer(${customer.id})">
                         <i class="fas fa-edit"></i> Edit
                     </button>
-                    <button class="btn btn-small btn-info" onclick="sendReminder(${customer.id})">
-                        <i class="fas fa-bell"></i> Warn
+                    <button class="btn btn-small btn-danger" onclick="deleteCustomer(${customer.id})">
+                        <i class="fas fa-trash"></i> Delete
                     </button>
                 </div>
             </div>
@@ -187,6 +187,34 @@ function viewCustomer(customerId) {
 function editCustomer(customerId) {
     console.log("Editing customer:", customerId);
     showNotification("Opening edit form...", "info");
+}
+
+async function deleteCustomer(customerId) {
+    if (!confirm('Are you sure you want to delete this customer?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/customers/${customerId}`, {
+            method: 'DELETE',
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to delete customer');
+        }
+
+        // Remove the customer card from the UI
+        const customerCard = document.querySelector(`.customer-card[data-customer-id="${customerId}"]`);
+        if (customerCard) {
+            customerCard.remove();
+        }
+
+        window.AppUtils.showNotification('Customer deleted successfully!', 'success');
+    } catch (error) {
+        console.error('Error deleting customer:', error);
+        window.AppUtils.showNotification(error.message, 'error');
+    }
 }
 
 
