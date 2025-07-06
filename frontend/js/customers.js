@@ -18,14 +18,18 @@ async function fetchCustomers(search = '', sortBy = 'created_at', sortOrder = 'D
 
 function renderCustomers(customers) {
     const customerGrid = document.getElementById('customer-grid');
+    const customerTableBody = document.getElementById('customer-table-body');
     customerGrid.innerHTML = ''; // Clear existing customers
+    customerTableBody.innerHTML = ''; // Clear existing customers
 
     if (customers.length === 0) {
         customerGrid.innerHTML = '<p>No customers found.</p>';
+        customerTableBody.innerHTML = '<tr><td colspan="5">No customers found.</td></tr>';
         return;
     }
 
     customers.forEach(customer => {
+        // Render card view
         const customerCard = `
             <div class="customer-card" data-customer-id="${customer.id}">
                 <div class="customer-card_header">
@@ -68,7 +72,48 @@ function renderCustomers(customers) {
             </div>
         `;
         customerGrid.insertAdjacentHTML('beforeend', customerCard);
+
+        // Render table view
+        const customerTableRow = `
+            <tr data-customer-id="${customer.id}">
+                <td>${customer.name}</td>
+                <td>${customer.phone}</td>
+                <td>${customer.address || 'N/A'}</td>
+                <td>${new Date(customer.created_at).toLocaleDateString()}</td>
+                <td>
+                    <button class="btn btn-small btn-primary" onclick="viewCustomer(${customer.id})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-small btn-secondary" onclick="editCustomer(${customer.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-small btn-danger" onclick="deleteCustomer(${customer.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        customerTableBody.insertAdjacentHTML('beforeend', customerTableRow);
     });
+}
+
+let isCardView = true; // Default view
+
+function toggleView() {
+    isCardView = !isCardView;
+    const customerGrid = document.getElementById('customer-grid');
+    const customerTableView = document.getElementById('customer-table-view');
+    const toggleViewBtn = document.getElementById('toggle-view-btn');
+
+    if (isCardView) {
+        customerGrid.style.display = 'grid';
+        customerTableView.style.display = 'none';
+        toggleViewBtn.innerHTML = '<i class="fas fa-table"></i> Toggle View';
+    } else {
+        customerGrid.style.display = 'none';
+        customerTableView.style.display = 'block';
+        toggleViewBtn.innerHTML = '<i class="fas fa-th-large"></i> Toggle View';
+    }
 }
 
 // Customer management specific functionality
@@ -86,6 +131,9 @@ function setupCustomerManagement() {
 
     // Add event listener for the form
     $("#add-customer-form").on("submit", handleAddCustomer);
+
+    // Add event listener for the toggle view button
+    $("#toggle-view-btn").on("click", toggleView);
 
     // Initial fetch of customers
     fetchCustomers();
@@ -262,6 +310,8 @@ async function handleUpdateCustomer(event) {
 
         window.AppUtils.closeModal('edit-customer-modal');
         window.AppUtils.showNotification('Customer updated successfully!', 'success');
+        // Refresh the customer list to show the updated customer in both views
+        fetchCustomers();
     } catch (error) {
         console.error('Error updating customer:', error);
         window.AppUtils.showNotification(error.message, 'error');
@@ -288,13 +338,8 @@ async function deleteCustomer(customerId) {
             throw new Error(errorData.error || 'Failed to delete customer');
         }
 
-        // Remove the customer card from the UI
-        const customerCard = document.querySelector(`.customer-card[data-customer-id="${customerId}"]`);
-        if (customerCard) {
-            customerCard.remove();
-        }
-
         window.AppUtils.showNotification('Customer deleted successfully!', 'success');
+        fetchCustomers();
     } catch (error) {
         console.error('Error deleting customer:', error);
         window.AppUtils.showNotification(error.message, 'error');
@@ -309,6 +354,13 @@ function sendUrgentReminder(customerId) {
 
 function toggleFilters() {
     $("#filters-panel").slideToggle(200);
+}
+
+function resetFilters() {
+    $("#customer-search").val('');
+    $(".filters_select").eq(0).val('created_at'); // Reset Sort By to 'Create Date'
+    $(".filters_select").eq(1).val('DESC'); // Reset Order to 'Descending'
+    fetchCustomers(); // Re-fetch customers with default filters
 }
 
 async function handleAddCustomer(event) {
@@ -334,8 +386,8 @@ async function handleAddCustomer(event) {
         // Handle success
         window.AppUtils.closeModal('add-customer-modal');
         window.AppUtils.showNotification('Customer added successfully!', 'success');
-        // Optionally, refresh the customer list or add the new customer to the grid
-        addCustomerToGrid(newCustomer);
+        // Refresh the customer list to show the new customer in both views
+        fetchCustomers();
         form.reset();
 
     } catch (error) {

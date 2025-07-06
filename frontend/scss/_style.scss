@@ -540,6 +540,7 @@ a{
 
 .filters {
     display: grid;
+    align-items: flex-end;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--spacing-md);
     padding: var(--spacing-lg);
@@ -547,6 +548,11 @@ a{
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--color-gray-300);
     box-shadow: var(--shadow-sm);
+
+    .filters_actions{
+        display: flex;
+        justify-content: end;
+    }
 }
 
 .filters_group {
