@@ -76,11 +76,11 @@ function renderCustomers(customers) {
         // Render table view
         const customerTableRow = `
             <tr data-customer-id="${customer.id}">
-                <td>${customer.name}</td>
-                <td>${customer.phone}</td>
-                <td>0</td>
-                <td>$0</td>
-                <td>
+                <td data-label="Name">${customer.name}</td>
+                <td data-label="Phone">${customer.phone}</td>
+                <td data-label="Active Plans">0</td>
+                <td data-label="Total Amount">$0</td>
+                <td data-label="Actions">
                     <button class="btn btn-small btn-primary" onclick="viewCustomer(${customer.id})">
                         <i class="fas fa-eye"></i>
                     </button>

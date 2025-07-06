@@ -95,6 +95,45 @@
     justify-content: flex-start;
 }
 
+.customer-table-view {
+    .table {
+        @media (max-width: 768px) {
+            thead {
+                display: none;
+            }
+
+            tr {
+                display: block;
+                margin-bottom: var(--spacing-md);
+                border: 1px solid var(--color-gray-200);
+                border-radius: var(--border-radius-lg);
+                overflow: hidden;
+            }
+
+            td {
+                display: block;
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+
+                &::before {
+                    content: attr(data-label);
+                    position: absolute;
+                    left: var(--spacing-md);
+                    width: calc(50% - var(--spacing-md));
+                    text-align: left;
+                    font-weight: 600;
+                    color: var(--color-gray-700);
+                }
+            }
+
+            td:last-child {
+                border-bottom: none;
+            }
+        }
+    }
+}
+
 // Customer detail
 .customer-detail {
     padding: var(--spacing-lg);
