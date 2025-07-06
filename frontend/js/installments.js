@@ -5,8 +5,7 @@ var installmentsData = [
     { id: 3, customer: 'Peter Jones', product: 'Smart TV', amount: 1500, dueDate: '2024-07-25', status: 'completed' },
 ];
 
-let currentStep = 1 // Declare the currentStep variable
-
+var currentStep = 1 // Declare the currentStep variable
 
 // Initial setup on document ready
 $(document).ready(function() {
