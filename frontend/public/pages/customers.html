@@ -6,9 +6,14 @@
             <h1 class="page-header_title">Customers</h1>
             <p class="page-header_subtitle">Manage customers</p>
         </div>
-        <button class="btn btn-primary" onclick="openModal('add-customer-modal')">
-            <i class="fas fa-plus"></i> Create Customer
-        </button>
+        <div class="page-header_actions">
+            <button class="btn btn-secondary" id="toggle-view-btn">
+                <i class="fas fa-table"></i> Toggle View
+            </button>
+            <button class="btn btn-primary" onclick="openModal('add-customer-modal')">
+                <i class="fas fa-plus"></i> Create Customer
+            </button>
+        </div>
     </header>
 
     <!-- Search and Filters -->
@@ -38,6 +43,11 @@
                     <option value="ASC">Ascending</option>
                 </select>
             </div>
+            <div class="filters_actions">
+                <button class="btn btn-secondary" onclick="resetFilters()">
+                    <i class="fas fa-sync-alt"></i> Reset Filters
+                </button>
+            </div>
         </div>
     </section>
 
@@ -46,6 +56,25 @@
         <div class="customer-grid" id="customer-grid">
             <div class="loading-overlay" style="display: none;">
                 <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <div class="customer-table-view" id="customer-table-view" style="display: none;">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customer-table-body">
+                        <!-- Customer table rows will be rendered here -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </section>
