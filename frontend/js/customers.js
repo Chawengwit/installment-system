@@ -1,5 +1,7 @@
 async function fetchCustomers(search = '', sortBy = 'created_at', sortOrder = 'DESC') {
+    const loadingOverlay = $('#customer-grid .loading-overlay');
     try {
+        loadingOverlay.show();
         const response = await fetch(`/api/customers?search=${search}&sortBy=${sortBy}&sortOrder=${sortOrder}`);
         if (!response.ok) {
             throw new Error('Failed to fetch customers');
@@ -9,6 +11,8 @@ async function fetchCustomers(search = '', sortBy = 'created_at', sortOrder = 'D
     } catch (error) {
         console.error('Error fetching customers:', error);
         window.AppUtils.showNotification(error.message, 'error');
+    } finally {
+        loadingOverlay.hide();
     }
 }
 
