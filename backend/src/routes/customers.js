@@ -85,4 +85,56 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
+// GET /api/customers/:id
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await db.query('SELECT * FROM customers WHERE id = $1', [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch customer' });
+    }
+});
+
+// PUT /api/customers/:id
+router.put('/:id', upload.single('idCard'), async (req, res) => {
+    const { id } = req.params;
+    const { name, phone, address } = req.body;
+    let id_card_image;
+
+    try {
+        // Check if there is a new file upload
+        if (req.file) {
+            id_card_image = '/uploads/' + path.basename(req.file.path);
+        } else {
+            // If no new file, keep the existing one
+            const currentCustomer = await db.query('SELECT id_card_image FROM customers WHERE id = $1', [id]);
+            if (currentCustomer.rows.length > 0) {
+                id_card_image = currentCustomer.rows[0].id_card_image;
+            }
+        }
+
+        const result = await db.query(
+            'UPDATE customers SET name = $1, phone = $2, address = $3, id_card_image = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 RETURNING *',
+            [name, phone, address, id_card_image, id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to update customer' });
+    }
+});
+
 module.exports = router;

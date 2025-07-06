@@ -184,10 +184,94 @@ function viewCustomer(customerId) {
     openModal("customer-detail-modal")
 }
 
-function editCustomer(customerId) {
-    console.log("Editing customer:", customerId);
-    showNotification("Opening edit form...", "info");
+async function editCustomer(customerId) {
+    try {
+        const response = await fetch(`/api/customers/${customerId}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch customer data');
+        }
+        const customer = await response.json();
+
+        const form = document.getElementById('edit-customer-form');
+        form.elements['id'].value = customer.id;
+        form.elements['name'].value = customer.name;
+        form.elements['phone'].value = customer.phone;
+        form.elements['address'].value = customer.address;
+
+        const preview = form.querySelector('.id-card-preview');
+        const placeholder = form.querySelector('.image-preview-placeholder');
+
+        if (customer.id_card_image) {
+            preview.src = customer.id_card_image;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+        } else {
+            preview.style.display = 'none';
+            placeholder.style.display = 'block';
+        }
+
+        // Handle image preview for new uploads
+        const fileInput = form.querySelector('#edit-idCard-input');
+        fileInput.onchange = () => {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.AppUtils.openModal('edit-customer-modal');
+    } catch (error) {
+        console.error('Error fetching customer for edit:', error);
+        window.AppUtils.showNotification(error.message, 'error');
+    }
 }
+
+async function handleUpdateCustomer(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const customerId = formData.get('id');
+    const loadingOverlay = $('#edit-customer-modal .loading-overlay');
+
+    try {
+        loadingOverlay.show();
+        const response = await fetch(`/api/customers/${customerId}`, {
+            method: 'PUT',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to update customer');
+        }
+
+        const updatedCustomer = await response.json();
+
+        // Update the customer card in the UI
+        const customerCard = document.querySelector(`.customer-card[data-customer-id="${customerId}"]`);
+        if (customerCard) {
+            customerCard.querySelector('.customer-card_name').textContent = updatedCustomer.name;
+            customerCard.querySelector('.customer-card_phone').textContent = updatedCustomer.phone;
+        }
+
+        window.AppUtils.closeModal('edit-customer-modal');
+        window.AppUtils.showNotification('Customer updated successfully!', 'success');
+    } catch (error) {
+        console.error('Error updating customer:', error);
+        window.AppUtils.showNotification(error.message, 'error');
+    } finally {
+        loadingOverlay.hide();
+    }
+}
+
+// Add event listener for the edit form
+document.getElementById('edit-customer-form').addEventListener('submit', handleUpdateCustomer);
 
 async function deleteCustomer(customerId) {
     if (!confirm('Are you sure you want to delete this customer?')) {
