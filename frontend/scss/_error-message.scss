@@ -1,0 +1,17 @@
+
+.error-message {
+  color: #d9534f;
+  font-size: 0.875em;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.form_input.error,
+.form_select.error,
+.form_textarea.error {
+  border-color: #d9534f;
+  &:focus {
+    border-color: #d9534f;
+    box-shadow: 0 0 0 2px rgba(217, 83, 79, 0.2);
+  }
+}

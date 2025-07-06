@@ -990,11 +990,6 @@ a{
     }
 }
 
-// Plan form
-.plan-form-section {
-    max-width: 800px;
-    margin: 0 auto;
-}
 
 .plan-form-container {
     background-color: var(--color-white);
@@ -1152,7 +1147,7 @@ a{
 // Responsive utilities
 @media (max-width: 768px) {
     .form_actions {
-        flex-direction: column;
+        // flex-direction: column;
     }
 
     .stats-grid {

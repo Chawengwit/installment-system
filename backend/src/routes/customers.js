@@ -16,6 +16,35 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// GET /api/customers
+router.get('/', async (req, res) => {
+    const { search, sortBy, sortOrder } = req.query;
+
+    let query = 'SELECT * FROM customers';
+    const queryParams = [];
+
+    if (search) {
+        query += ' WHERE name ILIKE $1 OR phone ILIKE $1';
+        queryParams.push(`%${search}%`);
+    }
+
+    const validSortBy = ['name', 'created_at'];
+    const orderBy = validSortBy.includes(sortBy) ? sortBy : 'created_at';
+
+    const validSortOrder = ['ASC', 'DESC'];
+    const order = validSortOrder.includes(sortOrder?.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
+
+    query += ` ORDER BY ${orderBy} ${order}`;
+
+    try {
+        const result = await db.query(query, queryParams);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch customers' });
+    }
+});
+
 // POST /api/customers
 router.post('/', upload.single('idCard'), async (req, res) => {
     const { name, phone, address } = req.body;

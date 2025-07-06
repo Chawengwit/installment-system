@@ -1,5 +1,3 @@
-let currentStep = 1;
-
 initializeApp();
 
 // Initialize application
@@ -82,14 +80,6 @@ function handleCreatePlan(e) {
         window.location.href = "index.html";
         }, 1000);
     }, 2000);
-}
-
-function resetPlanForm() {
-    currentStep = 1;
-    $(".form-step").removeClass("form-step-active");
-    $("#step-1").addClass("form-step-active");
-    $("#installment-plan-form")[0].reset();
-    $("#calculation-summary").hide();
 }
 
 function handleAddCard(e) {

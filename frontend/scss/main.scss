@@ -1,8 +1,9 @@
-@use './style';
-@use './nav';
-@use './dashboard';
-@use './customers';
-@use './credit-cards';
-@use './installments';
-@use './loading';
+@import "style";
+@import "nav";
+@import "dashboard";
+@import "customers";
+@import "credit-cards";
+@import "installments";
+@import "loading";
+@import "error-message";
 

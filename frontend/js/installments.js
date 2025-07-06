@@ -5,6 +5,14 @@ var installmentsData = [
     { id: 3, customer: 'Peter Jones', product: 'Smart TV', amount: 1500, dueDate: '2024-07-25', status: 'completed' },
 ];
 
+let currentStep = 1 // Declare the currentStep variable
+
+
+// Initial setup on document ready
+$(document).ready(function() {
+    setupInstallmentsPage();
+});
+
 function setupInstallmentsPage() {
     // Event listener for adding a new installment
     $('#installment-add-form').on('submit', handleAddInstallment);
@@ -148,9 +156,128 @@ function toggleInstallmentSections(showCreateForm) {
     }
 }
 
-// Initial setup on document ready
-$(document).ready(function() {
-    setupInstallmentsPage();
-    // Initially show the create form and hide the existing plans section
-    $('.existing-installments-section').hide();
-});
+function prevStep(step) {
+    // Form step
+    $(".form-step").removeClass("form-step-active");
+    $(`#step-${step}`).addClass("form-step-active");
+
+    // Progress indicator
+    $(".progress-indicator_step").removeClass("progress-indicator_step-active");
+    $(`.progress-indicator_step[data-step="${step}"]`).addClass("progress-indicator_step-active");
+
+    currentStep = step;
+}
+
+function nextStep(step) {
+    if (validateCurrentStep()) {
+        // Form step
+        $(".form-step").removeClass("form-step-active");
+        $(`#step-${step}`).addClass("form-step-active");
+
+        // Progress indicator
+        $(".progress-indicator_step").removeClass("progress-indicator_step-active");
+        $(`.progress-indicator_step[data-step="${step}"]`).addClass("progress-indicator_step-active");
+
+        currentStep = step;
+
+        // Update review section if going to step 5
+        if (step === 5) {
+            updateReviewSection();
+        }
+    }
+}
+
+function resetPlanForm() {
+    currentStep = 1;
+    $(".form-step").removeClass("form-step-active");
+    $("#step-1").addClass("form-step-active");
+    $("#installment-plan-form")[0].reset();
+    $("#calculation-summary").hide();
+}
+
+function validateCurrentStep() {
+    let isValid = true;
+    const currentStepElement = $(`.form-step-active`);
+
+    // Remove previous error states
+    currentStepElement.find(".form_input, .form_select").removeClass("error");
+    currentStepElement.find(".error-message").remove();
+
+    // Validate required fields in current step
+    currentStepElement.find("[required]").each(function () {
+        if (!$(this).val()) {
+            $(this).addClass("error")
+            $(this).after('<span class="error-message">This field is required</span>')
+            isValid = false;
+        }
+    })
+
+    // Step-specific validation
+    switch (currentStep) {
+        case 1:
+            const price = Number.parseFloat($("#product-price").val());
+            if (price <= 0) {
+                $("#product-price").addClass("error");
+                $("#product-price").after('<span class="error-message">Price must be greater than 0</span>');
+                isValid = false;
+            }
+        break
+
+        case 2:
+            if (!$("#installment-months").val()) {
+                $("#installment-months").addClass("error");
+                isValid = false;
+            }
+        break
+
+        case 3:
+            if (!$("#customer-select").val()) {
+                $("#customer-select").addClass("error");
+                isValid = false;
+            }
+        break
+
+        case 4:
+            if (!$('input[name="payment-method"]:checked').val()) {
+                $(".payment-methods").after('<span class="error-message">Please select a payment method</span>');
+                isValid = false;
+            }
+
+            if ($('input[name="payment-method"]:checked').val() === "credit-card" && !$("#card-select").val()) {
+                $("#card-select").addClass("error");
+                isValid = false;
+            }
+        break
+    }
+
+    if (!isValid) {
+        showNotification("Please fill in all required fields", "warning");
+    }
+
+    return isValid
+}
+
+function updateReviewSection() {
+    // Customer
+    const customerText = $("#customer-select option:selected").text()
+    $("#review-customer").text(customerText)
+
+    // Product
+    const productName = $("#product-name").val()
+    const productPrice = $("#product-price").val()
+    $("#review-product").text(`${productName} - ${formatCurrency(Number.parseFloat(productPrice))}`)
+
+    // Payment method
+    const paymentMethod = $('input[name="payment-method"]:checked').val();
+    let paymentText = paymentMethod === "cash" ? "Cash" : "Credit Card"
+    if (paymentMethod === "credit-card") {
+        const cardText = $("#card-select option:selected").text();
+        paymentText += ` - ${cardText.split(" - ")[0]}`
+    }
+    $("#review-payment-method").text(paymentText);
+
+    // Terms
+    const months = $("#installment-months").val();
+    const monthlyAmount = $("#summary-monthly").text();
+    $("#review-terms").text(`${months} months - ${monthlyAmount}/month`);
+}
