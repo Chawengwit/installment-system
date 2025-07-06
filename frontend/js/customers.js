@@ -323,27 +323,25 @@ async function handleUpdateCustomer(event) {
 // Add event listener for the edit form
 document.getElementById('edit-customer-form').addEventListener('submit', handleUpdateCustomer);
 
-async function deleteCustomer(customerId) {
-    if (!confirm('Are you sure you want to delete this customer?')) {
-        return;
-    }
+function deleteCustomer(customerId) {
+    window.AppUtils.showConfirmationModal('Are you sure you want to delete this customer?', async () => {
+        try {
+            const response = await fetch(`/api/customers/${customerId}`, {
+                method: 'DELETE',
+            });
 
-    try {
-        const response = await fetch(`/api/customers/${customerId}`, {
-            method: 'DELETE',
-        });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to delete customer');
+            }
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to delete customer');
+            window.AppUtils.showNotification('Customer deleted successfully!', 'success');
+            fetchCustomers();
+        } catch (error) {
+            console.error('Error deleting customer:', error);
+            window.AppUtils.showNotification(error.message, 'error');
         }
-
-        window.AppUtils.showNotification('Customer deleted successfully!', 'success');
-        fetchCustomers();
-    } catch (error) {
-        console.error('Error deleting customer:', error);
-        window.AppUtils.showNotification(error.message, 'error');
-    }
+    });
 }
 
 

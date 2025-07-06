@@ -192,6 +192,26 @@
 
 <script src="js/customers.js"></script>
 
+<!-- Confirmation Modal -->
+<div class="modal" id="confirmation-modal">
+    <div class="modal_overlay"></div>
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3 class="modal_title">Confirm Action</h3>
+            <button class="modal_close" onclick="window.AppUtils.closeModal('confirmation-modal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal_body">
+            <p id="confirmation-message"></p>
+        </div>
+        <div class="modal_footer">
+            <button class="btn btn-secondary" onclick="window.AppUtils.closeModal('confirmation-modal')">Cancel</button>
+            <button class="btn btn-danger" id="confirm-action-btn">Confirm</button>
+        </div>
+    </div>
+</div>
+
 <!-- Edit Customer Modal -->
 <div class="modal" id="edit-customer-modal">
     <div class="modal_overlay" onclick="closeModal('edit-customer-modal')"></div>
