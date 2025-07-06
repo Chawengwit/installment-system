@@ -1,6 +1,6 @@
-async function fetchCustomers(search = '', sortBy = 'created_at') {
+async function fetchCustomers(search = '', sortBy = 'created_at', sortOrder = 'DESC') {
     try {
-        const response = await fetch(`/api/customers?search=${search}&sortBy=${sortBy}`);
+        const response = await fetch(`/api/customers?search=${search}&sortBy=${sortBy}&sortOrder=${sortOrder}`);
         if (!response.ok) {
             throw new Error('Failed to fetch customers');
         }
@@ -89,18 +89,22 @@ function setupCustomerManagement() {
 
 function setupAdvancedSearch() {
     // Search input with debouncing
-    $("#customer-search").on("input", window.AppUtils.debounce(function () {
-            const searchTerm = $('#customer-search').val().toLowerCase()
-            const sortBy = $(".filters__select").eq(1).val();
-            fetchCustomers(searchTerm, sortBy);
+    $("#customer-search").on(
+            "input",
+            window.AppUtils.debounce(function () {
+        const searchTerm = $('#customer-search').val().toLowerCase()
+        const sortBy = $(".filters_select").eq(0).val();
+        const sortOrder = $(".filters_select").eq(1).val();
+        fetchCustomers(searchTerm, sortBy, sortOrder);
         }, 300),
     )
 
     // Filter dropdowns
-    $(".filters__select").on("change", () => {
+    $(".filters_select").on("change", () => {
         const searchTerm = $("#customer-search").val().toLowerCase();
-        const sortBy = $(".filters__select").eq(1).val();
-        fetchCustomers(searchTerm, sortBy);
+        const sortBy = $(".filters_select").eq(0).val();
+        const sortOrder = $(".filters_select").eq(1).val();
+        fetchCustomers(searchTerm, sortBy, sortOrder);
     })
 }
 

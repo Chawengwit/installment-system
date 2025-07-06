@@ -18,7 +18,7 @@ const upload = multer({ storage: storage });
 
 // GET /api/customers
 router.get('/', async (req, res) => {
-    const { search, sortBy } = req.query;
+    const { search, sortBy, sortOrder } = req.query;
 
     let query = 'SELECT * FROM customers';
     const queryParams = [];
@@ -28,13 +28,13 @@ router.get('/', async (req, res) => {
         queryParams.push(`%${search}%`);
     }
 
-    if (sortBy === 'name') {
-        query += ' ORDER BY name ASC';
-    } else if (sortBy === 'created_at') {
-        query += ' ORDER BY created_at DESC';
-    } else {
-        query += ' ORDER BY created_at DESC';
-    }
+    const validSortBy = ['name', 'created_at'];
+    const orderBy = validSortBy.includes(sortBy) ? sortBy : 'created_at';
+
+    const validSortOrder = ['ASC', 'DESC'];
+    const order = validSortOrder.includes(sortOrder?.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
+
+    query += ` ORDER BY ${orderBy} ${order}`;
 
     try {
         const result = await db.query(query, queryParams);
