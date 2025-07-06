@@ -108,11 +108,11 @@ function toggleView() {
     if (isCardView) {
         customerGrid.style.display = 'grid';
         customerTableView.style.display = 'none';
-        toggleViewBtn.innerHTML = '<i class="fas fa-table"></i> Toggle View';
+        toggleViewBtn.innerHTML = '<i class="fas fa-table"></i> Table View';
     } else {
         customerGrid.style.display = 'none';
         customerTableView.style.display = 'block';
-        toggleViewBtn.innerHTML = '<i class="fas fa-th-large"></i> Toggle View';
+        toggleViewBtn.innerHTML = '<i class="fas fa-th-large"></i> Card View';
     }
 }
 
