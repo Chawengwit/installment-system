@@ -78,8 +78,8 @@ function renderCustomers(customers) {
             <tr data-customer-id="${customer.id}">
                 <td>${customer.name}</td>
                 <td>${customer.phone}</td>
-                <td>${customer.address || 'N/A'}</td>
-                <td>${new Date(customer.created_at).toLocaleDateString()}</td>
+                <td>0</td>
+                <td>$0</td>
                 <td>
                     <button class="btn btn-small btn-primary" onclick="viewCustomer(${customer.id})">
                         <i class="fas fa-eye"></i>
@@ -108,11 +108,11 @@ function toggleView() {
     if (isCardView) {
         customerGrid.style.display = 'grid';
         customerTableView.style.display = 'none';
-        toggleViewBtn.innerHTML = '<i class="fas fa-table"></i> Toggle View';
+        toggleViewBtn.innerHTML = '<i class="fas fa-table"></i> Table View';
     } else {
         customerGrid.style.display = 'none';
         customerTableView.style.display = 'block';
-        toggleViewBtn.innerHTML = '<i class="fas fa-th-large"></i> Toggle View';
+        toggleViewBtn.innerHTML = '<i class="fas fa-th-large"></i> Card View';
     }
 }
 

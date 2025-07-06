@@ -219,12 +219,6 @@ a{
     }
 
     &.btn-danger {
-        background-color: var {
-            background-color: #0891b2;
-        }
-    }
-
-    &.btn-danger {
         background-color: var(--color-danger);
         color: var(--color-white);
 
