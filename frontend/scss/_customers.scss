@@ -92,6 +92,7 @@
     display: flex;
     gap: var(--spacing-sm);
     padding: var(--spacing-lg);
+    justify-content: flex-start;
 }
 
 // Customer detail
