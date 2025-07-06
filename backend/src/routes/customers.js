@@ -67,4 +67,22 @@ router.post('/', upload.single('idCard'), async (req, res) => {
     }
 });
 
+// DELETE /api/customers/:id
+router.delete('/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await db.query('DELETE FROM customers WHERE id = $1 RETURNING *', [id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+
+        res.status(200).json({ message: 'Customer deleted successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to delete customer' });
+    }
+});
+
 module.exports = router;
