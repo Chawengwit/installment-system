@@ -1,11 +1,11 @@
 // Modal functions
 function openModal(modalId) {
-    $(`#${modalId}`).addClass("active");
+    $(`#${modalId}`).addClass("open");
     $("body").css("overflow", "hidden");
 }
 
 function closeModal(modalId) {
-    $(`#${modalId}`).removeClass("active");
+    $(`#${modalId}`).removeClass("open");
     $("body").css("overflow", "auto");
 
     // Reset form if it exists
@@ -13,6 +13,20 @@ function closeModal(modalId) {
     if (form.length) {
         form[0].reset();
     }
+}
+
+function showConfirmationModal(message, onConfirm) {
+    const confirmationModal = $('#confirmation-modal');
+    const confirmationMessage = $('#confirmation-message');
+    const confirmActionBtn = $('#confirm-action-btn');
+
+    confirmationMessage.text(message);
+    confirmActionBtn.off('click').on('click', () => {
+        onConfirm();
+        closeModal('confirmation-modal');
+    });
+
+    openModal('confirmation-modal');
 }
 
 function debounce(func, wait) {
@@ -104,4 +118,5 @@ window.AppUtils = {
     formatCurrency,
     formatDate,
     debounce,
+    showConfirmationModal,
 };
