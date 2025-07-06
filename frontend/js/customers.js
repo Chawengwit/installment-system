@@ -89,12 +89,10 @@ function setupCustomerManagement() {
 
 function setupAdvancedSearch() {
     // Search input with debouncing
-    $("#customer-search").on(
-            "input",
-            window.AppUtils.debounce(function () {
-        const searchTerm = $(this).val().toLowerCase()
-        const sortBy = $(".filters__select").eq(1).val();
-        fetchCustomers(searchTerm, sortBy);
+    $("#customer-search").on("input", window.AppUtils.debounce(function () {
+            const searchTerm = $('#customer-search').val().toLowerCase()
+            const sortBy = $(".filters__select").eq(1).val();
+            fetchCustomers(searchTerm, sortBy);
         }, 300),
     )
 
