@@ -199,12 +199,31 @@ async function editCustomer(customerId) {
         form.elements['address'].value = customer.address;
 
         const preview = form.querySelector('.id-card-preview');
+        const placeholder = form.querySelector('.image-preview-placeholder');
+
         if (customer.id_card_image) {
             preview.src = customer.id_card_image;
             preview.style.display = 'block';
+            placeholder.style.display = 'none';
         } else {
             preview.style.display = 'none';
+            placeholder.style.display = 'block';
         }
+
+        // Handle image preview for new uploads
+        const fileInput = form.querySelector('#edit-idCard-input');
+        fileInput.onchange = () => {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        };
 
         window.AppUtils.openModal('edit-customer-modal');
     } catch (error) {

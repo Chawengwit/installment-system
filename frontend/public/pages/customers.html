@@ -192,8 +192,19 @@
             </div>
             <div class="form_group">
                 <label class="form_label">ID Card Photo</label>
-                <input type="file" class="form_file" name="idCard" accept="image/*">
-                <img src="" alt="ID Card Image" class="id-card-preview" style="max-width: 100px; margin-top: 10px; display: none;">
+                <div class="image-upload-container">
+                    <div class="image-preview">
+                        <img src="" alt="ID Card Image Preview" class="id-card-preview" style="display: none;">
+                        <span class="image-preview-placeholder">No Image</span>
+                    </div>
+                    <div class="image-upload-actions">
+                        <input type="file" class="form_file" name="idCard" id="edit-idCard-input" accept="image/*" style="display: none;">
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('edit-idCard-input').click();">
+                            <i class="fas fa-upload"></i> Upload New Image
+                        </button>
+                        <p class="image-upload-hint">Supports JPG, PNG, GIF</p>
+                    </div>
+                </div>
             </div>
             <div class="form_actions">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('edit-customer-modal')">Cancel</button>
