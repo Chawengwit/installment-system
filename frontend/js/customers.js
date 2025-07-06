@@ -1,3 +1,72 @@
+async function fetchCustomers(search = '', sortBy = 'created_at') {
+    try {
+        const response = await fetch(`/api/customers?search=${search}&sortBy=${sortBy}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch customers');
+        }
+        const customers = await response.json();
+        renderCustomers(customers);
+    } catch (error) {
+        console.error('Error fetching customers:', error);
+        window.AppUtils.showNotification(error.message, 'error');
+    }
+}
+
+function renderCustomers(customers) {
+    const customerGrid = document.getElementById('customer-grid');
+    customerGrid.innerHTML = ''; // Clear existing customers
+
+    if (customers.length === 0) {
+        customerGrid.innerHTML = '<p>No customers found.</p>';
+        return;
+    }
+
+    customers.forEach(customer => {
+        const customerCard = `
+            <div class="customer-card" data-customer-id="${customer.id}">
+                <div class="customer-card_header">
+                    <div class="customer-card_avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="customer-card_info">
+                        <h3 class="customer-card_name">${customer.name}</h3>
+                        <p class="customer-card_phone">${customer.phone}</p>
+                    </div>
+                    <div class="customer-card_status">
+                        <span class="badge badge-success">Current</span>
+                    </div>
+                </div>
+                <div class="customer-card_details">
+                    <div class="customer-card_stat">
+                        <span class="customer-card_stat-label">Active Plans</span>
+                        <span class="customer-card_stat-value">0</span>
+                    </div>
+                    <div class="customer-card_stat">
+                        <span class="customer-card_stat-label">Total Amount</span>
+                        <span class="customer-card_stat-value">$0</span>
+                    </div>
+                    <div class="customer-card_stat">
+                        <span class="customer-card_stat-label">Overdue</span>
+                        <span class="customer-card_stat-value">N/A</span>
+                    </div>
+                </div>
+                <div class="customer-card_actions">
+                    <button class="btn btn-small btn-primary" onclick="viewCustomer(${customer.id})">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="btn btn-small btn-secondary" onclick="editCustomer(${customer.id})">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-small btn-info" onclick="sendReminder(${customer.id})">
+                        <i class="fas fa-bell"></i> Warn
+                    </button>
+                </div>
+            </div>
+        `;
+        customerGrid.insertAdjacentHTML('beforeend', customerCard);
+    });
+}
+
 // Customer management specific functionality
 setupCustomerManagement()
 
@@ -13,6 +82,9 @@ function setupCustomerManagement() {
 
     // Add event listener for the form
     $("#add-customer-form").on("submit", handleAddCustomer);
+
+    // Initial fetch of customers
+    fetchCustomers();
 }
 
 function setupAdvancedSearch() {
@@ -21,40 +93,38 @@ function setupAdvancedSearch() {
             "input",
             window.AppUtils.debounce(function () {
         const searchTerm = $(this).val().toLowerCase()
-        filterCustomers(searchTerm)
+        const sortBy = $(".filters__select").eq(1).val();
+        fetchCustomers(searchTerm, sortBy);
         }, 300),
     )
 
     // Filter dropdowns
     $(".filters__select").on("change", () => {
-        applyFilters()
+        const searchTerm = $("#customer-search").val().toLowerCase();
+        const sortBy = $(".filters__select").eq(1).val();
+        fetchCustomers(searchTerm, sortBy);
     })
 }
 
 function setupCustomerCards() {
     // Add hover effects and click handlers
-    $(".customer-card").each(function () {
-        const $card = $(this)
+    $(document).on("click", ".customer-card", function (e) {
+        // Don't trigger if clicking on buttons
+        if (!$(e.target).closest("button").length) {
+            const customerId = $(this).data("customer-id") || 1
+            console.log("Viewing customer:", customerId)
+            window.AppUtils.openModal("customer-detail-modal")
+        }
+    })
 
-        // Add click to view functionality
-        $card.on("click", (e) => {
-            // Don't trigger if clicking on buttons
-            if (!$(e.target).closest("button").length) {
-                const customerId = $card.data("customer-id") || 1
-                console.log("Viewing customer:", customerId)
-                window.AppUtils.openModal("customer-detail-modal")
-            }
-        })
-
-        // Add keyboard navigation
-        $card.attr("tabindex", "0").on("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault()
-                const customerId = $card.data("customer-id") || 1
-                console.log("Viewing customer:", customerId)
-                window.AppUtils.openModal("customer-detail-modal")
-            }
-        })
+    // Add keyboard navigation
+    $(document).on("keydown", ".customer-card", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            const customerId = $(this).data("customer-id") || 1
+            console.log("Viewing customer:", customerId)
+            window.AppUtils.openModal("customer-detail-modal")
+        }
     })
 }
 
