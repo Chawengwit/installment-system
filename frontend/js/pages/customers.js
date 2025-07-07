@@ -21,10 +21,18 @@
             $main.on("submit", "#edit-customer-form", this.handleUpdateCustomer.bind(this));
             $main.on("click", ".btn-delete-customer", this.handleDeleteCustomer.bind(this));
             $main.on("click", ".search-bar_filter-btn", this.toggleFilters.bind(this));
+            $main.on("click", ".reset-filters-btn", this.resetFilters.bind(this));
         },
 
         toggleFilters: function() {
             $("#filters-panel").slideToggle(200);
+        },
+
+        resetFilters: function() {
+            $("#customer-search").val('');
+            $(".filters_select").eq(0).val('created_at');
+            $(".filters_select").eq(1).val('DESC');
+            this.fetchCustomers();
         },
 
         handleSearch: function() {
