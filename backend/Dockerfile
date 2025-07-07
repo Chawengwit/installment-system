@@ -13,7 +13,7 @@ COPY backend/src ./src
 COPY backend/tests ./tests
 
 # Copy frontend for serving static files
-# COPY frontend ./frontend
+COPY frontend ./frontend
 
 EXPOSE 3000
 
