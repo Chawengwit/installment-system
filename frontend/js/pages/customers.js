@@ -20,6 +20,11 @@
             $main.on("submit", "#add-customer-form", this.handleAddCustomer.bind(this));
             $main.on("submit", "#edit-customer-form", this.handleUpdateCustomer.bind(this));
             $main.on("click", ".btn-delete-customer", this.handleDeleteCustomer.bind(this));
+            $main.on("click", ".search-bar_filter-btn", this.toggleFilters.bind(this));
+        },
+
+        toggleFilters: function() {
+            $("#filters-panel").slideToggle(200);
         },
 
         handleSearch: function() {
