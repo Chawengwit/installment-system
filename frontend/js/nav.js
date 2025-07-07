@@ -1,62 +1,67 @@
 $(function() {
+    const $mainContent = $("#main-content");
+    const loadedScripts = {}; // Track which scripts have been loaded
+
     // Load the navigation bar
     $("#nav-container").load("/nav.html", function() {
-        // Set the active link on initial load
-        const initialPath = window.location.pathname;
-        const initialPage = (initialPath === "/" || initialPath === "/index.html") ? "/dashboard" : initialPath;
-        $(`.navbar_link[href="${initialPage}"]`).addClass("navbar_link--active");
+        setupNavigation();
 
-        // Add click handler for navigation links
-        $(".navbar_link").on("click", function(e) {
-            e.preventDefault();
-            const page = $(this).attr("href");
-            // Prevent reloading the same page
-            if (page === window.location.pathname) {
-                return;
-            }
-            loadPage(page);
-        });
-
-        // Add click handler for the navbar toggle
-        $("#navbar-toggle").on("click", function() {
-            $("#navbar-menu").toggleClass("active");
-        });
+        const path = normalizePath(window.location.pathname);
+        loadPage(path, true);
     });
 
-    // Function to load page content with a fade transition
-    function loadPage(page, isInitialLoad = false) {
-        const $mainContent = $("#main-content");
+    function setupNavigation() {
+        $(document).on("click", ".navbar_link", function (e) {
+            e.preventDefault();
+            const href = $(this).attr("href");
+            const page = normalizePath(href);
 
-        const action = () => {
-            // Use replaceState for initial load to avoid a blank entry in history
+            if (page === normalizePath(window.location.pathname)) return;
+            loadPage(page);
+        });
+    }
+
+    // Function to load page content with a fade transition
+    function loadPage(pagePath, isInitialLoad = false) {
+        const pageName = pagePath.replace("/", "");
+        const htmlPath = `/pages/${pageName}.html`;
+        const jsPath = `/js/${pageName}.js`;
+        const initFnName = `init${capitalize(pageName)}Page`;
+
+        const doLoad = () => {
             if (isInitialLoad) {
-                window.history.replaceState({ path: page }, '', page);
+                window.history.replaceState({ path: pagePath }, "", pagePath);
             } else {
-                window.history.pushState({ path: page }, '', page);
+                window.history.pushState({ path: pagePath }, "", pagePath);
             }
 
-            // Load the page content
-            $mainContent.load(`/pages${page}.html`, function(response, status, xhr) {
-                if (status == "error") {
-                    $mainContent.html('<h2>Page Not Found</h2><p>Sorry, the page you are looking for does not exist.</p>');
+            $mainContent.load(htmlPath, function (response, status) {
+                if (status === "error") {
+                    $mainContent.html(`<h2>Page Not Found</h2><p>${htmlPath} not found.</p>`);
+                    return;
                 }
-                // Update the active link in the navigation
-                $(".navbar_link").removeClass("navbar_link--active");
-                $(`.navbar_link[href="${page}"]`).addClass("navbar_link--active");
 
-                // Fade in the new content
+                $(".navbar_link").removeClass("navbar_link--active");
+                $(`.navbar_link[href="${pagePath}"]`).addClass("navbar_link--active");
+
+                if (!loadedScripts[jsPath]) {
+                    $.getScript(jsPath, function () {
+                        loadedScripts[jsPath] = true;
+                        if (typeof window[initFnName] === "function") {
+                            window[initFnName]();
+                        }
+                    });
+                } else {
+                    if (typeof window[initFnName] === "function") {
+                        window[initFnName]();
+                    }
+                }
+
                 $mainContent.fadeIn(200);
             });
         };
 
-        if (isInitialLoad) {
-            // For the first load, just load and fade in
-            $mainContent.hide();
-            action();
-        } else {
-            // For subsequent loads, fade out first
-            $mainContent.fadeOut(200, action);
-        }
+        $mainContent.fadeOut(200, doLoad);
     }
 
     // Handle back/forward button clicks
@@ -66,8 +71,11 @@ $(function() {
         }
     };
 
-    // Load the initial page
-    const initialPath = window.location.pathname;
-    const pageToLoad = (initialPath === "/" || initialPath === "/index.html") ? "/dashboard" : initialPath;
-    loadPage(pageToLoad, true);
+    function normalizePath(path) {
+        return path.replace(/^\/?index\.html$/, "/dashboard").replace(/\.html$/, "");
+    }
+
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
 });

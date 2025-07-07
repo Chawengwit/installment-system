@@ -1,20 +1,19 @@
 initializeApp();
 
-// Initialize application
+// Initialize global application behavior (not per-page)
 function initializeApp() {
-    setupEventListeners();
-    setupNavigation();
-    setupModals();
+    setupGlobalEventListeners();
+    setupGlobalModals();
 }
 
-// Setup event listeners
-function setupEventListeners() {
-    // Mobile navigation toggle
-    $("#navbar-toggle").on("click", () => {
+// Global event handlers
+function setupGlobalEventListeners() {
+    // Toggle mobile menu
+    $(document).on("click", "#navbar-toggle", function () {
         $("#navbar-menu").toggleClass("active");
     });
 
-    // Close mobile menu when clicking outside
+    // Click outside nav to close
     $(document).on("click", (e) => {
         if (!$(e.target).closest(".navbar").length) {
             $("#navbar-menu").removeClass("active");
@@ -29,29 +28,20 @@ function setupEventListeners() {
     $("#customer-search").on("input", debounce(handleCustomerSearch, 300));
 }
 
-// Setup modals
-function setupModals() {
-    // Close modal when clicking overlay
-    $(".modal_overlay").on("click", function () {
-        const modalId = $(this).closest(".modal").attr("id");
-        closeModal(modalId);
-    });
-
-    // Close modal with Escape key
-    $(document).on("keydown", (e) => {
+// Global modal ESC & overlay
+function setupGlobalModals() {
+    $(document).on("keydown", function (e) {
         if (e.key === "Escape") {
             $(".modal.active").each(function () {
                 closeModal($(this).attr("id"));
             });
         }
     });
-}
 
-function setupNavigation() {
-    // Highlight active navigation item based on current page
-    const currentPage = window.location.pathname.split("/").pop() || "index.html";
-    $(".navbar_link").removeClass("navbar_link--active");
-    $(`.navbar_link[href="${currentPage}"]`).addClass("navbar_link--active");
+    $(document).on("click", ".modal_overlay", function () {
+        const modalId = $(this).closest(".modal").attr("id");
+        closeModal(modalId);
+    });
 }
 
 // Installment plan functions
