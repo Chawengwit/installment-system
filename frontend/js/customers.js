@@ -192,8 +192,6 @@ function setupCustomerDetailModal() {
     })
 }
 
-
-
 function sendReminder(customerId, type = "email") {
     // Show loading state
     const $btn = $(event.target)
