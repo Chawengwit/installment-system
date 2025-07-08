@@ -78,7 +78,7 @@ router.post('/', upload.single('idCard'), async (req, res) => {
     const id_card_image = req.file ? '/uploads/' + basename(req.file.path) : null;
 
     // ✅ This is the validation part added
-    if (!name || !phone || !address) {
+    if (!name || !phone) {
         return res.status(400).json({ error: 'Some params are required' });
     }
 
