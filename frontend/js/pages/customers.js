@@ -128,6 +128,16 @@ class PageCustomers {
                         <p class="customer-card_phone">${customer.phone}</p>
                     </div>
                 </div>
+                <div class="customer-section-details">
+                    <div class="customer-section-details_item">
+                        <span class="label">Active Plans:</span>
+                        <span class="value">0</span>
+                    </div>
+                    <div class="customer-section-details_item">
+                        <span class="label">Total Amount:</span>
+                        <span class="value">$0</span>
+                    </div>
+                </div>
                 <div class="customer-card_actions">
                     <button class="btn btn-small btn-primary btn-view-customer"><i class="fas fa-eye"></i> View</button>
                     <button class="btn btn-small btn-secondary btn-edit-customer"><i class="fas fa-edit"></i> Edit</button>

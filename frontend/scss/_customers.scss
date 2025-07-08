@@ -55,6 +55,32 @@
     margin: 0;
 }
 
+.customer-section-details {
+    display: flex;
+    justify-content: space-around;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-top: 1px solid var(--color-gray-200);
+    border-bottom: 1px solid var(--color-gray-200);
+    margin-bottom: var(--spacing-md);
+
+    .customer-section-details_item {
+        text-align: center;
+
+        .label {
+            display: block;
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-600);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .value {
+            font-size: var(--font-size-md);
+            font-weight: 600;
+            color: var(--color-gray-900);
+        }
+    }
+}
+
 .customer-card_actions {
     display: flex;
     gap: var(--spacing-sm);
