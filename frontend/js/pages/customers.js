@@ -4,17 +4,21 @@ class PageCustomers {
     constructor() {
         this.isCardView = true;
         this.$mainContent = $("#main-content");
+        this.currentPage = 1;
+        this.customersPerPage = 10;
+        this.totalCustomers = 0;
+        this.isLoading = false;
+        this.hasMore = true;
     }
 
     init() {
-        this.fetchCustomers();
+        this.fetchCustomers(true);
         this.bindEvents();
-        console.log("Customers page initialized");
     }
 
     destroy() {
         this.$mainContent.off();
-        console.log("Customers page destroyed");
+        $(window).off("scroll");
     }
 
     bindEvents() {
@@ -30,7 +34,8 @@ class PageCustomers {
         this.$mainContent.on("click", ".search-bar_filter-btn", this.toggleFilters.bind(this));
         this.$mainContent.on("click", ".reset-filters-btn", this.resetFilters.bind(this));
 
-        // Modal Open/Close Events
+        $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
+
         this.$mainContent.on("click", "#create-customer-btn", () => openModal('add-customer-modal'));
         this.$mainContent.on("click", "#add-customer-modal .modal_overlay, #add-customer-modal .modal_close, #cancel-add-customer", () => closeModal('add-customer-modal'));
         this.$mainContent.on("click", "#customer-detail-modal .modal_overlay, #customer-detail-modal .modal_close", () => closeModal('customer-detail-modal'));
@@ -46,41 +51,62 @@ class PageCustomers {
         $("#customer-search").val('');
         $(".filters_select").eq(0).val('created_at');
         $(".filters_select").eq(1).val('DESC');
-        this.fetchCustomers();
+        this.currentPage = 1;
+        this.hasMore = true;
+        this.fetchCustomers(true);
     }
 
     handleSearch() {
+        this.currentPage = 1;
+        this.hasMore = true;
         const searchTerm = $('#customer-search').val().toLowerCase();
         const sortBy = $(".filters_select").eq(0).val();
         const sortOrder = $(".filters_select").eq(1).val();
-        this.fetchCustomers(searchTerm, sortBy, sortOrder);
+        this.fetchCustomers(true, searchTerm, sortBy, sortOrder);
     }
 
-    async fetchCustomers(search = '', sortBy = 'created_at', sortOrder = 'DESC') {
-        const loadingOverlay = $('#customer-grid .loading-overlay');
+    async fetchCustomers(clearExisting = false, search = '', sortBy = 'created_at', sortOrder = 'DESC') {
+        if (this.isLoading || !this.hasMore) {
+            return;
+        }
+
+        this.isLoading = true;
+        $('#infinite-scroll-loading').show();
+
+        const offset = (this.currentPage - 1) * this.customersPerPage;
         try {
-            loadingOverlay.show();
-            const response = await fetch(`/api/customers?search=${search}&sortBy=${sortBy}&sortOrder=${sortOrder}`);
+            const response = await fetch(`/api/customers?search=${search}&sortBy=${sortBy}&sortOrder=${sortOrder}&limit=${this.customersPerPage}&offset=${offset}`);
             if (!response.ok) throw new Error('Failed to fetch customers');
-            const customers = await response.json();
-            this.renderCustomers(customers);
+            const data = await response.json();
+
+            this.totalCustomers = data.totalCustomers;
+            this.hasMore = (this.currentPage * this.customersPerPage) < this.totalCustomers;
+
+            this.renderCustomers(data.customers, clearExisting);
+            this.currentPage++;
         } catch (error) {
             console.error('Error fetching customers:', error);
             showNotification(error.message, 'error');
         } finally {
-            loadingOverlay.hide();
+            this.isLoading = false;
+            $('#infinite-scroll-loading').hide();
         }
     }
 
-    renderCustomers(customers) {
+    renderCustomers(customers, clearExisting) {
         const customerGrid = $('#customer-grid');
         const customerTableBody = $('#customer-table-body');
-        customerGrid.html('');
-        customerTableBody.html('');
 
-        if (customers.length === 0) {
+        if (clearExisting) {
+            customerGrid.html('');
+            customerTableBody.html('');
+        }
+
+        if (customers.length === 0 && clearExisting) {
             customerGrid.html('<p>No customers found.</p>');
             customerTableBody.html('<tr><td colspan="5">No customers found.</td></tr>');
+            return;
+        } else if (customers.length === 0 && !clearExisting) {
             return;
         }
 
@@ -100,6 +126,16 @@ class PageCustomers {
                     <div class="customer-card_info">
                         <h3 class="customer-card_name">${customer.name}</h3>
                         <p class="customer-card_phone">${customer.phone}</p>
+                    </div>
+                </div>
+                <div class="customer-section-details">
+                    <div class="customer-section-details_item">
+                        <span class="label">Active Plans:</span>
+                        <span class="value">0</span>
+                    </div>
+                    <div class="customer-section-details_item">
+                        <span class="label">Total Amount:</span>
+                        <span class="value">$0</span>
                     </div>
                 </div>
                 <div class="customer-card_actions">
@@ -147,7 +183,6 @@ class PageCustomers {
     handleViewCustomer(e) {
         e.stopPropagation();
         const customerId = $(e.currentTarget).closest("[data-customer-id]").data("customer-id");
-        console.log("Viewing customer:", customerId);
         openModal("customer-detail-modal");
     }
 
@@ -163,7 +198,9 @@ class PageCustomers {
             if (!response.ok) throw new Error((await response.json()).error || 'Failed to create customer');
             closeModal('add-customer-modal');
             showNotification('Customer added successfully!', 'success');
-            this.fetchCustomers();
+            this.currentPage = 1;
+            this.hasMore = true;
+            this.fetchCustomers(true);
             form.reset();
         } catch (error) {
             showNotification(error.message, 'error');
@@ -185,7 +222,9 @@ class PageCustomers {
             if (!response.ok) throw new Error((await response.json()).error || 'Failed to update customer');
             closeModal('edit-customer-modal');
             showNotification('Customer updated successfully!', 'success');
-            this.fetchCustomers();
+            this.currentPage = 1;
+            this.hasMore = true;
+            this.fetchCustomers(true);
         } catch (error) {
             showNotification(error.message, 'error');
         } finally {
@@ -201,7 +240,9 @@ class PageCustomers {
                 const response = await fetch(`/api/customers/${customerId}`, { method: 'DELETE' });
                 if (!response.ok) throw new Error((await response.json()).error || 'Failed to delete customer');
                 showNotification('Customer deleted successfully!', 'success');
-                this.fetchCustomers();
+                this.currentPage = 1;
+                this.hasMore = true;
+                this.fetchCustomers(true);
             } catch (error) {
                 showNotification(error.message, 'error');
             }
@@ -236,7 +277,6 @@ class PageCustomers {
                 imageNotFoundPlaceholder.hide();
             }
 
-            // Handle image preview for new uploads
             const fileInput = form.find('#edit-idCard-input');
             fileInput.off('change').on('change', function() {
                 const file = this.files[0];
@@ -255,6 +295,14 @@ class PageCustomers {
         } catch (error) {
             console.error('Error fetching customer for edit:', error);
             showNotification(error.message, 'error');
+        }
+    }
+
+    handleScroll() {
+        const scrollHeight = $(document).height();
+        const scrollPos = $(window).height() + $(window).scrollTop();
+        if (scrollHeight - scrollPos < 200 && !this.isLoading && this.hasMore) {
+            this.fetchCustomers(false, $('#customer-search').val().toLowerCase(), $(".filters_select").eq(0).val(), $(".filters_select").eq(1).val());
         }
     }
 }

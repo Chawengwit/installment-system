@@ -35,14 +35,18 @@ const fileExists = async (filePath) => {
 
 // GET /api/customers
 router.get('/', async (req, res) => {
-    const { search, sortBy, sortOrder } = req.query;
+    const { search, sortBy, sortOrder, limit, offset } = req.query;
 
-    let query = 'SELECT * FROM customers';
+    let customerQuery = 'SELECT * FROM customers';
+    let countQuery = 'SELECT COUNT(*) FROM customers';
     const queryParams = [];
+    const countParams = [];
 
     if (search) {
-        query += ' WHERE name ILIKE $1 OR phone ILIKE $1';
+        customerQuery += ' WHERE name ILIKE $1 OR phone ILIKE $1';
+        countQuery += ' WHERE name ILIKE $1 OR phone ILIKE $1';
         queryParams.push(`%${search}%`);
+        countParams.push(`%${search}%`);
     }
 
     const validSortBy = ['name', 'created_at'];
@@ -51,11 +55,24 @@ router.get('/', async (req, res) => {
     const validSortOrder = ['ASC', 'DESC'];
     const order = validSortOrder.includes(sortOrder?.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
 
-    query += ` ORDER BY ${orderBy} ${order}`;
+    customerQuery += ` ORDER BY ${orderBy} ${order}`;
+
+    // Add limit and offset for pagination
+    if (limit) {
+        customerQuery += ` LIMIT $${queryParams.length + 1}`;
+        queryParams.push(limit);
+    }
+    if (offset) {
+        customerQuery += ` OFFSET $${queryParams.length + 1}`;
+        queryParams.push(offset);
+    }
 
     try {
-        const result = await dbQuery(query, queryParams);
-        const customers = await Promise.all(result.rows.map(async customer => {
+        const customersResult = await dbQuery(customerQuery, queryParams);
+        const countResult = await dbQuery(countQuery, countParams);
+        const totalCustomers = parseInt(countResult.rows[0].count, 10);
+
+        const customers = await Promise.all(customersResult.rows.map(async customer => {
             if (customer.id_card_image) {
                 const imagePath = join(__dirname, '..', '..', 'public', customer.id_card_image);
                 const exists = await fileExists(imagePath);
@@ -65,7 +82,7 @@ router.get('/', async (req, res) => {
             }
             return customer;
         }));
-        res.json(customers);
+        res.json({ customers, totalCustomers });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Failed to fetch customers' });
@@ -158,7 +175,7 @@ router.put('/:id', upload.single('idCard'), async (req, res) => {
 
         const result = await dbQuery(
             'UPDATE customers SET name = $1, phone = $2, address = $3, id_card_image = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 RETURNING *',
-            [name, phone, address, id_card_image]
+            [name, phone, address, id_card_image, id]
         );
 
         if (result.rowCount === 0) {
