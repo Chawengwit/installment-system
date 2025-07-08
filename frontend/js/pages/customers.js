@@ -29,6 +29,13 @@ class PageCustomers {
         this.$mainContent.on("click", ".btn-edit-customer", this.handleEditCustomer.bind(this));
         this.$mainContent.on("click", ".search-bar_filter-btn", this.toggleFilters.bind(this));
         this.$mainContent.on("click", ".reset-filters-btn", this.resetFilters.bind(this));
+
+        // Modal Open/Close Events
+        this.$mainContent.on("click", "#create-customer-btn", () => openModal('add-customer-modal'));
+        this.$mainContent.on("click", "#add-customer-modal .modal_overlay, #add-customer-modal .modal_close, #cancel-add-customer", () => closeModal('add-customer-modal'));
+        this.$mainContent.on("click", "#customer-detail-modal .modal_overlay, #customer-detail-modal .modal_close", () => closeModal('customer-detail-modal'));
+        this.$mainContent.on("click", "#edit-customer-modal .modal_overlay, #edit-customer-modal .modal_close, #cancel-edit-customer", () => closeModal('edit-customer-modal'));
+        this.$mainContent.on("click", "#confirmation-modal .modal_overlay, #confirmation-modal .modal_close, #cancel-confirmation", () => closeModal('confirmation-modal'));
     }
 
     toggleFilters() {
