@@ -42,42 +42,41 @@ All commands should be run from the `backend` directory.
 *   **Frontend:** Uses jQuery for DOM manipulation and AJAX. JavaScript is structured using ES Module classes for page-specific logic and utility functions.
 *   **API:** API routes are prefixed with `/api`.
 
-## Reusable Page Structure and Patterns
+## Reusable Page Structure and Patterns (Derived from Customers Page)
 
-The Customers page (`frontend/public/pages/customers.html`) serves as a template for other pages, demonstrating a consistent structure and set of reusable patterns:
+The Customers page (`frontend/public/pages/customers.html`, `frontend/js/pages/customers.js`, `frontend/scss/_customers.scss`) serves as a comprehensive template for building other pages in the application. It demonstrates a consistent structure, stage management, and reusable patterns for both UI and logic.
 
-### HTML Structure
-*   **Header:** `page-header` class for title, subtitle, and main actions (e.g., "Create Customer", "Toggle View").
-*   **Search and Filters:** `search-section` containing a `search-bar` (input, filter button) and a collapsible `filters` panel.
-*   **Content Display:** A section (e.g., `customer-list`) which dynamically switches between different views (e.g., `customer-grid` for card view, `customer-table-view` for table view). Both views typically include a `loading-overlay`.
-*   **Modals:** Separate `div` elements with `modal` class for various interactions (e.g., Add, Edit, Detail, Confirmation). These are typically hidden by default and controlled by JavaScript.
+### HTML Structure (e.g., `frontend/public/pages/customers.html`)
+*   **Page Header (`page-header`):** Consistent layout for page titles, subtitles, and primary actions (e.g., "Create Customer", "Toggle View").
+*   **Search and Filters (`search-section`):** Standardized section for search input (`search-bar`) and a collapsible filter panel (`filters`).
+*   **Content Display (`customer-list`):** A flexible section to display dynamic content, often switching between different views (e.g., `customer-grid` for card view, `customer-table-view` for table view). Includes a `loading-overlay` for asynchronous operations.
+*   **Modals (`modal`):** Reusable modal structures for various interactions (Add, Edit, Detail, Confirmation). These are typically hidden by default and controlled by JavaScript.
+*   **Infinite Scroll Loading Indicator (`infinite-scroll-loading`):** A dedicated element to show loading status during infinite scrolling.
 
-### JavaScript Patterns (ES Modules)
-Page-specific JavaScript (e.g., `frontend/js/pages/customers.js`) is structured as an ES Module exporting a class, following these conventions:
-*   **ES Module Class:** Logic is encapsulated within a class (e.g., `PageCustomers`), exported as the default.
-*   **`constructor()`:** Initializes properties like `$mainContent` (the page's main content wrapper).
-*   **`init()`:** The main entry point for the page, responsible for initial data fetching and binding event listeners.
-*   **`destroy()`:** A method to clean up event listeners and resources when navigating away from the page, preventing memory leaks.
-*   **`bindEvents()`:** Centralized event delegation using `$("#main-content").on(...)` to handle interactions within the main content area. This ensures events are bound once and are effective for dynamically added content.
-*   **Data Fetching:** Asynchronous methods (e.g., `fetchCustomers()`) handle API calls, search, sorting, and display loading states.
-*   **Rendering:** Methods like `renderCustomers()` dynamically generate HTML based on fetched data. Helper methods (e.g., `createCustomerCard()`, `createCustomerTableRow()`) are used for individual element creation.
-*   **View Toggling:** Functions to switch between different content layouts (e.g., card vs. table views).
-*   **Modal Interactions:** Methods (e.g., `handleAddCustomer`, `handleUpdateCustomer`, `handleDeleteCustomer`, `handleEditCustomer`, `handleViewCustomer`) manage form submissions, API calls, and modal visibility using imported utility functions (e.g., `openModal`, `closeModal`, `showConfirmationModal`).
-*   **Utility Usage:** Leverages imported utility functions from `frontend/js/utils/AppUtils.js` (e.g., `debounce` for search input, `showNotification` for user feedback).
+### JavaScript Patterns (ES Modules) (e.g., `frontend/js/pages/customers.js`)
+Page-specific JavaScript is structured as an ES Module exporting a class, following these conventions:
+*   **ES Module Class:** All page logic is encapsulated within a class (e.g., `PageCustomers`), exported as the default. This promotes modularity and avoids global namespace pollution.
+*   **`constructor()`:** Initializes page-specific properties, including caching jQuery selectors for main content (`$mainContent`), and managing state variables (e.g., `currentPage`, `customersPerPage`, `isLoading`, `hasMore`).
+*   **`init()`:** The main entry point for the page. It's responsible for initial data fetching (e.g., `fetchCustomers(true)` to clear existing data on first load) and binding all necessary event listeners.
+*   **`destroy()`:** A crucial method for cleaning up event listeners (especially window-level events like scroll) and other resources when navigating away from the page. This prevents memory leaks and ensures a clean state for the next page.
+*   **`bindEvents()`:** Centralized event delegation using `$("#main-content").on(...)` for all page-specific interactions. This ensures events are bound once and efficiently handle dynamically added content.
+*   **Data Fetching (`fetchCustomers()`):** Asynchronous methods handle API calls, including parameters for search, sorting, and pagination (limit/offset). It manages loading states (`isLoading`), tracks if more data is available (`hasMore`), and updates the UI accordingly.
+*   **Rendering (`renderCustomers()`):** Dynamically generates and updates HTML content based on fetched data. It supports both clearing existing content and appending new data for infinite scrolling.
+*   **View Toggling (`toggleView()`):** Functions to switch between different content layouts (e.g., card vs. table views).
+*   **Modal Interactions:** Dedicated methods (e.g., `handleAddCustomer`, `handleUpdateCustomer`, `handleDeleteCustomer`, `handleEditCustomer`, `handleViewCustomer`) manage form submissions, API calls, and modal visibility. They leverage imported utility functions for opening/closing modals and showing confirmations.
+*   **Infinite Scrolling (`handleScroll()`):** A debounced scroll event listener that triggers `fetchCustomers` when the user approaches the bottom of the page, enabling seamless loading of more data.
+*   **Utility Usage:** Leverages imported utility functions from `frontend/js/utils/AppUtils.js` (e.g., `debounce` for search input, `showNotification` for user feedback, `openModal`, `closeModal`, `showConfirmationModal`).
 
-### SCSS Patterns
-Page-specific SCSS (e.g., `frontend/scss/_customers.scss`) defines styles for the page's unique components (e.g., `customer-grid`, `customer-card`, `customer-table-view`). It uses SCSS variables for consistent styling and includes responsive adjustments.
+### SCSS Patterns (e.g., `frontend/scss/_customers.scss`)
+Page-specific SCSS defines styles for the page's unique components (e.g., `customer-grid`, `customer-card`, `customer-table-view`, `customer-section-details`). It consistently uses SCSS variables for styling and includes responsive adjustments using media queries.
 
-### General Reusability Guidelines
-When creating new pages or refactoring existing ones, adapt the following patterns:
-*   **Modular JavaScript (ES Modules):** Always encapsulate page-specific JS logic within an ES Module class and export it as the default.
-*   **Centralized Event Binding:** Use event delegation on the main content wrapper (`#main-content`) for all page-specific events.
-*   **Standard Page Layout:** Adhere to the header, search/filter, and content display sections.
-*   **Dynamic Content Rendering:** Implement functions to fetch data and render HTML based on the current view.
-*   **Modal Usage:** Follow the consistent pattern for add/edit/detail/confirmation modals, controlled by imported `AppUtils` functions.
-*   **Loading States:** Implement `loading-overlay` for asynchronous operations.
-*   **Search and Filtering:** Use the standardized input and filter panel with `debounce` for search.
-*   **Responsive Tables:** Apply the provided SCSS pattern for responsive tables.
-*   **Image Upload Preview:** Utilize the `image-upload-container` and associated JS for previewing images before upload where applicable.
-*   **Utility Modules:** Import common utility functions from `frontend/js/utils/AppUtils.js` instead of creating global functions.
-*   **Utility Modules:** Common utility functions are now in `frontend/js/utils/AppUtils.js` and imported where needed.
+### General Reusability Guidelines for New Pages
+When creating new pages or refactoring existing ones, strictly adapt the following patterns:
+*   **HTML Structure:** Follow the established header, search/filter, content display, and modal patterns.
+*   **JavaScript Modularity:** Always encapsulate page-specific JS logic within an ES Module class and export it as the default. Implement `init()` and `destroy()` methods for proper lifecycle management.
+*   **Event Handling:** Use centralized event delegation on the main content wrapper (`#main-content`).
+*   **Data Flow:** Implement `fetch` and `render` methods similar to `fetchCustomers` and `renderCustomers`.
+*   **Modal Management:** Utilize the imported `AppUtils` functions for all modal interactions.
+*   **Loading Indicators:** Incorporate `loading-overlay` for sections with asynchronous operations and `infinite-scroll-loading` for paginated content.
+*   **Utility Imports:** Import common utility functions from `frontend/js/utils/AppUtils.js` as needed.
+*   **SCSS Styling:** Create a dedicated SCSS partial (e.g., `_pagename.scss`) and import it into `main.scss`. Define styles for unique page components, adhering to the established naming conventions and variable usage.

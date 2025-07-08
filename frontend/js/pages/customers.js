@@ -25,7 +25,6 @@ class PageCustomers {
         this.$mainContent.on("input", "#customer-search", debounce(this.handleSearch.bind(this), 300));
         this.$mainContent.on("change", ".filters_select", this.handleSearch.bind(this));
         this.$mainContent.on("click", "#toggle-view-btn", this.toggleView.bind(this));
-        this.$mainContent.on("click", ".customer-card", this.handleViewCustomer.bind(this));
         this.$mainContent.on("click", ".btn-view-customer", this.handleViewCustomer.bind(this));
         this.$mainContent.on("submit", "#add-customer-form", this.handleAddCustomer.bind(this));
         this.$mainContent.on("submit", "#edit-customer-form", this.handleUpdateCustomer.bind(this));
