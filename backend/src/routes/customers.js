@@ -1,8 +1,9 @@
-const express = require('express');
-const router = express.Router();
-const db = require('../db');
-const multer = require('multer');
-const path = require('path');
+import { Router } from 'express';
+import { query as dbQuery } from '../db/index.js';
+import multer from 'multer';
+import { basename, extname } from 'path';
+
+const router = Router();
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({
@@ -10,7 +11,7 @@ const storage = multer.diskStorage({
         cb(null, 'public/uploads/');
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
+        cb(null, Date.now() + extname(file.originalname));
     }
 });
 
@@ -37,7 +38,7 @@ router.get('/', async (req, res) => {
     query += ` ORDER BY ${orderBy} ${order}`;
 
     try {
-        const result = await db.query(query, queryParams);
+        const result = await dbQuery(query, queryParams);
         res.json(result.rows);
     } catch (err) {
         console.error(err);
@@ -48,7 +49,7 @@ router.get('/', async (req, res) => {
 // POST /api/customers
 router.post('/', upload.single('idCard'), async (req, res) => {
     const { name, phone, address } = req.body;
-    const id_card_image = req.file ? '/uploads/' + path.basename(req.file.path) : null;
+    const id_card_image = req.file ? '/uploads/' + basename(req.file.path) : null;
 
     // ✅ This is the validation part added
     if (!name || !phone || !address) {
@@ -56,7 +57,7 @@ router.post('/', upload.single('idCard'), async (req, res) => {
     }
 
     try {
-        const result = await db.query(
+        const result = await dbQuery(
             'INSERT INTO customers (name, phone, address, id_card_image) VALUES ($1, $2, $3, $4) RETURNING *',
             [name, phone, address, id_card_image]
         );
@@ -72,7 +73,7 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const result = await db.query('DELETE FROM customers WHERE id = $1 RETURNING *', [id]);
+        const result = await dbQuery('DELETE FROM customers WHERE id = $1 RETURNING *', [id]);
 
         if (result.rowCount === 0) {
             return res.status(404).json({ error: 'Customer not found' });
@@ -90,7 +91,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const result = await db.query('SELECT * FROM customers WHERE id = $1', [id]);
+        const result = await dbQuery('SELECT * FROM customers WHERE id = $1', [id]);
 
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Customer not found' });
@@ -112,16 +113,16 @@ router.put('/:id', upload.single('idCard'), async (req, res) => {
     try {
         // Check if there is a new file upload
         if (req.file) {
-            id_card_image = '/uploads/' + path.basename(req.file.path);
+            id_card_image = '/uploads/' + basename(req.file.path);
         } else {
             // If no new file, keep the existing one
-            const currentCustomer = await db.query('SELECT id_card_image FROM customers WHERE id = $1', [id]);
+            const currentCustomer = await dbQuery('SELECT id_card_image FROM customers WHERE id = $1', [id]);
             if (currentCustomer.rows.length > 0) {
                 id_card_image = currentCustomer.rows[0].id_card_image;
             }
         }
 
-        const result = await db.query(
+        const result = await dbQuery(
             'UPDATE customers SET name = $1, phone = $2, address = $3, id_card_image = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 RETURNING *',
             [name, phone, address, id_card_image, id]
         );
@@ -137,4 +138,4 @@ router.put('/:id', upload.single('idCard'), async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

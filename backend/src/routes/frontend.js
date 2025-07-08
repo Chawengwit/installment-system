@@ -1,8 +1,13 @@
-const express = require('express');
-const path = require('path');
-const router = express.Router();
+import { Router } from 'express';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-const pathToFrontend = path.join(__dirname, '../../frontend');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const router = Router();
+
+const pathToFrontend = join(__dirname, '../../frontend');
 
 // Serve the main application shell for all frontend routes
 router.get([
@@ -13,7 +18,7 @@ router.get([
     '/installments',
     '/installments-create'
 ], (req, res) => {
-    res.sendFile(path.join(pathToFrontend, '/public/index.html'));
+    res.sendFile(join(pathToFrontend, '/public/index.html'));
 });
 
-module.exports = router;
+export default router;

@@ -1,11 +1,12 @@
-const express = require('express');
-const router = express.Router();
-const db = require('../db');
+import { Router } from 'express';
+import { query as dbQuery } from '../db/index.js';
+
+const router = Router();
 
 // GET /api/products
 router.get('/', async (req, res) => {
     try {
-        const result = await db.query('SELECT * FROM products');
+        const result = await dbQuery('SELECT * FROM products');
         res.json(result.rows);
     } catch (err) {
         console.error(err);
@@ -23,7 +24,7 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const result = await db.query(
+        const result = await dbQuery(
             'INSERT INTO products (name, price) VALUES ($1, $2) RETURNING *',
             [name, price]
         );
@@ -34,4 +35,4 @@ router.post('/', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;
