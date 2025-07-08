@@ -10,7 +10,7 @@
             <button class="btn btn-secondary" id="toggle-view-btn">
                 <i class="fas fa-table"></i> Toggle View
             </button>
-            <button class="btn btn-primary" onclick="openModal('add-customer-modal')">
+            <button class="btn btn-primary" id="create-customer-btn">
                 <i class="fas fa-plus"></i> Create Customer
             </button>
         </div>
@@ -82,14 +82,14 @@
 
 <!-- Add Customer Modal -->
 <div class="modal" id="add-customer-modal">
-    <div class="modal_overlay" onclick="closeModal('add-customer-modal')"></div>
+    <div class="modal_overlay"></div>
     <div class="modal_content">
         <div class="loading-overlay" style="display: none;">
             <div class="loading-spinner"></div>
         </div>
         <div class="modal_header">
             <h3 class="modal_title">Add New Customer</h3>
-            <button class="modal_close" onclick="closeModal('add-customer-modal')">
+            <button class="modal_close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -111,7 +111,7 @@
                 <input type="file" class="form_file" name="idCard" accept="image/*">
             </div>
             <div class="form_actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('add-customer-modal')">Cancel</button>
+                <button type="button" class="btn btn-secondary" id="cancel-add-customer">Cancel</button>
                 <button type="submit" class="btn btn-primary">Add Customer</button>
             </div>
         </form>
@@ -120,11 +120,11 @@
 
 <!-- Customer Detail Modal -->
 <div class="modal modal-large" id="customer-detail-modal">
-    <div class="modal_overlay" onclick="closeModal('customer-detail-modal')"></div>
+    <div class="modal_overlay"></div>
     <div class="modal_content">
         <div class="modal_header">
             <h3 class="modal_title">Customer Details</h3>
-            <button class="modal_close" onclick="closeModal('customer-detail-modal')">
+            <button class="modal_close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -196,7 +196,7 @@
     <div class="modal_content">
         <div class="modal_header">
             <h3 class="modal_title">Confirm Action</h3>
-            <button class="modal_close" onclick="window.AppUtils.closeModal('confirmation-modal')">
+            <button class="modal_close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -204,7 +204,7 @@
             <p id="confirmation-message"></p>
         </div>
         <div class="modal_footer">
-            <button class="btn btn-secondary" onclick="window.AppUtils.closeModal('confirmation-modal')">Cancel</button>
+            <button class="btn btn-secondary" id="cancel-confirmation">Cancel</button>
             <button class="btn btn-danger" id="confirm-action-btn">Confirm</button>
         </div>
     </div>
@@ -212,14 +212,14 @@
 
 <!-- Edit Customer Modal -->
 <div class="modal" id="edit-customer-modal">
-    <div class="modal_overlay" onclick="closeModal('edit-customer-modal')"></div>
+    <div class="modal_overlay"></div>
     <div class="modal_content">
         <div class="loading-overlay" style="display: none;">
             <div class="loading-spinner"></div>
         </div>
         <div class="modal_header">
             <h3 class="modal_title">Edit Customer</h3>
-            <button class="modal_close" onclick="closeModal('edit-customer-modal')">
+            <button class="modal_close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -241,8 +241,9 @@
                 <label class="form_label">ID Card Photo</label>
                 <div class="image-upload-container">
                     <div class="image-preview">
-                        <img src="" alt="ID Card Image Preview" class="id-card-preview" style="display: none;">
-                        <span class="image-preview-placeholder">No Image</span>
+                        <img src="" alt="ID Card Image Preview" class="id-card-preview" style="display: none;" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span class="image-preview-placeholder image-not-found-placeholder" style="display: none;">Image Not Found</span>
+                        <span class="image-preview-placeholder no-image-placeholder">No Image</span>
                     </div>
                     <div class="image-upload-actions">
                         <input type="file" class="form_file" name="idCard" id="edit-idCard-input" accept="image/*" style="display: none;">
@@ -254,7 +255,7 @@
                 </div>
             </div>
             <div class="form_actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('edit-customer-modal')">Cancel</button>
+                <button type="button" class="btn btn-secondary" id="cancel-edit-customer">Cancel</button>
                 <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
         </form>

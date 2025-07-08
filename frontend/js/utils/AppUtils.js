@@ -1,10 +1,10 @@
 // Modal functions
-function openModal(modalId) {
+export function openModal(modalId) {
     $(`#${modalId}`).addClass("open");
     $("body").css("overflow", "hidden");
 }
 
-function closeModal(modalId) {
+export function closeModal(modalId) {
     $(`#${modalId}`).removeClass("open");
     $("body").css("overflow", "auto");
 
@@ -15,21 +15,21 @@ function closeModal(modalId) {
     }
 }
 
-function showConfirmationModal(message, onConfirm) {
-    const confirmationModal = $('#confirmation-modal');
-    const confirmationMessage = $('#confirmation-message');
-    const confirmActionBtn = $('#confirm-action-btn');
+export function showConfirmationModal(message, onConfirm) {
+    const confirmationModal = $("#confirmation-modal");
+    const confirmationMessage = $("#confirmation-message");
+    const confirmActionBtn = $("#confirm-action-btn");
 
     confirmationMessage.text(message);
-    confirmActionBtn.off('click').on('click', () => {
+    confirmActionBtn.off("click").on("click", () => {
         onConfirm();
-        closeModal('confirmation-modal');
+        closeModal("confirmation-modal");
     });
 
-    openModal('confirmation-modal');
+    openModal("confirmation-modal");
 }
 
-function debounce(func, wait) {
+export function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
         const later = () => {
@@ -41,7 +41,7 @@ function debounce(func, wait) {
     };
 }
 
-function showNotification(message, type = "info") {
+export function showNotification(message, type = "info") {
     // Create notification element
     const notification = $(`
             <div class="notification notification--${type}">
@@ -57,7 +57,7 @@ function showNotification(message, type = "info") {
 
     // Add to page
     if (!$(".notification-container").length) {
-        $("body").append('<div class="notification-container"></div>');
+        $("body").append("<div class=\"notification-container\"></div>");
     }
 
     $(".notification-container").append(notification);
@@ -85,6 +85,10 @@ function hideNotification(notification) {
     }, 300);
 }
 
+export function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 function getNotificationIcon(type) {
     const icons = {
         success: "check-circle",
@@ -95,28 +99,17 @@ function getNotificationIcon(type) {
     return icons[type] || icons.info;
 }
 
-function formatCurrency(amount) {
+export function formatCurrency(amount) {
     return new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
     }).format(amount);
 }
 
-function formatDate(date) {
+export function formatDate(date) {
     return new Intl.DateTimeFormat("en-US", {
         year: "numeric",
         month: "short",
         day: "numeric",
     }).format(new Date(date));
 }
-
-// Export functions for use in other scripts
-window.AppUtils = {
-    openModal,
-    closeModal,
-    showNotification,
-    formatCurrency,
-    formatDate,
-    debounce,
-    showConfirmationModal,
-};

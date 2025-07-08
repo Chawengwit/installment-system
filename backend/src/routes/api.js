@@ -1,15 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const productRoutes = require('./products');
-const customertRoutes = require('./customers');
+import { Router } from 'express';
+import productRoutes from './products.js';
+import customerRoutes from './customers.js';
 
+const router = Router();
 
 router.get('/health', (req, res) => {
     res.json({ status: 'OK' });
 });
 
-router.use('/customers', customertRoutes);
+router.use('/customers', customerRoutes);
 router.use('/products', productRoutes);
 
-
-module.exports = router;
+export default router;

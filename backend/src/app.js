@@ -1,24 +1,27 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+import frontendRoutes from './routes/frontend.js';
+import apiRoutes from './routes/api.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
-
-const frontendRoutes = require('./routes/frontend');
-
-const apiRoutes = require('./routes/api');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Define paths
-const pathToBackendPublic = path.join(__dirname, '..', 'public');
-const pathToFrontend = path.join(__dirname, '..', 'frontend');
-const pathToFrontendPublic = path.join(pathToFrontend, 'public');
-const pathToFrontendJs = path.join(pathToFrontend, 'js');
-const pathToFrontendDist = path.join(pathToFrontend, 'dist');
+const pathToBackendPublic = join(__dirname, '..', 'public');
+const pathToFrontend = join(__dirname, '..', 'frontend');
+const pathToFrontendPublic = join(pathToFrontend, 'public');
+const pathToFrontendJs = join(pathToFrontend, 'js');
+const pathToFrontendDist = join(pathToFrontend, 'dist');
 
 // Serve static files
 app.use(express.static(pathToBackendPublic)); // For uploads
@@ -32,4 +35,4 @@ app.use('/', frontendRoutes);
 // API routes
 app.use('/api', apiRoutes);
 
-module.exports = app;
+export default app;
