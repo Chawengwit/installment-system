@@ -1,7 +1,13 @@
 import { Router } from 'express';
 import { query as dbQuery } from '../db/index.js';
 import multer from 'multer';
-import { basename, extname } from 'path';
+import { basename, extname, join } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import fs from 'fs/promises';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const router = Router();
 
@@ -16,6 +22,16 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
+
+// Helper function to check if a file exists
+const fileExists = async (filePath) => {
+    try {
+        await fs.access(filePath);
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
 
 // GET /api/customers
 router.get('/', async (req, res) => {
@@ -39,7 +55,17 @@ router.get('/', async (req, res) => {
 
     try {
         const result = await dbQuery(query, queryParams);
-        res.json(result.rows);
+        const customers = await Promise.all(result.rows.map(async customer => {
+            if (customer.id_card_image) {
+                const imagePath = join(__dirname, '..', '..', 'public', customer.id_card_image);
+                const exists = await fileExists(imagePath);
+                if (!exists) {
+                    customer.id_card_image = null; // Set to null if file doesn't exist
+                }
+            }
+            return customer;
+        }));
+        res.json(customers);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Failed to fetch customers' });
@@ -97,7 +123,15 @@ router.get('/:id', async (req, res) => {
             return res.status(404).json({ error: 'Customer not found' });
         }
 
-        res.json(result.rows[0]);
+        const customer = result.rows[0];
+        if (customer.id_card_image) {
+            const imagePath = join(__dirname, '..', '..', 'public', customer.id_card_image);
+            const exists = await fileExists(imagePath);
+            if (!exists) {
+                customer.id_card_image = null; // Set to null if file doesn't exist
+            }
+        }
+        res.json(customer);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Failed to fetch customer' });
@@ -124,7 +158,7 @@ router.put('/:id', upload.single('idCard'), async (req, res) => {
 
         const result = await dbQuery(
             'UPDATE customers SET name = $1, phone = $2, address = $3, id_card_image = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 RETURNING *',
-            [name, phone, address, id_card_image, id]
+            [name, phone, address, id_card_image]
         );
 
         if (result.rowCount === 0) {
