@@ -1228,3 +1228,10 @@ a{
 .text-info {
     color: var(--color-info);
 }
+
+.infinite-scroll-loading{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
