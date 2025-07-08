@@ -241,8 +241,9 @@
                 <label class="form_label">ID Card Photo</label>
                 <div class="image-upload-container">
                     <div class="image-preview">
-                        <img src="" alt="ID Card Image Preview" class="id-card-preview" style="display: none;">
-                        <span class="image-preview-placeholder">No Image</span>
+                        <img src="" alt="ID Card Image Preview" class="id-card-preview" style="display: none;" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span class="image-preview-placeholder image-not-found-placeholder" style="display: none;">Image Not Found</span>
+                        <span class="image-preview-placeholder no-image-placeholder">No Image</span>
                     </div>
                     <div class="image-upload-actions">
                         <input type="file" class="form_file" name="idCard" id="edit-idCard-input" accept="image/*" style="display: none;">

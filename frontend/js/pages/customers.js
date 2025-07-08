@@ -223,16 +223,20 @@ class PageCustomers {
             form.find('[name="address"]').val(customer.address);
 
             const preview = form.find('.id-card-preview');
-            const placeholder = form.find('.image-preview-placeholder');
+            const noImagePlaceholder = form.find('.no-image-placeholder');
+            const imageNotFoundPlaceholder = form.find('.image-not-found-placeholder');
 
             if (customer.id_card_image) {
                 preview.attr('src', customer.id_card_image).show();
-                placeholder.hide();
+                noImagePlaceholder.hide();
+                imageNotFoundPlaceholder.hide();
             } else {
                 preview.hide();
-                placeholder.show();
+                noImagePlaceholder.show();
+                imageNotFoundPlaceholder.hide();
             }
 
+            // Handle image preview for new uploads
             const fileInput = form.find('#edit-idCard-input');
             fileInput.off('change').on('change', function() {
                 const file = this.files[0];
@@ -240,7 +244,8 @@ class PageCustomers {
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         preview.attr('src', e.target.result).show();
-                        placeholder.hide();
+                        noImagePlaceholder.hide();
+                        imageNotFoundPlaceholder.hide();
                     };
                     reader.readAsDataURL(file);
                 }
