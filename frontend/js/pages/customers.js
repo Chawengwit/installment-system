@@ -124,6 +124,7 @@ class PageCustomers {
                     <div class="customer-card_avatar"><i class="fas fa-user"></i></div>
                     <div class="customer-card_info">
                         <h3 class="customer-card_name">${customer.name}</h3>
+                        <p class="customer-card_id-card-number">ID: ${customer.id_card_number}</p>
                         <p class="customer-card_phone"><a href="tel:${customer.phone}">${customer.phone}</a></p>
                     </div>
                 </div>
@@ -150,6 +151,7 @@ class PageCustomers {
         return `
             <tr data-customer-id="${customer.id}">
                 <td data-label="Name">${customer.name}</td>
+                <td data-label="ID Card Number">${customer.id_card_number}</td>
                 <td data-label="Phone"><a href="tel:${customer.phone}">${customer.phone}</a></td>
                 <td data-label="Active Plans">0</td>
                 <td data-label="Total Amount">$0</td>
