@@ -25,6 +25,7 @@ class PageCreditCards {
         this.$mainContent.on("click", "#add-card-modal .modal_overlay, #add-card-modal .modal_close, #cancel-add-card", () => closeModal('add-card-modal'));
         this.$mainContent.on("click", "#edit-card-modal .modal_overlay, #edit-card-modal .modal_close, #cancel-edit-card", () => closeModal('edit-card-modal'));
         this.$mainContent.on("click", "#card-details-modal .modal_overlay, #card-details-modal .modal_close", () => closeModal('card-details-modal'));
+        this.$mainContent.on("click", "#confirmation-modal .modal_overlay, #confirmation-modal .modal_close, #cancel-confirmation", () => closeModal('confirmation-modal'));
         this.$mainContent.on("submit", "#add-card-form", this.handleAddCard.bind(this));
         this.$mainContent.on("submit", "#edit-card-form", this.handleUpdateCard.bind(this));
         this.$mainContent.on("click", ".btn-edit-card", this.handleEditCard.bind(this));
