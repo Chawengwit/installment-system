@@ -459,6 +459,11 @@ a{
             border-color: var(--color-primary);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
+
+        &.is-invalid {
+            border-color: var(--color-danger);
+            box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25); // Using RGB for --color-danger
+        }
     }
 
     .form_textarea {

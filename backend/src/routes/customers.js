@@ -33,6 +33,20 @@ const fileExists = async (filePath) => {
     }
 };
 
+// Helper function to check for duplicate phone or ID card number
+const checkDuplicateCustomer = async (phone, idCardNumber, customerId = null) => {
+    let query = 'SELECT id FROM customers WHERE (phone = $1 OR id_card_number = $2)';
+    const params = [phone, idCardNumber];
+
+    if (customerId) {
+        query += ' AND id != $3';
+        params.push(customerId);
+    }
+
+    const result = await dbQuery(query, params);
+    return result.rows.length > 0;
+};
+
 // GET /api/customers
 router.get('/', async (req, res) => {
     const { search, sortBy, sortOrder, limit, offset } = req.query;
@@ -99,6 +113,11 @@ router.post('/', upload.single('idCard'), async (req, res) => {
     }
 
     try {
+        const isDuplicate = await checkDuplicateCustomer(phone, id_card_number);
+        if (isDuplicate) {
+            return res.status(409).json({ error: 'Customer with this phone or ID card number already exists.' });
+        }
+
         const result = await dbQuery(
             'INSERT INTO customers (name, phone, address, id_card_image, id_card_number) VALUES ($1, $2, $3, $4, $5) RETURNING *',
             [name, phone, address || null, id_card_image, id_card_number || null]
@@ -172,9 +191,14 @@ router.put('/:id', upload.single('idCard'), async (req, res) => {
             }
         }
 
+        const isDuplicate = await checkDuplicateCustomer(phone, id_card_number, parseInt(id, 10));
+        if (isDuplicate) {
+            return res.status(409).json({ error: 'Customer with this phone or ID card number already exists.' });
+        }
+
         const result = await dbQuery(
             'UPDATE customers SET name = $1, phone = $2, address = $3, id_card_image = $4, id_card_number = $5, updated_at = CURRENT_TIMESTAMP WHERE id = $6 RETURNING *',
-            [name, phone, address, id_card_image, id_card_number, id]
+            [name, phone, address || null, id_card_image, id_card_number || null, id]
         );
 
         if (result.rowCount === 0) {

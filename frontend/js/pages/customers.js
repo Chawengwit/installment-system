@@ -193,10 +193,19 @@ class PageCustomers {
         const formData = new FormData(form);
         const loadingOverlay = $('#add-customer-modal .loading-overlay');
 
+        // Clear previous highlights
+        $(form).find('input[name="phone"], input[name="id_card_number"]').removeClass('is-invalid');
+
         try {
             loadingOverlay.show();
             const response = await fetch('/api/customers', { method: 'POST', body: formData });
-            if (!response.ok) throw new Error((await response.json()).error || 'Failed to create customer');
+            if (!response.ok) {
+                const errorData = await response.json();
+                if (response.status === 409) {
+                    this.highlightInvalidFields(form, errorData.error);
+                }
+                throw new Error(errorData.error || 'Failed to create customer');
+            }
             closeModal('add-customer-modal');
             showNotification('Customer added successfully!', 'success');
             this.currentPage = 1;
@@ -217,10 +226,19 @@ class PageCustomers {
         const customerId = formData.get('id');
         const loadingOverlay = $('#edit-customer-modal .loading-overlay');
 
+        // Clear previous highlights
+        $(form).find('input[name="phone"], input[name="id_card_number"]').removeClass('is-invalid');
+
         try {
             loadingOverlay.show();
             const response = await fetch(`/api/customers/${customerId}`, { method: 'PUT', body: formData });
-            if (!response.ok) throw new Error((await response.json()).error || 'Failed to update customer');
+            if (!response.ok) {
+                const errorData = await response.json();
+                if (response.status === 409) {
+                    this.highlightInvalidFields(form, errorData.error);
+                }
+                throw new Error(errorData.error || 'Failed to update customer');
+            }
             closeModal('edit-customer-modal');
             showNotification('Customer updated successfully!', 'success');
             this.currentPage = 1;
@@ -231,6 +249,20 @@ class PageCustomers {
         } finally {
             loadingOverlay.hide();
         }
+    }
+
+    highlightInvalidFields(form, errorMessage) {
+        if (errorMessage.includes('phone')) {
+            $(form).find('input[name="phone"]').addClass('is-invalid');
+        }
+        if (errorMessage.includes('ID card number')) {
+            $(form).find('input[name="id_card_number"]').addClass('is-invalid');
+        }
+
+        // Remove highlight on input
+        $(form).find('input[name="phone"], input[name="id_card_number"]').on('input', function() {
+            $(this).removeClass('is-invalid');
+        });
     }
 
     handleDeleteCustomer(e) {
