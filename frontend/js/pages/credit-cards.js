@@ -237,6 +237,8 @@ class PageCreditCards {
                 const response = await fetch(`/api/credit-cards/${cardId}`, { method: 'DELETE' });
                 if (!response.ok) throw new Error((await response.json()).error || 'Failed to delete credit card');
                 showNotification('Credit card deleted successfully!', 'success');
+                // Remove the card element from the DOM
+                $(e.currentTarget).closest("[data-card-id]").remove();
                 this.currentPage = 1;
                 this.hasMore = true;
                 this.fetchCreditCards(true);

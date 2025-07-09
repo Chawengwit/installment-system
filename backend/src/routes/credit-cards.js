@@ -82,4 +82,19 @@ router.put('/:id', async (req, res) => {
     }
 });
 
+// DELETE a credit card by ID
+router.delete('/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await query('DELETE FROM credit_cards WHERE id = $1 RETURNING *', [id]);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Credit card not found' });
+        }
+        res.status(204).send(); // No content
+    } catch (error) {
+        console.error(`Error deleting credit card ${id}:`, error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 export default router;
