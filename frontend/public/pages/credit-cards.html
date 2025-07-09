@@ -7,79 +7,21 @@
             <p class="page-header_subtitle">Manage your business credit cards and monitor usage</p>
         </div>
         <div class="page-header_actions">
-            <button class="btn btn-secondary" onclick="exportCardData()">
+            <button class="btn btn-secondary" id="export-card-btn">
                 <i class="fas fa-download"></i> Export Data
             </button>
-            <button class="btn btn-primary" onclick="openModal('add-card-modal')">
+            <button class="btn btn-primary" id="create-card-btn">
                 <i class="fas fa-plus"></i> Add Card
             </button>
         </div>
     </header>
-
-    <!-- Credit Card Overview -->
-    <section class="card-overview">
-        <div class="overview-stats">
-            <div class="overview-stat overview-stat-primary">
-                <div class="overview-stat_icon">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <div class="overview-stat_content">
-                    <h3 class="overview-stat_number">5</h3>
-                    <p class="overview-stat_label">Total Cards</p>
-                    <span class="overview-stat_change overview-stat_change-positive">
-                        <i class="fas fa-arrow-up"></i> +1 this month
-                    </span>
-                </div>
-            </div>
-            
-            <div class="overview-stat overview-stat-success">
-                <div class="overview-stat_icon">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-                <div class="overview-stat_content">
-                    <h3 class="overview-stat_number">$85,500</h3>
-                    <p class="overview-stat_label">Total Limit</p>
-                    <span class="overview-stat_change overview-stat_change-neutral">
-                        <i class="fas fa-minus"></i> No change
-                    </span>
-                </div>
-            </div>
-            
-            <div class="overview-stat overview-stat-warning">
-                <div class="overview-stat_icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div class="overview-stat_content">
-                    <h3 class="overview-stat_number">$40,270</h3>
-                    <p class="overview-stat_label">Used Amount</p>
-                    <span class="overview-stat_change overview-stat_change-negative">
-                        <i class="fas fa-arrow-down"></i> -$2,500 this month
-                    </span>
-                </div>
-            </div>
-            
-            <div class="overview-stat overview-stat-info">
-                <div class="overview-stat_icon">
-                    <i class="fas fa-piggy-bank"></i>
-                </div>
-                <div class="overview-stat_content">
-                    <h3 class="overview-stat_number">$45,230</h3>
-                    <p class="overview-stat_label">Available</p>
-                    <div class="overview-stat_progress">
-                        <div class="progress-bar" style="width: 53%"></div>
-                        <span class="overview-stat_percentage">53% available</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Credit Cards List -->
     <section class="credit-cards-section">
         <div class="section-header">
             <h2 class="section-title">Your Credit Cards</h2>
             <div class="section-filters">
-                <select class="filter-select" onchange="filterCards(this.value)">
+                <select class="filter-select" id="filter-card-select">
                     <option value="all">All Cards</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -89,88 +31,8 @@
         </div>
 
         <div class="credit-cards-grid" id="cards-container">
-            <!-- Credit Card 1 -->
-            <div class="credit-card credit-card-visa" data-card-id="1">
-                <div class="credit-card_header">
-                    <div class="credit-card_brand">
-                        <i class="fab fa-cc-visa"></i>
-                        <span>KBank Visa</span>
-                    </div>
-                    <div class="credit-card_actions">
-                        <button class="credit-card_action" onclick="editCard(1)" title="Edit Card">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="credit-card_action" onclick="viewCardDetails(1)" title="View Details">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="credit-card_action" onclick="cardMenu(1)" title="More Options">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="credit-card_number">
-                    **** **** **** 1234
-                </div>
-            </div>
-
-            <!-- Credit Card 2 -->
-            <div class="credit-card credit-card-mastercard" data-card-id="2">
-                <div class="credit-card_header">
-                    <div class="credit-card_brand">
-                        <i class="fab fa-cc-mastercard"></i>
-                        <span>SCB MasterCard</span>
-                    </div>
-                    <div class="credit-card_actions">
-                        <button class="credit-card_action" onclick="editCard(2)" title="Edit Card">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="credit-card_action" onclick="viewCardDetails(2)" title="View Details">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="credit-card_action" onclick="cardMenu(2)" title="More Options">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="credit-card_number">
-                    **** **** **** 5678
-                </div>
-            </div>
-
-            <!-- Credit Card 3 -->
-            <div class="credit-card credit-card-platinum" data-card-id="3">
-                <div class="credit-card_header">
-                    <div class="credit-card_brand">
-                        <i class="fab fa-cc-visa"></i>
-                        <span>Visa Platinum</span>
-                    </div>
-                    <div class="credit-card_actions">
-                        <button class="credit-card_action" onclick="editCard(3)" title="Edit Card">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="credit-card_action" onclick="viewCardDetails(3)" title="View Details">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="credit-card_action" onclick="cardMenu(3)" title="More Options">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="credit-card_number">
-                    **** **** **** 9012
-                </div>
-
-                <div class="credit-card_holder">
-                    <span class="credit-card_holder-label">Card Holder</span>
-                    <span class="credit-card_holder-name">Premium Account</span>
-                </div>
-                
-                
-                
-                
-
-                
+            <div class="loading-overlay" style="display: none;">
+                <div class="loading-spinner"></div>
             </div>
         </div>
     </section>
@@ -178,15 +40,15 @@
 
 <!-- Add Card Modal -->
 <div class="modal" id="add-card-modal">
-    <div class="modal_overlay" onclick="closeModal('add-card-modal')"></div>
+    <div class="modal_overlay"></div>
     <div class="modal_content">
         <div class="modal_header">
             <h3 class="modal_title">Add New Credit Card</h3>
-            <button class="modal_close" onclick="closeModal('add-card-modal')">
+            <button class="modal_close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <form class="form customer-detail" id="add-card-form" onsubmit="handleAddCard(event)">
+        <form class="form customer-detail" id="add-card-form">
             <div class="form_group">
                 <label class="form_label">Card Name *</label>
                 <input type="text" class="form_input" name="cardName" placeholder="e.g., KBank Visa Business" required>
@@ -195,37 +57,45 @@
                 <label class="form_label">Card Number *</label>
                 <input type="text" class="form_input" name="cardNumber" placeholder="**** **** **** 1234" maxlength="19" required>
             </div>
-            <div class="form_row">
-                <div class="form_group">
-                    <label class="form_label">Expiry Date *</label>
-                    <input type="text" class="form_input" name="expiryDate" placeholder="MM/YY" maxlength="5" required>
-                </div>
-                <div class="form_group">
-                    <label class="form_label">CVV *</label>
-                    <input type="text" class="form_input" name="cvv" placeholder="123" maxlength="4" required>
-                </div>
-            </div>
             <div class="form_group">
                 <label class="form_label">Credit Limit ($) *</label>
                 <input type="number" class="form_input" name="creditLimit" placeholder="25000.00" step="0.01" min="0" required>
             </div>
+            <div class="form_actions">
+                <button type="button" class="btn btn-secondary" id="cancel-add-card">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Card</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Card Modal -->
+<div class="modal" id="edit-card-modal">
+    <div class="modal_overlay"></div>
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3 class="modal_title">Edit Credit Card</h3>
+            <button class="modal_close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form class="form customer-detail" id="edit-card-form">
+            <input type="hidden" name="id">
             <div class="form_group">
-                <label class="form_label">Card Type *</label>
-                <select class="form_select" name="cardType" required>
-                    <option value="">Select card type...</option>
-                    <option value="visa">Visa</option>
-                    <option value="mastercard">MasterCard</option>
-                    <option value="amex">American Express</option>
-                    <option value="discover">Discover</option>
-                </select>
+                <label class="form_label">Card Name *</label>
+                <input type="text" class="form_input" name="card_name" required>
             </div>
             <div class="form_group">
-                <label class="form_label">Card Holder Name</label>
-                <input type="text" class="form_input" name="cardHolder" placeholder="Business Account">
+                <label class="form_label">Card Number *</label>
+                <input type="text" class="form_input" name="card_number" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Credit Limit ($) *</label>
+                <input type="number" class="form_input" name="credit_limit" step="0.01" min="0" required>
             </div>
             <div class="form_actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('add-card-modal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add Card</button>
+                <button type="button" class="btn btn-secondary" id="cancel-edit-card">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
         </form>
     </div>
@@ -233,11 +103,11 @@
 
 <!-- Card Details Modal -->
 <div class="modal modal-large" id="card-details-modal">
-    <div class="modal_overlay" onclick="closeModal('card-details-modal')"></div>
+    <div class="modal_overlay"></div>
     <div class="modal_content">
         <div class="modal_header">
             <h3 class="modal_title">Card Transaction History</h3>
-            <button class="modal_close" onclick="closeModal('card-details-modal')">
+            <button class="modal_close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -331,3 +201,22 @@
     </div>
 </div>
 
+<!-- Confirmation Modal -->
+<div class="modal" id="confirmation-modal">
+    <div class="modal_overlay"></div>
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3 class="modal_title">Confirm Action</h3>
+            <button class="modal_close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal_body">
+            <p id="confirmation-message"></p>
+        </div>
+        <div class="modal_footer">
+            <button class="btn btn-secondary" id="cancel-confirmation">Cancel</button>
+            <button class="btn btn-danger" id="confirm-action-btn">Confirm</button>
+        </div>
+    </div>
+</div>

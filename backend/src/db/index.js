@@ -22,6 +22,19 @@ const createTables = async () => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
+
+            CREATE TABLE IF NOT EXISTS credit_cards (
+                id SERIAL PRIMARY KEY,
+                card_name VARCHAR(100) NOT NULL,
+                card_number VARCHAR(100) NOT NULL,
+                credit_limit NUMERIC(12, 2) NOT NULL,
+                used_amount NUMERIC(12, 2) DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_credit_card_name ON credit_cards(card_name);
+            CREATE INDEX IF NOT EXISTS idx_credit_card_number ON credit_cards(card_number);
         `);
     } finally {
         client.release();

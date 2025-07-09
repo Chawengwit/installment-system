@@ -6,12 +6,12 @@
   display: block;
 }
 
-.form_input.error,
-.form_select.error,
-.form_textarea.error {
+.form_input.is-invalid,
+.form_select.is-invalid,
+.form_textarea.is-invalid {
   border-color: #d9534f;
   &:focus {
     border-color: #d9534f;
-    box-shadow: 0 0 0 2px rgba(217, 83, 79, 0.2);
+    box-shadow: 0 0 0 2px var(--color-danger-light);
   }
 }
