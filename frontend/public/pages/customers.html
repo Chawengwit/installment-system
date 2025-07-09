@@ -21,7 +21,7 @@
         <div class="search-bar">
             <div class="search-bar_input-group">
                 <i class="fas fa-search search-bar_icon"></i>
-                <input type="text" class="search-bar_input" placeholder="Search customers by name or phone..." id="customer-search">
+                <input type="text" class="search-bar_input" placeholder="Search customers by name, phone, or ID card number..." id="customer-search">
             </div>
             <button class="btn btn-secondary search-bar_filter-btn">
                 <i class="fas fa-filter"></i> Filter
@@ -65,6 +65,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>ID Card Number</th>
                             <th>Phone</th>
                             <th>Active Plans</th>
                             <th>Total Amount</th>
@@ -107,6 +108,10 @@
             <div class="form_group">
                 <label class="form_label">Phone Number *</label>
                 <input type="tel" class="form_input" name="phone" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">ID Card Number *</label>
+                <input type="text" class="form_input" name="id_card_number" required>
             </div>
             <div class="form_group">
                 <label class="form_label">Address</label>
@@ -238,6 +243,10 @@
             <div class="form_group">
                 <label class="form_label">Phone Number *</label>
                 <input type="tel" class="form_input" name="phone" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">ID Card Number *</label>
+                <input type="text" class="form_input" name="id_card_number" required>
             </div>
             <div class="form_group">
                 <label class="form_label">Address</label>

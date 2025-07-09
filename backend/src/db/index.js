@@ -18,6 +18,7 @@ const createTables = async () => {
                 phone VARCHAR(20),
                 address TEXT,
                 id_card_image TEXT,
+                id_card_number VARCHAR(50) NOT NULL DEFAULT '',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );

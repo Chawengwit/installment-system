@@ -124,6 +124,7 @@ class PageCustomers {
                     <div class="customer-card_avatar"><i class="fas fa-user"></i></div>
                     <div class="customer-card_info">
                         <h3 class="customer-card_name">${customer.name}</h3>
+                        <p class="customer-card_id-card-number">ID: ${customer.id_card_number}</p>
                         <p class="customer-card_phone"><a href="tel:${customer.phone}">${customer.phone}</a></p>
                     </div>
                 </div>
@@ -150,6 +151,7 @@ class PageCustomers {
         return `
             <tr data-customer-id="${customer.id}">
                 <td data-label="Name">${customer.name}</td>
+                <td data-label="ID Card Number">${customer.id_card_number}</td>
                 <td data-label="Phone"><a href="tel:${customer.phone}">${customer.phone}</a></td>
                 <td data-label="Active Plans">0</td>
                 <td data-label="Total Amount">$0</td>
@@ -191,10 +193,19 @@ class PageCustomers {
         const formData = new FormData(form);
         const loadingOverlay = $('#add-customer-modal .loading-overlay');
 
+        // Clear previous highlights
+        $(form).find('input[name="phone"], input[name="id_card_number"]').removeClass('is-invalid');
+
         try {
             loadingOverlay.show();
             const response = await fetch('/api/customers', { method: 'POST', body: formData });
-            if (!response.ok) throw new Error((await response.json()).error || 'Failed to create customer');
+            if (!response.ok) {
+                const errorData = await response.json();
+                if (response.status === 409) {
+                    this.highlightInvalidFields(form, errorData.error);
+                }
+                throw new Error(errorData.error || 'Failed to create customer');
+            }
             closeModal('add-customer-modal');
             showNotification('Customer added successfully!', 'success');
             this.currentPage = 1;
@@ -215,10 +226,19 @@ class PageCustomers {
         const customerId = formData.get('id');
         const loadingOverlay = $('#edit-customer-modal .loading-overlay');
 
+        // Clear previous highlights
+        $(form).find('input[name="phone"], input[name="id_card_number"]').removeClass('is-invalid');
+
         try {
             loadingOverlay.show();
             const response = await fetch(`/api/customers/${customerId}`, { method: 'PUT', body: formData });
-            if (!response.ok) throw new Error((await response.json()).error || 'Failed to update customer');
+            if (!response.ok) {
+                const errorData = await response.json();
+                if (response.status === 409) {
+                    this.highlightInvalidFields(form, errorData.error);
+                }
+                throw new Error(errorData.error || 'Failed to update customer');
+            }
             closeModal('edit-customer-modal');
             showNotification('Customer updated successfully!', 'success');
             this.currentPage = 1;
@@ -229,6 +249,20 @@ class PageCustomers {
         } finally {
             loadingOverlay.hide();
         }
+    }
+
+    highlightInvalidFields(form, errorMessage) {
+        if (errorMessage.includes('phone')) {
+            $(form).find('input[name="phone"]').addClass('is-invalid');
+        }
+        if (errorMessage.includes('ID card number')) {
+            $(form).find('input[name="id_card_number"]').addClass('is-invalid');
+        }
+
+        // Remove highlight on input
+        $(form).find('input[name="phone"], input[name="id_card_number"]').on('input', function() {
+            $(this).removeClass('is-invalid');
+        });
     }
 
     handleDeleteCustomer(e) {
@@ -260,6 +294,7 @@ class PageCustomers {
             form.find('[name="id"]').val(customer.id);
             form.find('[name="name"]').val(customer.name);
             form.find('[name="phone"]').val(customer.phone);
+            form.find('[name="id_card_number"]').val(customer.id_card_number);
             form.find('[name="address"]').val(customer.address);
 
             const preview = form.find('.id-card-preview');
