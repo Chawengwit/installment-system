@@ -53,7 +53,7 @@ router.post('/', async (req, res) => {
 // PUT (update) a credit card by ID
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { card_name, card_number, credit_limit, used_amount } = req.body;
+    const { card_name, card_number, credit_limit } = req.body;
 
     if (!card_name || !card_number || !credit_limit) {
         return res.status(400).json({ error: 'Missing required fields' });
@@ -61,8 +61,8 @@ router.put('/:id', async (req, res) => {
 
     try {
         const { rows } = await query(
-            'UPDATE credit_cards SET card_name = $1, card_number = $2, credit_limit = $3, used_amount = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 RETURNING *',
-            [card_name, card_number, credit_limit, used_amount, id]
+            'UPDATE credit_cards SET card_name = $1, card_number = $2, credit_limit = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $4 RETURNING *',
+            [card_name, card_number, credit_limit, id]
         );
         if (rows.length === 0) {
             return res.status(404).json({ error: 'Credit card not found' });

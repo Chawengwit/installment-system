@@ -79,10 +79,10 @@ class PageCreditCards {
 
     createCreditCard(card) {
         return `
-            <div class="credit-card credit-card-visa" data-card-id="${card.id}">
+            <div class="credit-card" data-card-id="${card.id}">
                 <div class="credit-card_header">
                     <div class="credit-card_brand">
-                        <i class="fab fa-cc-visa"></i>
+                        <i class="fas fa-credit-card"></i>
                         <span>${card.card_name}</span>
                     </div>
                     <div class="credit-card_actions">
@@ -99,6 +99,16 @@ class PageCreditCards {
                 </div>
                 <div class="credit-card_number">
                     **** **** **** ${String(card.card_number).slice(-4)}
+                </div>
+                <div class="credit-card_details">
+                    <div class="credit-card_detail-item">
+                        <span class="credit-card_detail-label">Limit:</span>
+                        <span class="credit-card_detail-value">${card.credit_limit}</span>
+                    </div>
+                    <div class="credit-card_detail-item">
+                        <span class="credit-card_detail-label">Used:</span>
+                        <span class="credit-card_detail-value">${card.used_amount}</span>
+                    </div>
                 </div>
             </div>
         `;
@@ -151,7 +161,6 @@ class PageCreditCards {
             form.find('[name="card_name"]').val(card.card_name);
             form.find('[name="card_number"]').val(card.card_number);
             form.find('[name="credit_limit"]').val(card.credit_limit);
-            form.find('[name="used_amount"]').val(card.used_amount);
 
             openModal('edit-card-modal');
         } catch (error) {
@@ -168,8 +177,7 @@ class PageCreditCards {
             id: formData.get('id'),
             card_name: formData.get('card_name'),
             card_number: formData.get('card_number'),
-            credit_limit: formData.get('credit_limit'),
-            used_amount: formData.get('used_amount')
+            credit_limit: formData.get('credit_limit')
         };
         const cardId = data.id;
 
