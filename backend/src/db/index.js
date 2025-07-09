@@ -20,7 +20,8 @@ const createTables = async () => {
                 id_card_image TEXT,
                 id_card_number VARCHAR(50) NOT NULL DEFAULT '',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                installment_status BOOLEAN NOT NULL DEFAULT FALSE
             );
 
             CREATE TABLE IF NOT EXISTS credit_cards (
@@ -30,12 +31,14 @@ const createTables = async () => {
                 credit_limit NUMERIC(12, 2) NOT NULL,
                 used_amount NUMERIC(12, 2) DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                installment_status BOOLEAN NOT NULL DEFAULT FALSE
             );
 
             CREATE INDEX IF NOT EXISTS idx_credit_card_name ON credit_cards(card_name);
             CREATE INDEX IF NOT EXISTS idx_credit_card_number ON credit_cards(card_number);
         `);
+
     } finally {
         client.release();
     }

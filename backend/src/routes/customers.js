@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { query as dbQuery } from '../db/index.js';
+import { query } from '../db/index.js';
 import multer from 'multer';
 import { basename, extname, join } from 'path';
 import { fileURLToPath } from 'url';
@@ -43,7 +43,7 @@ const checkDuplicateCustomer = async (phone, idCardNumber, customerId = null) =>
         params.push(customerId);
     }
 
-    const result = await dbQuery(query, params);
+    const result = await query(query, params);
     return result.rows.length > 0;
 };
 
@@ -82,8 +82,8 @@ router.get('/', async (req, res) => {
     }
 
     try {
-        const customersResult = await dbQuery(customerQuery, queryParams);
-        const countResult = await dbQuery(countQuery, countParams);
+        const customersResult = await query(customerQuery, queryParams);
+        const countResult = await query(countQuery, countParams);
         const totalCustomers = parseInt(countResult.rows[0].count, 10);
 
         const customers = await Promise.all(customersResult.rows.map(async customer => {
@@ -118,9 +118,9 @@ router.post('/', upload.single('idCard'), async (req, res) => {
             return res.status(409).json({ error: 'Customer with this phone or ID card number already exists.' });
         }
 
-        const result = await dbQuery(
+        const result = await query(
             'INSERT INTO customers (name, phone, address, id_card_image, id_card_number) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [name, phone, address || null, id_card_image, id_card_number || null]
+            [name, phone, address || null, id_card_image, id_card_number]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -134,13 +134,13 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const result = await dbQuery('DELETE FROM customers WHERE id = $1 RETURNING *', [id]);
+        const result = await query('DELETE FROM customers WHERE id = $1 RETURNING *', [id]);
 
         if (result.rowCount === 0) {
             return res.status(404).json({ error: 'Customer not found' });
         }
 
-        res.status(200).json({ message: 'Customer deleted successfully' });
+        res.status(204).send();
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Failed to delete customer' });
@@ -152,7 +152,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const result = await dbQuery('SELECT * FROM customers WHERE id = $1', [id]);
+        const result = await query('SELECT * FROM customers WHERE id = $1', [id]);
 
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Customer not found' });
@@ -185,7 +185,7 @@ router.put('/:id', upload.single('idCard'), async (req, res) => {
             id_card_image = '/uploads/' + basename(req.file.path);
         } else {
             // If no new file, keep the existing one
-            const currentCustomer = await dbQuery('SELECT id_card_image FROM customers WHERE id = $1', [id]);
+            const currentCustomer = await query('SELECT id_card_image FROM customers WHERE id = $1', [id]);
             if (currentCustomer.rows.length > 0) {
                 id_card_image = currentCustomer.rows[0].id_card_image;
             }
@@ -196,9 +196,9 @@ router.put('/:id', upload.single('idCard'), async (req, res) => {
             return res.status(409).json({ error: 'Customer with this phone or ID card number already exists.' });
         }
 
-        const result = await dbQuery(
+        const result = await query(
             'UPDATE customers SET name = $1, phone = $2, address = $3, id_card_image = $4, id_card_number = $5, updated_at = CURRENT_TIMESTAMP WHERE id = $6 RETURNING *',
-            [name, phone, address || null, id_card_image, id_card_number || null, id]
+            [name, phone, address || null, id_card_image, id_card_number, id]
         );
 
         if (result.rowCount === 0) {
