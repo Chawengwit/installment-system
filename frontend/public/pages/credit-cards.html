@@ -7,10 +7,10 @@
             <p class="page-header_subtitle">Manage your business credit cards and monitor usage</p>
         </div>
         <div class="page-header_actions">
-            <button class="btn btn-secondary" onclick="exportCardData()">
+            <button class="btn btn-secondary" id="export-card-btn">
                 <i class="fas fa-download"></i> Export Data
             </button>
-            <button class="btn btn-primary" onclick="openModal('add-card-modal')">
+            <button class="btn btn-primary" id="create-card-btn">
                 <i class="fas fa-plus"></i> Add Card
             </button>
         </div>
@@ -79,7 +79,7 @@
         <div class="section-header">
             <h2 class="section-title">Your Credit Cards</h2>
             <div class="section-filters">
-                <select class="filter-select" onchange="filterCards(this.value)">
+                <select class="filter-select" id="filter-card-select">
                     <option value="all">All Cards</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -97,13 +97,13 @@
                         <span>KBank Visa</span>
                     </div>
                     <div class="credit-card_actions">
-                        <button class="credit-card_action" onclick="editCard(1)" title="Edit Card">
+                        <button class="credit-card_action btn-edit-card" title="Edit Card">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="credit-card_action" onclick="viewCardDetails(1)" title="View Details">
+                        <button class="credit-card_action btn-view-card" title="View Details">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="credit-card_action" onclick="cardMenu(1)" title="More Options">
+                        <button class="credit-card_action btn-card-menu" title="More Options">
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                     </div>
@@ -121,13 +121,13 @@
                         <span>SCB MasterCard</span>
                     </div>
                     <div class="credit-card_actions">
-                        <button class="credit-card_action" onclick="editCard(2)" title="Edit Card">
+                        <button class="credit-card_action btn-edit-card" title="Edit Card">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="credit-card_action" onclick="viewCardDetails(2)" title="View Details">
+                        <button class="credit-card_action btn-view-card" title="View Details">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="credit-card_action" onclick="cardMenu(2)" title="More Options">
+                        <button class="credit-card_action btn-card-menu" title="More Options">
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                     </div>
@@ -145,13 +145,13 @@
                         <span>Visa Platinum</span>
                     </div>
                     <div class="credit-card_actions">
-                        <button class="credit-card_action" onclick="editCard(3)" title="Edit Card">
+                        <button class="credit-card_action btn-edit-card" title="Edit Card">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="credit-card_action" onclick="viewCardDetails(3)" title="View Details">
+                        <button class="credit-card_action btn-view-card" title="View Details">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="credit-card_action" onclick="cardMenu(3)" title="More Options">
+                        <button class="credit-card_action btn-card-menu" title="More Options">
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                     </div>
@@ -166,11 +166,6 @@
                     <span class="credit-card_holder-name">Premium Account</span>
                 </div>
                 
-                
-                
-                
-
-                
             </div>
         </div>
     </section>
@@ -178,15 +173,15 @@
 
 <!-- Add Card Modal -->
 <div class="modal" id="add-card-modal">
-    <div class="modal_overlay" onclick="closeModal('add-card-modal')"></div>
+    <div class="modal_overlay"></div>
     <div class="modal_content">
         <div class="modal_header">
             <h3 class="modal_title">Add New Credit Card</h3>
-            <button class="modal_close" onclick="closeModal('add-card-modal')">
+            <button class="modal_close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <form class="form customer-detail" id="add-card-form" onsubmit="handleAddCard(event)">
+        <form class="form customer-detail" id="add-card-form">
             <div class="form_group">
                 <label class="form_label">Card Name *</label>
                 <input type="text" class="form_input" name="cardName" placeholder="e.g., KBank Visa Business" required>
@@ -224,7 +219,7 @@
                 <input type="text" class="form_input" name="cardHolder" placeholder="Business Account">
             </div>
             <div class="form_actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('add-card-modal')">Cancel</button>
+                <button type="button" class="btn btn-secondary" id="cancel-add-card">Cancel</button>
                 <button type="submit" class="btn btn-primary">Add Card</button>
             </div>
         </form>
@@ -233,11 +228,11 @@
 
 <!-- Card Details Modal -->
 <div class="modal modal-large" id="card-details-modal">
-    <div class="modal_overlay" onclick="closeModal('card-details-modal')"></div>
+    <div class="modal_overlay"></div>
     <div class="modal_content">
         <div class="modal_header">
             <h3 class="modal_title">Card Transaction History</h3>
-            <button class="modal_close" onclick="closeModal('card-details-modal')">
+            <button class="modal_close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
