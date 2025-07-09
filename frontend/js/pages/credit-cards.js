@@ -108,7 +108,11 @@ class PageCreditCards {
                     </div>
                     <div class="credit-card_detail-item">
                         <span class="credit-card_detail-label">Used:</span>
-                        <span class="credit-card_detail-value">${card.used_amount}</span>
+                        <span class="credit-card_detail-value used">${card.used_amount}</span>
+                    </div>
+                    <div class="credit-card_detail-item">
+                        <span class="credit-card_detail-label">Available:</span>
+                        <span class="credit-card_detail-value available">${card.credit_limit - card.used_amount}</span>
                     </div>
                 </div>
             </div>
