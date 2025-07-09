@@ -260,6 +260,7 @@ class PageCustomers {
             form.find('[name="id"]').val(customer.id);
             form.find('[name="name"]').val(customer.name);
             form.find('[name="phone"]').val(customer.phone);
+            form.find('[name="id_card_number"]').val(customer.id_card_number);
             form.find('[name="address"]').val(customer.address);
 
             const preview = form.find('.id-card-preview');
