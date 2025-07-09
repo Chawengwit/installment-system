@@ -202,6 +202,42 @@
     </div>
 </div>
 
+<!-- Edit Card Modal -->
+<div class="modal" id="edit-card-modal">
+    <div class="modal_overlay"></div>
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3 class="modal_title">Edit Credit Card</h3>
+            <button class="modal_close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form class="form customer-detail" id="edit-card-form">
+            <input type="hidden" name="id">
+            <div class="form_group">
+                <label class="form_label">Card Name *</label>
+                <input type="text" class="form_input" name="card_name" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Card Number *</label>
+                <input type="text" class="form_input" name="card_number" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Credit Limit ($) *</label>
+                <input type="number" class="form_input" name="credit_limit" step="0.01" min="0" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Used Amount ($)</label>
+                <input type="number" class="form_input" name="used_amount" step="0.01" min="0">
+            </div>
+            <div class="form_actions">
+                <button type="button" class="btn btn-secondary" id="cancel-edit-card">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Card Details Modal -->
 <div class="modal modal-large" id="card-details-modal">
     <div class="modal_overlay"></div>
