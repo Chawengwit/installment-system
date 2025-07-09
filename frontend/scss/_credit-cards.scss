@@ -37,8 +37,8 @@
 }
 
 .credit-card {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-    color: var(--color-white);
+    background-color: var(--color-blue-100); /* Light blue */
+    color: var(--color-gray-800);
     border-radius: var(--border-radius-xl);
     padding: var(--spacing-lg);
     box-shadow: var(--shadow-lg);
@@ -120,6 +120,14 @@
             .credit-card_detail-value {
                 font-size: var(--font-size-md);
                 font-weight: 600;
+            }
+
+            .credit-card_detail-value.used {
+                color: var(--color-danger);
+            }
+
+            .credit-card_detail-value.available {
+                color: var(--color-success);
             }
         }
     }
