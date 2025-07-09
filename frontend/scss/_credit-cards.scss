@@ -37,8 +37,8 @@
 }
 
 .credit-card {
-    background-color: var(--color-blue-100); /* Light blue */
-    color: var(--color-gray-800);
+    background-color: var(--color-gray-800); /* Dark tone */
+    color: var(--color-white);
     border-radius: var(--border-radius-xl);
     padding: var(--spacing-lg);
     box-shadow: var(--shadow-lg);
@@ -70,8 +70,8 @@
     .credit-card_action {
         width: 32px;
         height: 32px;
-        border: 1px solid var(--color-white);
-        background-color: transparent;
+        border: none;
+        background-color: rgba(255, 255, 255, 0.2);
         color: var(--color-white);
         border-radius: var(--border-radius-md);
         display: flex;
@@ -81,16 +81,42 @@
         transition: var(--transition-fast);
         
         &:hover {
-            background-color: var(--color-white);
-            color: var(--color-primary);
-            transform: scale(1.1);
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+    }
+
+    .btn-view-card {
+        background-color: transparent;
+        color: var(--color-primary);
+        &:hover {
+            background-color: var(--color-primary-light);
+            color: var(--color-primary-dark);
+        }
+    }
+
+    .btn-edit-card {
+        background-color: transparent;
+        color: var(--color-secondary);
+        &:hover {
+            background-color: var(--color-secondary-light);
+            color: var(--color-secondary-dark);
+        }
+    }
+
+    .btn-delete-card {
+        background-color: transparent;
+        color: var(--color-danger);
+        &:hover {
+            background-color: var(--color-danger-light);
+            color: var(--color-danger-dark);
         }
     }
 
     .credit-card_actions {
         display: flex;
         gap: var(--spacing-xs);
-        opacity: 0.7;
         transition: var(--transition-fast);
     }
 
@@ -112,9 +138,8 @@
             text-align: left;
 
             .credit-card_detail-label {
-                display: block;
-                font-size: var(--font-size-sm);
                 opacity: 0.8;
+                color: var(--color-white);
             }
 
             .credit-card_detail-value {
