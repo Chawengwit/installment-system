@@ -190,33 +190,9 @@
                 <label class="form_label">Card Number *</label>
                 <input type="text" class="form_input" name="cardNumber" placeholder="**** **** **** 1234" maxlength="19" required>
             </div>
-            <div class="form_row">
-                <div class="form_group">
-                    <label class="form_label">Expiry Date *</label>
-                    <input type="text" class="form_input" name="expiryDate" placeholder="MM/YY" maxlength="5" required>
-                </div>
-                <div class="form_group">
-                    <label class="form_label">CVV *</label>
-                    <input type="text" class="form_input" name="cvv" placeholder="123" maxlength="4" required>
-                </div>
-            </div>
             <div class="form_group">
                 <label class="form_label">Credit Limit ($) *</label>
                 <input type="number" class="form_input" name="creditLimit" placeholder="25000.00" step="0.01" min="0" required>
-            </div>
-            <div class="form_group">
-                <label class="form_label">Card Type *</label>
-                <select class="form_select" name="cardType" required>
-                    <option value="">Select card type...</option>
-                    <option value="visa">Visa</option>
-                    <option value="mastercard">MasterCard</option>
-                    <option value="amex">American Express</option>
-                    <option value="discover">Discover</option>
-                </select>
-            </div>
-            <div class="form_group">
-                <label class="form_label">Card Holder Name</label>
-                <input type="text" class="form_input" name="cardHolder" placeholder="Business Account">
             </div>
             <div class="form_actions">
                 <button type="button" class="btn btn-secondary" id="cancel-add-card">Cancel</button>
