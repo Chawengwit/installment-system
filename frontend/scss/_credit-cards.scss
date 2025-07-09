@@ -70,8 +70,8 @@
     .credit-card_action {
         width: 32px;
         height: 32px;
-        border: none;
-        background-color: rgba(255, 255, 255, 0.2);
+        border: 1px solid var(--color-white);
+        background-color: transparent;
         color: var(--color-white);
         border-radius: var(--border-radius-md);
         display: flex;
@@ -81,7 +81,8 @@
         transition: var(--transition-fast);
         
         &:hover {
-            background-color: rgba(255, 255, 255, 0.3);
+            background-color: var(--color-white);
+            color: var(--color-primary);
             transform: scale(1.1);
         }
     }

@@ -39,6 +39,10 @@ router.post('/', async (req, res) => {
     }
 
     try {
+        const existingCard = await query('SELECT id FROM credit_cards WHERE card_number = $1', [card_number]);
+        if (existingCard.rows.length > 0) {
+            return res.status(409).json({ error: 'Credit card number already exists' });
+        }
         const { rows } = await query(
             'INSERT INTO credit_cards (card_name, card_number, credit_limit) VALUES ($1, $2, $3) RETURNING *',
             [card_name, card_number, credit_limit]
@@ -60,6 +64,10 @@ router.put('/:id', async (req, res) => {
     }
 
     try {
+        const existingCard = await query('SELECT id FROM credit_cards WHERE card_number = $1 AND id != $2', [card_number, id]);
+        if (existingCard.rows.length > 0) {
+            return res.status(409).json({ error: 'Credit card number already exists' });
+        }
         const { rows } = await query(
             'UPDATE credit_cards SET card_name = $1, card_number = $2, credit_limit = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $4 RETURNING *',
             [card_name, card_number, credit_limit, id]
@@ -70,21 +78,6 @@ router.put('/:id', async (req, res) => {
         res.json(rows[0]);
     } catch (error) {
         console.error(`Error updating credit card ${id}:`, error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// DELETE a credit card by ID
-router.delete('/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const result = await query('DELETE FROM credit_cards WHERE id = $1 RETURNING *', [id]);
-        if (result.rowCount === 0) {
-            return res.status(404).json({ error: 'Credit card not found' });
-        }
-        res.status(204).send(); // No content
-    } catch (error) {
-        console.error(`Error deleting credit card ${id}:`, error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

@@ -86,11 +86,11 @@ class PageCreditCards {
                         <span>${card.card_name}</span>
                     </div>
                     <div class="credit-card_actions">
-                        <button class="credit-card_action btn-edit-card" title="Edit Card">
-                            <i class="fas fa-edit"></i>
-                        </button>
                         <button class="credit-card_action btn-view-card" title="View Details">
                             <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="credit-card_action btn-edit-card" title="Edit Card">
+                            <i class="fas fa-edit"></i>
                         </button>
                         <button class="credit-card_action btn-delete-card" title="Delete Card">
                             <i class="fas fa-trash"></i>
@@ -124,6 +124,9 @@ class PageCreditCards {
             credit_limit: formData.get('creditLimit')
         };
 
+        // Clear previous highlights
+        $(form).find('input[name="cardNumber"]').removeClass('is-invalid');
+
         try {
             const response = await fetch('/api/credit-cards', {
                 method: 'POST',
@@ -135,6 +138,9 @@ class PageCreditCards {
 
             if (!response.ok) {
                 const errorData = await response.json();
+                if (response.status === 409) {
+                    this.highlightInvalidFields(form, errorData.error);
+                }
                 throw new Error(errorData.error || 'Failed to create credit card');
             }
 
@@ -181,6 +187,9 @@ class PageCreditCards {
         };
         const cardId = data.id;
 
+        // Clear previous highlights
+        $(form).find('input[name="card_number"]').removeClass('is-invalid');
+
         try {
             const response = await fetch(`/api/credit-cards/${cardId}`, {
                 method: 'PUT',
@@ -192,6 +201,9 @@ class PageCreditCards {
 
             if (!response.ok) {
                 const errorData = await response.json();
+                if (response.status === 409) {
+                    this.highlightInvalidFields(form, errorData.error);
+                }
                 throw new Error(errorData.error || 'Failed to update credit card');
             }
 
@@ -203,6 +215,19 @@ class PageCreditCards {
         } catch (error) {
             showNotification(error.message, 'error');
         }
+    }
+
+    highlightInvalidFields(form, errorMessage) {
+        if (errorMessage.includes('Credit card number already exists')) {
+            // For add form, name is 'cardNumber', for edit form, name is 'card_number'
+            const inputName = form.id === 'add-card-form' ? 'cardNumber' : 'card_number';
+            $(form).find(`input[name="${inputName}"]`).addClass('is-invalid');
+        }
+
+        // Remove highlight on input
+        $(form).find('input[name="cardNumber"], input[name="card_number"]').on('input', function() {
+            $(this).removeClass('is-invalid');
+        });
     }
 
     handleDeleteCard(e) {
