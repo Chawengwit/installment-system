@@ -5,9 +5,7 @@ const router = express.Router();
 
 // GET all credit cards
 router.get('/', async (req, res) => {
-    const { limit = 10, offset = 0, installment_status } = req.query;
-
-    console.log("## AA", limit, offset, installment_status);
+    const { limit = 10, offset = 0, installment_status, search } = req.query;
 
     let baseQuery = 'FROM credit_cards';
     let whereClause = '';
@@ -18,6 +16,12 @@ router.get('/', async (req, res) => {
     if (installment_status !== undefined) {
         filters.push(`installment_status = $${paramIndex}`);
         queryParams.push(installment_status === 'true');
+        paramIndex++;
+    }
+
+    if (search) {
+        filters.push(`(card_name ILIKE $${paramIndex} OR card_number ILIKE $${paramIndex})`);
+        queryParams.push(`%${search}%`);
         paramIndex++;
     }
 
@@ -32,8 +36,6 @@ router.get('/', async (req, res) => {
         LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `;
 
-    console.log("## Query: ", creditCardQuery);
-
     queryParams.push(limit);
     queryParams.push(offset);
 
@@ -42,7 +44,7 @@ router.get('/', async (req, res) => {
         ${whereClause}
     `;
 
-    const countParams = queryParams.slice(0, filters.length); // ส่งเฉพาะพารามิเตอร์ของ WHERE
+    const countParams = queryParams.slice(0, filters.length);
 
     try {
         const { rows } = await query(creditCardQuery, queryParams);

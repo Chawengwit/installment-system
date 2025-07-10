@@ -1,4 +1,44 @@
 // Credit Cards Section
+.search-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+.search-bar {
+    position: relative;
+    flex-grow: 1;
+
+    input {
+        width: 100%;
+        padding: var(--spacing-sm) var(--spacing-md);
+        padding-right: var(--spacing-xl); /* Space for icon */
+        border: 1px solid var(--color-gray-300);
+        border-radius: var(--border-radius-md);
+        font-size: var(--font-size-md);
+        
+        &:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+    }
+
+    .search-icon {
+        position: absolute;
+        right: var(--spacing-md);
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--color-gray-500);
+    }
+}
+
 .credit-cards-section {
     .section-header {
         display: flex;
@@ -8,24 +48,26 @@
         flex-wrap: wrap;
         gap: var(--spacing-md);
     }
+}
+
+.section-filters {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.filter-select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-sm);
+    background-color: var(--color-white);
+    flex-grow: 1;
+    max-width: 200px;
     
-    .section-filters {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
-    }
-    
-    .filter-select {
-        padding: var(--spacing-sm) var(--spacing-md);
-        border: 1px solid var(--color-gray-300);
-        border-radius: var(--border-radius-md);
-        font-size: var(--font-size-sm);
-        background-color: var(--color-white);
-        
-        &:focus {
-            outline: none;
-            border-color: var(--color-primary);
-        }
+    &:focus {
+        outline: none;
+        border-color: var(--color-primary);
     }
 }
 

@@ -13,6 +13,7 @@ class PageCreditCards {
     init() {
         this.fetchCreditCards(true);
         this.bindEvents();
+        $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
     }
 
     destroy() {
@@ -31,20 +32,30 @@ class PageCreditCards {
         this.$mainContent.on("click", ".btn-edit-card", this.handleEditCard.bind(this));
         this.$mainContent.on("click", ".btn-delete-card", this.handleDeleteCard.bind(this));
         this.$mainContent.on("change", "#filter-card-select", this.handleFilterChange.bind(this));
+        this.$mainContent.on("input", "#card-search-input", debounce(this.handleSearchInput.bind(this), 300));
     }
 
-    async fetchCreditCards(clearExisting = false, filter = 'all') {
+    async fetchCreditCards(clearExisting = false, filter = 'all', searchTerm = '') {
         if (this.isLoading || !this.hasMore) {
             return;
         }
 
         this.isLoading = true;
+        if (clearExisting) {
+            this.showLoadingOverlay();
+        } else {
+            $('.infinite-scroll-loading').show();
+        }
 
         const offset = (this.currentPage - 1) * this.cardsPerPage;
         let url = `/api/credit-cards?limit=${this.cardsPerPage}&offset=${offset}`;
 
         if (filter !== 'all') {
             url += `&installment_status=${filter === 'used' ? true : false}`;
+        }
+
+        if (searchTerm) {
+            url += `&search=${encodeURIComponent(searchTerm)}`;
         }
 
         try {
@@ -62,6 +73,8 @@ class PageCreditCards {
             showNotification(error.message, 'error');
         } finally {
             this.isLoading = false;
+            this.hideLoadingOverlay();
+            $('.infinite-scroll-loading').hide();
         }
     }
 
@@ -69,7 +82,16 @@ class PageCreditCards {
         this.currentPage = 1;
         this.hasMore = true;
         const filter = $('#filter-card-select').val();
-        this.fetchCreditCards(true, filter);
+        const searchTerm = $('#card-search-input').val();
+        this.fetchCreditCards(true, filter, searchTerm);
+    }
+
+    handleSearchInput() {
+        this.currentPage = 1;
+        this.hasMore = true;
+        const filter = $('#filter-card-select').val();
+        const searchTerm = $('#card-search-input').val();
+        this.fetchCreditCards(true, filter, searchTerm);
     }
 
     renderCreditCards(cards, clearExisting) {
@@ -262,6 +284,21 @@ class PageCreditCards {
                 showNotification(error.message, 'error');
             }
         });
+    }
+
+    showLoadingOverlay() {
+        $('.credit-cards-grid .loading-overlay').show();
+    }
+
+    hideLoadingOverlay() {
+        $('.credit-cards-grid .loading-overlay').hide();
+    }
+
+    handleScroll() {
+        if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100 && !this.isLoading && this.hasMore) {
+            const filter = $('#filter-card-select').val();
+            this.fetchCreditCards(false, filter);
+        }
     }
 }
 
