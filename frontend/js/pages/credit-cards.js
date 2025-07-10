@@ -30,9 +30,10 @@ class PageCreditCards {
         this.$mainContent.on("submit", "#edit-card-form", this.handleUpdateCard.bind(this));
         this.$mainContent.on("click", ".btn-edit-card", this.handleEditCard.bind(this));
         this.$mainContent.on("click", ".btn-delete-card", this.handleDeleteCard.bind(this));
+        this.$mainContent.on("change", "#filter-card-select", this.handleFilterChange.bind(this));
     }
 
-    async fetchCreditCards(clearExisting = false) {
+    async fetchCreditCards(clearExisting = false, filter = 'all') {
         if (this.isLoading || !this.hasMore) {
             return;
         }
@@ -40,8 +41,14 @@ class PageCreditCards {
         this.isLoading = true;
 
         const offset = (this.currentPage - 1) * this.cardsPerPage;
+        let url = `/api/credit-cards?limit=${this.cardsPerPage}&offset=${offset}`;
+
+        if (filter !== 'all') {
+            url += `&installment_status=${filter === 'used' ? true : false}`;
+        }
+
         try {
-            const response = await fetch(`/api/credit-cards?limit=${this.cardsPerPage}&offset=${offset}`);
+            const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch credit cards');
             const data = await response.json();
 
@@ -56,6 +63,13 @@ class PageCreditCards {
         } finally {
             this.isLoading = false;
         }
+    }
+
+    handleFilterChange() {
+        this.currentPage = 1;
+        this.hasMore = true;
+        const filter = $('#filter-card-select').val();
+        this.fetchCreditCards(true, filter);
     }
 
     renderCreditCards(cards, clearExisting) {

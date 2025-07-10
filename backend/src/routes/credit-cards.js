@@ -5,10 +5,48 @@ const router = express.Router();
 
 // GET all credit cards
 router.get('/', async (req, res) => {
-    const { limit = 10, offset = 0 } = req.query;
+    const { limit = 10, offset = 0, installment_status } = req.query;
+
+    console.log("## AA", limit, offset, installment_status);
+
+    let baseQuery = 'FROM credit_cards';
+    let whereClause = '';
+    const filters = [];
+    const queryParams = [];
+    let paramIndex = 1;
+
+    if (installment_status !== undefined) {
+        filters.push(`installment_status = $${paramIndex}`);
+        queryParams.push(installment_status === 'true');
+        paramIndex++;
+    }
+
+    if (filters.length > 0) {
+        whereClause = ' WHERE ' + filters.join(' AND ');
+    }
+
+    const creditCardQuery = `
+        SELECT * ${baseQuery}
+        ${whereClause}
+        ORDER BY created_at DESC
+        LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+    `;
+
+    console.log("## Query: ", creditCardQuery);
+
+    queryParams.push(limit);
+    queryParams.push(offset);
+
+    const countQuery = `
+        SELECT COUNT(*) ${baseQuery}
+        ${whereClause}
+    `;
+
+    const countParams = queryParams.slice(0, filters.length); // ส่งเฉพาะพารามิเตอร์ของ WHERE
+
     try {
-        const { rows } = await query('SELECT * FROM credit_cards ORDER BY created_at DESC LIMIT $1 OFFSET $2', [limit, offset]);
-        const total = await query('SELECT COUNT(*) FROM credit_cards');
+        const { rows } = await query(creditCardQuery, queryParams);
+        const total = await query(countQuery, countParams);
         res.json({ credit_cards: rows, total: total.rows[0].count });
     } catch (error) {
         console.error('Error fetching credit cards:', error);
