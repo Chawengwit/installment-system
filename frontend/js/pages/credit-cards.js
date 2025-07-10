@@ -116,10 +116,7 @@ class PageCreditCards {
                     **** **** **** ${String(card.card_number).slice(-4)}
                 </div>
                 <div class="credit-card_details">
-                    <div class="credit-card_detail-item">
-                        <span class="credit-card_detail-label">Limit:</span>
-                        <span class="credit-card_detail-value">${card.credit_limit}</span>
-                    </div>
+                    
                     <div class="credit-card_detail-item">
                         <span class="credit-card_detail-label">Used:</span>
                         <span class="credit-card_detail-value used">${card.used_amount}</span>
