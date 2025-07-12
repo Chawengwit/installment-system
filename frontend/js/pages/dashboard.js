@@ -36,7 +36,45 @@ class PageDashboard {
         this.$mainContent.on("click", "#add-new-plan-modal .btn[data-action='next']", this.nextStep.bind(this));
         this.$mainContent.on("click", "#add-new-plan-modal .btn[data-action='prev']", this.prevStep.bind(this));
 
+        // File upload event
+        this.$mainContent.on("click", "#add-new-plan-modal .file-upload_area", function() {
+            $(this).siblings('.file-upload_input').trigger('click');
+        });
+        this.$mainContent.on("change", "#add-new-plan-modal #product-images", this.handleImageUpload.bind(this));
+
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
+    }
+
+    handleImageUpload(event) {
+        const files = event.target.files;
+        const previewContainer = $('#product-image-list');
+
+        Array.from(files).forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageItem = $(
+                        `<div class="image-list-item">
+                            <img src="${e.target.result}" class="uploaded-image-preview">
+                            <button type="button" class="remove-image-btn"><i class="fas fa-times-circle"></i></button>
+                        </div>`
+                    );
+                    previewContainer.append(imageItem);
+
+                    // Add event listener to remove button
+                    imageItem.find('.remove-image-btn').on('click', function() {
+                        $(this).closest('.image-list-item').remove();
+                    });
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showNotification('Only image files are allowed.', 'warning');
+            }
+        });
+        showNotification(`${files.length} image(s) selected.`, 'info');
+
+        // Clear the file input value to allow re-uploading the same file or new files immediately
+        event.target.value = '';
     }
 
     showStep(stepNumber) {
