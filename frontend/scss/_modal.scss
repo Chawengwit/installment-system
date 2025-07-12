@@ -35,47 +35,58 @@
         transform: translateY(20px);
         opacity: 0;
         animation: modal-fade-in 0.3s forwards;
+        display: flex; /* Added */
+        flex-direction: column; /* Added */
+        max-height: 90vh; /* Keep this */
+        overflow-y: hidden; /* Changed from auto to hidden */
     }
 
     &_header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid var(--color-border);
+        padding: var(--spacing-lg); /* Changed padding-bottom to padding */
+        border-bottom: 1px solid var(--color-gray-200); /* Changed var(--color-border) to var(--color-gray-200) */
+        position: sticky; /* Added */
+        top: 0; /* Added */
+        background-color: var(--color-white); /* Added */
+        z-index: 10; /* Added */
     }
 
     &_title {
-        font-size: 1.5rem;
-        color: var(--color-heading);
+        font-size: var(--font-size-lg); /* Changed 1.5rem to var(--font-size-lg) */
+        color: var(--color-gray-900); /* Changed var(--color-heading) to var(--color-gray-900) */
         margin: 0;
     }
 
     &_close {
-        color: var(--color-text-light);
-        font-size: 1.5rem;
+        color: var(--color-gray-500); /* Changed var(--color-text-light) to var(--color-gray-500) */
+        font-size: var(--font-size-lg); /* Changed 1.5rem to var(--font-size-lg) */
         background: none;
         border: none;
         cursor: pointer;
-        transition: color 0.2s ease;
+        transition: var(--transition-fast); /* Changed color 0.2s ease to var(--transition-fast) */
 
         &:hover {
-            color: var(--color-danger);
+            color: var(--color-gray-700); /* Changed var(--color-danger) to var(--color-gray-700) */
+            background-color: var(--color-gray-100); /* Added */
         }
     }
 
     &_body {
-        color: var(--color-text);
+        color: var(--color-gray-700); /* Changed var(--color-text) to var(--color-gray-700) */
         line-height: 1.6;
-        padding: var(--spacing-lg);
+        padding: var(--spacing-lg); /* Keep this */
+        flex-grow: 1; /* Added */
+        overflow-y: auto; /* Added */
     }
 
     &_footer {
         display: flex;
         justify-content: flex-end;
-        gap: 1rem;
+        gap: var(--spacing-md); /* Changed 1rem to var(--spacing-md) */
         padding: var(--spacing-lg);
-        border-top: 1px solid var(--color-border);
+        border-top: 1px solid var(--color-gray-200); /* Changed var(--color-border) to var(--color-gray-200) */
     }
 
     &.modal-large &_content {
@@ -99,5 +110,158 @@
     to {
         transform: translateY(0);
         opacity: 1;
+    }
+}
+
+
+#add-new-plan-modal {
+    .modal_content {
+        max-width: 900px;
+    }
+
+    .progress-indicator {
+        position: sticky; /* Added */
+        top: 70px; /* Adjust based on header height */
+        background-color: var(--color-white); /* Added */
+        z-index: 9; /* Added, slightly lower than header */
+        // margin-bottom: var(--spacing-2xl); /* Keep existing margin */
+    }
+
+    .plan-form-section {
+        padding: var(--spacing-xl);
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .form-step {
+        display: none;
+
+        &.form-step-active {
+            display: block;
+        }
+    }
+
+    .form-step_header {
+        text-align: center;
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .form-step_title {
+        font-size: var(--font-size-2xl);
+        font-weight: 700;
+        color: var(--color-gray-900);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .form-step_description {
+        color: var(--color-gray-600);
+        font-size: var(--font-size-lg);
+    }
+
+    .form_row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-lg);
+    }
+
+    .input-with-icon {
+        position: relative;
+
+        .input-with-icon_icon {
+            position: absolute;
+            left: var(--spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-gray-400);
+        }
+
+        .form_input {
+            padding-left: 2.5rem;
+        }
+    }
+
+    .file-upload {
+        .file-upload_input {
+            display: none;
+        }
+
+        .file-upload_area {
+            border: 2px dashed var(--color-gray-300);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-2xl);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-fast);
+
+            &:hover {
+                border-color: var(--color-primary);
+                background-color: rgba(37, 99, 235, 0.02);
+            }
+        }
+
+        .file-upload_icon {
+            font-size: var(--font-size-3xl);
+            color: var(--color-gray-400);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .file-upload_text {
+            font-size: var(--font-size-lg);
+            color: var(--color-gray-700);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .file-upload_hint {
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-500);
+        }
+    }
+
+    .customer-selection,
+    .payment-methods,
+    .credit-card-details,
+    .review-summary {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .customer-options,
+    .card-selection {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .customer-option,
+    .card-option {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+        border: 1px solid var(--color-gray-200);
+        border-radius: var(--border-radius-lg);
+        cursor: pointer;
+        transition: var(--transition-fast);
+
+        &:hover {
+            border-color: var(--color-primary);
+            background-color: rgba(37, 99, 235, 0.02);
+        }
+    }
+
+    .payment-method_label {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-lg);
+        padding: var(--spacing-lg);
+        border: 2px solid var(--color-gray-200);
+        border-radius: var(--border-radius-lg);
+        cursor: pointer;
+        transition: var(--transition-fast);
+
+        &:hover {
+            border-color: var(--color-primary);
+            background-color: rgba(37, 99, 235, 0.02);
+        }
     }
 }
