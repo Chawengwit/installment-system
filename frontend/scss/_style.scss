@@ -501,7 +501,7 @@ a{
     align-items: center;
     flex-wrap: wrap;
     gap: var(--spacing-md);
-    margin-bottom: var(--spacing-xl); /* Adjusted for consistency */
+    margin-bottom: var(--spacing-xl);
 
     @media (max-width: 768px) {
         flex-direction: column;
@@ -512,8 +512,8 @@ a{
 .search-bar {
     position: relative;
     flex-grow: 1;
-    max-width: 400px; /* Set a max-width for consistency */
-
+    width: 80%;
+    
     input {
         width: 100%;
         padding: var(--spacing-sm) var(--spacing-md);
