@@ -36,6 +36,9 @@ class PageDashboard {
         this.$mainContent.on("click", "#add-new-plan-modal .btn[data-action='next']", this.nextStep.bind(this));
         this.$mainContent.on("click", "#add-new-plan-modal .btn[data-action='prev']", this.prevStep.bind(this));
 
+        // Customer search within modal
+        this.$mainContent.on("input", "#add-new-plan-modal #customer-search-input", debounce(this.fetchCustomersForModal.bind(this), 300));
+
         // File upload event
         this.$mainContent.on("click", "#add-new-plan-modal .file-upload_area", function() {
             $(this).siblings('.file-upload_input').trigger('click');
@@ -82,6 +85,10 @@ class PageDashboard {
         $('#add-new-plan-modal .form-step').removeClass('form-step-active');
         $('#add-new-plan-modal #step-' + stepNumber).addClass('form-step-active');
 
+        if (stepNumber === 3) {
+            this.fetchCustomersForModal();
+        }
+
         $('#add-new-plan-modal .progress-indicator_step').removeClass('progress-indicator_step-active progress-indicator_step-completed');
         for (let i = 1; i <= stepNumber; i++) {
             $('#add-new-plan-modal .progress-indicator_step[data-step="' + i + '"]').addClass('progress-indicator_step-active');
@@ -101,6 +108,48 @@ class PageDashboard {
         if (this.currentStep > 1) {
             this.showStep(this.currentStep - 1);
         }
+    }
+
+    async fetchCustomersForModal(event) {
+        const search = event ? $(event.target).val().toLowerCase() : '';
+        const customerOptionsContainer = $('#add-new-plan-modal .customer-options');
+        customerOptionsContainer.html('<p>Loading customers...</p>');
+
+        try {
+            const response = await fetch(`/api/customers?search=${search}&limit=5`); // Limit to 5 customers
+            if (!response.ok) throw new Error('Failed to fetch customers for modal');
+            const data = await response.json();
+
+            customerOptionsContainer.html(''); // Clear loading message
+            if (data.customers && data.customers.length > 0) {
+                data.customers.forEach(customer => {
+                    customerOptionsContainer.append(this.createCustomerOption(customer));
+                });
+            } else {
+                customerOptionsContainer.html('<p>No customers found.</p>');
+            }
+        } catch (error) {
+            console.error('Error fetching customers for modal:', error);
+            customerOptionsContainer.html('<p class="text-danger">Error loading customers.</p>');
+            showNotification(error.message, 'error');
+        }
+    }
+
+    createCustomerOption(customer) {
+        return `
+            <div class="customer-option" data-customer-id="${customer.id}">
+                <div class="customer-option_avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="customer-option_info">
+                    <h4 class="customer-option_name">${customer.name}</h4>
+                    <p class="customer-option_details">${customer.phone} • ${customer.activePlans || 0} active plans</p>
+                </div>
+                <div class="customer-option_status">
+                    <span class="badge badge-info">Available</span>
+                </div>
+            </div>
+        `;
     }
 
     handleSearch() {
