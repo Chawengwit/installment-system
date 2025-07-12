@@ -945,68 +945,6 @@ a{
     margin-bottom: var(--spacing-2xl);
 }
 
-.activity-list {
-    background-color: var(--color-white);
-    border-radius: var(--border-radius-xl);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-}
-
-// Recent activity
-.recent-activity {
-    margin-bottom: var(--spacing-2xl);
-}
-
-.activity-item {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-lg);
-    border-bottom: 1px solid var(--color-gray-200);
-
-    &:last-child {
-        border-bottom: none;
-    }
-
-    .activity-item_icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--color-white);
-        font-size: var(--font-size-sm);
-
-        &.activity-item_icon-primary {
-            background-color: var(--color-primary);
-        }
-
-        &.activity-item_icon-success {
-            background-color: var(--color-success);
-        }
-
-        &.activity-item_icon-warning {
-            background-color: var(--color-warning);
-        }
-    }
-
-    .activity-item_content {
-        flex: 1;
-    }
-
-    .activity-item_text {
-        color: var(--color-gray-700);
-        margin-bottom: var(--spacing-xs);
-    }
-
-    .activity-item_time {
-        color: var(--color-gray-500);
-        font-size: var(--font-size-sm);
-    }
-}
-
-
 .plan-form-container {
     background-color: var(--color-white);
     border-radius: var(--border-radius-xl);
