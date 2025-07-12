@@ -43,8 +43,8 @@ class PageDashboard {
         this.$mainContent.on("click", "#add-new-plan-modal .customer-selector", this.handleCustomerSelection.bind(this));
 
         // File upload event
-        this.$mainContent.on("click", "#add-new-plan-modal .file-upload_area", function() {
-            $(this).siblings('.file-upload_input').trigger('click');
+        this.$mainContent.on("click", "#add-new-plan-modal .file-upload_area", (event) => {
+            $(event.currentTarget).siblings('.file-upload_input').trigger('click');
         });
         this.$mainContent.on("change", "#add-new-plan-modal #product-images", this.handleImageUpload.bind(this));
 
@@ -141,7 +141,8 @@ class PageDashboard {
             customerOptionsContainer.html(''); // Clear loading message
             if (data.customers && data.customers.length > 0) {
                 data.customers.forEach(customer => {
-                    customerOptionsContainer.append(this.createCustomerOption(customer));
+                    const isSelected = (this.selectedCustomerId && this.selectedCustomerId === customer.id);
+                    customerOptionsContainer.append(this.createCustomerOption(customer, isSelected));
                 });
             } else {
                 customerOptionsContainer.html('<p>No customers found.</p>');
@@ -153,9 +154,10 @@ class PageDashboard {
         }
     }
 
-    createCustomerOption(customer) {
+    createCustomerOption(customer, isSelected) {
+        const selectedClass = isSelected ? 'customer-option-selected' : '';
         return `
-            <div class="customer-option" data-customer-id="${customer.id}">
+            <div class="customer-option ${selectedClass}" data-customer-id="${customer.id}">
                 <div class="customer-option_avatar">
                     <i class="fas fa-user"></i>
                 </div>
