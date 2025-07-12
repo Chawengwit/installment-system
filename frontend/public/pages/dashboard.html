@@ -316,7 +316,7 @@
                                         <input type="text" id="customer-search-input" placeholder="Search by name or phone...">
                                         <i class="fas fa-search search-icon"></i>
                                     </div>
-                                    <a class="btn btn-primary" id="add-plan-btn" onclick="openModal('add-customer-modal')">
+                                    <a class="btn btn-primary" id="add-customer-from-dashboard-btn">
                                         <i class="fas fa-plus"></i>Add Customer
                                     </a>
                                 </div>
@@ -526,4 +526,58 @@
     </div>
 </div>
 
+<!-- Add Customer Modal -->
+<div class="modal" id="add-customer-modal">
+    <div class="modal_overlay"></div>
+    <div class="modal_content">
+        <div class="loading-overlay" style="display: none;">
+            <div class="loading-spinner"></div>
+        </div>
+        <div class="modal_header">
+            <h3 class="modal_title">Add New Customer</h3>
+            <button class="modal_close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form class="form customer-detail" id="add-customer-form">
+            <div class="form_group">
+                <label class="form_label">Full Name *</label>
+                <input type="text" class="form_input" name="name" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Phone Number *</label>
+                <input type="tel" class="form_input" name="phone" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">ID Card Number *</label>
+                <input type="text" class="form_input" name="id_card_number" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Address</label>
+                <textarea class="form_textarea" name="address" rows="3"></textarea>
+            </div>
+            <div class="form_group">
+                <label class="form_label">ID Card Photo</label>
+                <input type="file" class="form_file" name="idCard" accept="image/*">
+            </div>
+            <div class="form_actions">
+                <button type="button" class="btn btn-secondary" id="cancel-add-customer">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Customer</button>
+            </div>
+        </form>
+    </div>
+</div>
 
+<!-- Loading Overlay -->
+<!-- <div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+</div> -->
+
+<!-- Infinite Scroll Loading Indicator -->
+<!-- <div class="infinite-scroll-loading" id="infinite-scroll-loading">
+    <div class="spinner"></div>
+    <p>Loading more installments...</p>
+</div> -->
+
+<!-- <script type="module" src="../js/main.js"></script>
+<script type="module" src="../js/pages/dashboard.js"></script> -->

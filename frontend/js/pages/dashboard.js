@@ -27,7 +27,10 @@ class PageDashboard {
             openModal('add-new-plan-modal');
             this.showStep(1); // Show first step when modal opens
         });
-        this.$mainContent.on("click", ".modal_close", () => closeModal('add-new-plan-modal'));
+        this.$mainContent.on("click", ".modal_close", (event) => {
+            const modalId = $(event.currentTarget).closest('.modal').attr('id');
+            closeModal(modalId);
+        });
         this.$mainContent.on("input", "#dashboard-search", debounce(this.handleSearch.bind(this), 300));
         this.$mainContent.on("change", "#dashboard-status-filter", this.handleSearch.bind(this));
         this.$mainContent.on("click", "#toggle-view-btn", this.toggleView.bind(this));
@@ -43,8 +46,14 @@ class PageDashboard {
         this.$mainContent.on("click", "#add-new-plan-modal .customer-selector", this.handleCustomerSelection.bind(this));
 
         // File upload event
-        
-        this.$mainContent.on("change", "#add-new-plan-modal #product-images", this.handleImageUpload.bind(this));
+        this.$mainContent.on("click", "#add-new-plan-modal .file-upload_area", (event) => {
+            $(event.currentTarget).siblings('.file-upload_input').trigger('click');
+        });
+
+        // Add new customer from dashboard modal
+        this.$mainContent.on("click", "#add-customer-from-dashboard-btn", () => {
+            openModal('add-customer-modal');
+        });
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
     }
