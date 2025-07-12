@@ -39,6 +39,9 @@ class PageDashboard {
         // Customer search within modal
         this.$mainContent.on("input", "#add-new-plan-modal #customer-search-input", debounce(this.fetchCustomersForModal.bind(this), 300));
 
+        // Customer selection within modal
+        this.$mainContent.on("click", "#add-new-plan-modal .customer-selector", this.handleCustomerSelection.bind(this));
+
         // File upload event
         this.$mainContent.on("click", "#add-new-plan-modal .file-upload_area", function() {
             $(this).siblings('.file-upload_input').trigger('click');
@@ -46,6 +49,21 @@ class PageDashboard {
         this.$mainContent.on("change", "#add-new-plan-modal #product-images", this.handleImageUpload.bind(this));
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
+    }
+
+    handleCustomerSelection(event) {
+        const selectedCustomerOption = $(event.currentTarget).closest('.customer-option');
+        const customerId = selectedCustomerOption.data('customer-id');
+
+        // Remove selected class from all other options
+        $('#add-new-plan-modal .customer-option').removeClass('customer-option-selected');
+
+        // Add selected class to the clicked option
+        selectedCustomerOption.addClass('customer-option-selected');
+
+        // Store the selected customer ID
+        this.selectedCustomerId = customerId;
+        console.log('Selected Customer ID:', this.selectedCustomerId);
     }
 
     handleImageUpload(event) {
@@ -146,7 +164,9 @@ class PageDashboard {
                     <p class="customer-option_details">${customer.phone} • ${customer.activePlans || 0} active plans</p>
                 </div>
                 <div class="customer-option_status">
-                    <span class="badge badge-info">Available</span>
+                    <div class="customer-selector" data-customer-id="${customer.id}">
+                        <i class="fas fa-check"></i>
+                    </div>
                 </div>
             </div>
         `;
