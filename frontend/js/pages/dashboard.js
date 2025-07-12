@@ -106,11 +106,22 @@ class PageDashboard {
         const previewContainer = $('#product-image-list');
 
         Array.from(files).forEach(file => {
+            // Create a unique identifier for the file (e.g., filename + size)
+            const fileIdentifier = `${file.name}-${file.size}`;
+
+            // Check if an image with this identifier already exists in the preview
+            const existingImage = previewContainer.find(`.image-list-item[data-file-id="${fileIdentifier}"]`);
+
+            if (existingImage.length > 0) {
+                showNotification(`Image "${file.name}" is already added.`, 'info');
+                return; // Skip this file
+            }
+
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const imageItem = $(
-                        `<div class="image-list-item">
+                        `<div class="image-list-item" data-file-id="${fileIdentifier}">
                             <img src="${e.target.result}" class="uploaded-image-preview">
                             <button type="button" class="remove-image-btn"><i class="fas fa-times-circle"></i></button>
                         </div>`
@@ -133,52 +144,7 @@ class PageDashboard {
         event.target.value = '';
     }
 
-    handleCustomerSelection(event) {
-        const selectedCustomerOption = $(event.currentTarget).closest('.customer-option');
-        const customerId = selectedCustomerOption.data('customer-id');
-
-        // Remove selected class from all other options
-        $('#add-new-plan-modal .customer-option').removeClass('customer-option-selected');
-
-        // Add selected class to the clicked option
-        selectedCustomerOption.addClass('customer-option-selected');
-
-        // Store the selected customer ID
-        this.selectedCustomerId = customerId;
-        console.log('Selected Customer ID:', this.selectedCustomerId);
-    }
-
-    handleImageUpload(event) {
-        const files = event.target.files;
-        const previewContainer = $('#product-image-list');
-
-        Array.from(files).forEach(file => {
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const imageItem = $(
-                        `<div class="image-list-item">
-                            <img src="${e.target.result}" class="uploaded-image-preview">
-                            <button type="button" class="remove-image-btn"><i class="fas fa-times-circle"></i></button>
-                        </div>`
-                    );
-                    previewContainer.append(imageItem);
-
-                    // Add event listener to remove button
-                    imageItem.find('.remove-image-btn').on('click', function() {
-                        $(this).closest('.image-list-item').remove();
-                    });
-                };
-                reader.readAsDataURL(file);
-            } else {
-                showNotification('Only image files are allowed.', 'warning');
-            }
-        });
-        showNotification(`${files.length} image(s) selected.`, 'info');
-
-        // Clear the file input value to allow re-uploading the same file or new files immediately
-        event.target.value = '';
-    }
+    
 
     clearAddPlanForm() {
         $('#installment-plan-form')[0].reset();
