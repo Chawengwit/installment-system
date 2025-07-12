@@ -72,6 +72,40 @@
         </div>
     </section>
 
+    <section class="installment-list">
+        <div class="installment-grid" id="installments-grid">
+            <div class="loading-overlay" style="display: none;">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <div class="installment-table-view" id="installment-table-view" style="display: none;">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="installment-table-body">
+                        <!-- Installment table rows will be rendered here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Infinite Scroll Loading Indicator -->
+    <div id="infinite-scroll-loading" style="display: none; text-align: center; padding: 20px;">
+        <div class="loading-spinner" style="margin:0 auto;"></div>
+        <p>Loading more installments...</p>
+    </div>
+
     <div class="modal" id="add-new-plan-modal">
         <div class="modal_overlay"></div>
         <div class="modal_content">
@@ -524,7 +558,6 @@
 
         </div>
     </div>
-</div>
 
 <!-- Add Customer Modal -->
 <div class="modal" id="add-customer-modal">

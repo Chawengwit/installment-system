@@ -15,6 +15,44 @@ class PageDashboard {
     init() {
         this.bindEvents();
         this.fetchInstallments(true);
+        this.setupCustomerModals();
+    }
+
+    setupCustomerModals() {
+        // Add Customer Modal
+        this.$mainContent.on("submit", "#add-customer-form", this.handleAddCustomer.bind(this));
+        this.$mainContent.on("click", "#cancel-add-customer", () => closeModal('add-customer-modal'));
+
+        // Edit Customer Modal (if applicable, though not directly used in dashboard for editing)
+        // this.$mainContent.on("submit", "#edit-customer-form", this.handleEditCustomer.bind(this));
+        // this.$mainContent.on("click", "#cancel-edit-customer", () => closeModal('edit-customer-modal'));
+    }
+
+    async handleAddCustomer(event) {
+        event.preventDefault();
+        const form = $(event.currentTarget);
+        const formData = new FormData(form[0]);
+
+        try {
+            const response = await fetch('/api/customers', {
+                method: 'POST',
+                body: formData
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to add customer');
+            }
+            showNotification('Customer added successfully!', 'success');
+            closeModal('add-customer-modal');
+            form[0].reset();
+            // Optionally re-fetch customers for the modal if it's open
+            if ($('#add-new-plan-modal').hasClass('modal-active')) {
+                this.fetchCustomersForModal();
+            }
+        } catch (error) {
+            console.error('Error adding customer:', error);
+            showNotification(error.message, 'error');
+        }
     }
 
     destroy() {
@@ -55,7 +93,44 @@ class PageDashboard {
             openModal('add-customer-modal');
         });
 
+        this.$mainContent.on("change", "#add-new-plan-modal #product-images", this.handleImageUpload.bind(this));
+
+        // Form submission for new plan
+        this.$mainContent.on("submit", "#installment-plan-form", this.handleFormSubmission.bind(this));
+
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
+    }
+
+    handleImageUpload(event) {
+        const files = event.target.files;
+        const previewContainer = $('#product-image-list');
+
+        Array.from(files).forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageItem = $(
+                        `<div class="image-list-item">
+                            <img src="${e.target.result}" class="uploaded-image-preview">
+                            <button type="button" class="remove-image-btn"><i class="fas fa-times-circle"></i></button>
+                        </div>`
+                    );
+                    previewContainer.append(imageItem);
+
+                    // Add event listener to remove button
+                    imageItem.find('.remove-image-btn').on('click', function() {
+                        $(this).closest('.image-list-item').remove();
+                    });
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showNotification('Only image files are allowed.', 'warning');
+            }
+        });
+        showNotification(`${files.length} image(s) selected.`, 'info');
+
+        // Clear the file input value to allow re-uploading the same file or new files immediately
+        event.target.value = '';
     }
 
     handleCustomerSelection(event) {
@@ -103,6 +178,22 @@ class PageDashboard {
 
         // Clear the file input value to allow re-uploading the same file or new files immediately
         event.target.value = '';
+    }
+
+    clearAddPlanForm() {
+        $('#installment-plan-form')[0].reset();
+        $('#product-image-list').empty();
+        $('#add-new-plan-modal .customer-option').removeClass('customer-option-selected');
+        this.selectedCustomerId = null;
+        this.showStep(1);
+    }
+
+    async handleFormSubmission(event) {
+        event.preventDefault();
+        // TODO: Implement form submission logic for the new installment plan
+        showNotification('Installment plan submitted (placeholder)!', 'success');
+        closeModal('add-new-plan-modal');
+        this.clearAddPlanForm();
     }
 
     showStep(stepNumber) {
