@@ -190,6 +190,10 @@
         }
 
         .file-upload_area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
             border: 2px dashed var(--color-gray-300);
             border-radius: var(--border-radius-lg);
             padding: var(--spacing-2xl);

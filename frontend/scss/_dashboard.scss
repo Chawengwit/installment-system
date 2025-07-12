@@ -365,44 +365,6 @@
     }
 }
 
-.file-upload {
-    .file-upload_input {
-        display: none;
-    }
-
-    .file-upload_area {
-        border: 2px dashed var(--color-gray-300);
-        border-radius: var(--border-radius-lg);
-        padding: var(--spacing-2xl);
-        text-align: center;
-        cursor: pointer;
-        transition: var(--transition-fast);
-
-        &:hover {
-            border-color: var(--color-primary);
-            background-color: rgba(37, 99, 235, 0.02);
-        }
-    }
-
-    .file-upload_icon {
-        font-size: var(--font-size-3xl);
-        color: var(--color-gray-400);
-        margin-bottom: var(--spacing-md);
-    }
-
-    .file-upload_text {
-        font-size: var(--font-size-lg);
-        color: var(--color-gray-700);
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .file-upload_hint {
-        font-size: var(--font-size-sm);
-        color: var(--color-gray-500);
-        margin: 0;
-    }
-}
-
 .credit-card-details {
     max-width: 600px;
     margin: var(--spacing-xl) auto 0;

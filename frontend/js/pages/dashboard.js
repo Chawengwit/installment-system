@@ -43,9 +43,7 @@ class PageDashboard {
         this.$mainContent.on("click", "#add-new-plan-modal .customer-selector", this.handleCustomerSelection.bind(this));
 
         // File upload event
-        this.$mainContent.on("click", "#add-new-plan-modal .file-upload_area", (event) => {
-            $(event.currentTarget).siblings('.file-upload_input').trigger('click');
-        });
+        
         this.$mainContent.on("change", "#add-new-plan-modal #product-images", this.handleImageUpload.bind(this));
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
@@ -134,13 +132,28 @@ class PageDashboard {
         customerOptionsContainer.html('<p>Loading customers...</p>');
 
         try {
+            let customers = [];
+            // If a customer is already selected, fetch their details and add them to the top
+            if (this.selectedCustomerId) {
+                const selectedCustomerResponse = await fetch(`/api/customers/${this.selectedCustomerId}`);
+                if (!selectedCustomerResponse.ok) throw new Error('Failed to fetch selected customer details');
+                const selectedCustomer = await selectedCustomerResponse.json();
+                if (selectedCustomer) {
+                    customers.push(selectedCustomer);
+                }
+            }
+
             const response = await fetch(`/api/customers?search=${search}&limit=5`); // Limit to 5 customers
             if (!response.ok) throw new Error('Failed to fetch customers for modal');
             const data = await response.json();
 
+            // Filter out the already selected customer from the search results to avoid duplication
+            const filteredCustomers = data.customers.filter(customer => customer.id !== this.selectedCustomerId);
+            customers = customers.concat(filteredCustomers);
+
             customerOptionsContainer.html(''); // Clear loading message
-            if (data.customers && data.customers.length > 0) {
-                data.customers.forEach(customer => {
+            if (customers && customers.length > 0) {
+                customers.forEach(customer => {
                     const isSelected = (this.selectedCustomerId && this.selectedCustomerId === customer.id);
                     customerOptionsContainer.append(this.createCustomerOption(customer, isSelected));
                 });
