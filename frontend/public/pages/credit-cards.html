@@ -16,24 +16,30 @@
         </div>
     </header>
 
+    <!-- Search and Filters -->
+    <section class="search-section">
+        <div class="search-bar">
+            <input type="text" id="card-search-input" placeholder="Search credit cards by name or number...">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+        <div class="section-filters">
+            <select class="filter-select" id="filter-card-select">
+                <option value="all">All Cards</option>
+                <option value="used">Used</option>
+                <option value="not-used">Not Used</option>
+            </select>
+        </div>
+    </section>
+
     <!-- Credit Cards List -->
     <section class="credit-cards-section">
-        <div class="section-header">
-            <h2 class="section-title">Your Credit Cards</h2>
-            <div class="section-filters">
-                <select class="filter-select" id="filter-card-select">
-                    <option value="all">All Cards</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="high-usage">High Usage</option>
-                </select>
-            </div>
-        </div>
-
         <div class="credit-cards-grid" id="cards-container">
             <div class="loading-overlay" style="display: none;">
                 <div class="loading-spinner"></div>
             </div>
+        </div>
+        <div class="infinite-scroll-loading" style="display: none;">
+            <div class="loading-spinner"></div>
         </div>
     </section>
 </div>

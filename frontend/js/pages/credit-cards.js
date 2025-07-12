@@ -13,6 +13,7 @@ class PageCreditCards {
     init() {
         this.fetchCreditCards(true);
         this.bindEvents();
+        $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
     }
 
     destroy() {
@@ -30,18 +31,35 @@ class PageCreditCards {
         this.$mainContent.on("submit", "#edit-card-form", this.handleUpdateCard.bind(this));
         this.$mainContent.on("click", ".btn-edit-card", this.handleEditCard.bind(this));
         this.$mainContent.on("click", ".btn-delete-card", this.handleDeleteCard.bind(this));
+        this.$mainContent.on("change", "#filter-card-select", this.handleFilterChange.bind(this));
+        this.$mainContent.on("input", "#card-search-input", debounce(this.handleSearchInput.bind(this), 300));
     }
 
-    async fetchCreditCards(clearExisting = false) {
+    async fetchCreditCards(clearExisting = false, filter = 'all', searchTerm = '') {
         if (this.isLoading || !this.hasMore) {
             return;
         }
 
         this.isLoading = true;
+        if (clearExisting) {
+            this.showLoadingOverlay();
+        } else {
+            $('.infinite-scroll-loading').show();
+        }
 
         const offset = (this.currentPage - 1) * this.cardsPerPage;
+        let url = `/api/credit-cards?limit=${this.cardsPerPage}&offset=${offset}`;
+
+        if (filter !== 'all') {
+            url += `&installment_status=${filter === 'used' ? true : false}`;
+        }
+
+        if (searchTerm) {
+            url += `&search=${encodeURIComponent(searchTerm)}`;
+        }
+
         try {
-            const response = await fetch(`/api/credit-cards?limit=${this.cardsPerPage}&offset=${offset}`);
+            const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch credit cards');
             const data = await response.json();
 
@@ -55,7 +73,25 @@ class PageCreditCards {
             showNotification(error.message, 'error');
         } finally {
             this.isLoading = false;
+            this.hideLoadingOverlay();
+            $('.infinite-scroll-loading').hide();
         }
+    }
+
+    handleFilterChange() {
+        this.currentPage = 1;
+        this.hasMore = true;
+        const filter = $('#filter-card-select').val();
+        const searchTerm = $('#card-search-input').val();
+        this.fetchCreditCards(true, filter, searchTerm);
+    }
+
+    handleSearchInput() {
+        this.currentPage = 1;
+        this.hasMore = true;
+        const filter = $('#filter-card-select').val();
+        const searchTerm = $('#card-search-input').val();
+        this.fetchCreditCards(true, filter, searchTerm);
     }
 
     renderCreditCards(cards, clearExisting) {
@@ -102,10 +138,7 @@ class PageCreditCards {
                     **** **** **** ${String(card.card_number).slice(-4)}
                 </div>
                 <div class="credit-card_details">
-                    <div class="credit-card_detail-item">
-                        <span class="credit-card_detail-label">Limit:</span>
-                        <span class="credit-card_detail-value">${card.credit_limit}</span>
-                    </div>
+                    
                     <div class="credit-card_detail-item">
                         <span class="credit-card_detail-label">Used:</span>
                         <span class="credit-card_detail-value used">${card.used_amount}</span>
@@ -251,6 +284,21 @@ class PageCreditCards {
                 showNotification(error.message, 'error');
             }
         });
+    }
+
+    showLoadingOverlay() {
+        $('.credit-cards-grid .loading-overlay').show();
+    }
+
+    hideLoadingOverlay() {
+        $('.credit-cards-grid .loading-overlay').hide();
+    }
+
+    handleScroll() {
+        if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100 && !this.isLoading && this.hasMore) {
+            const filter = $('#filter-card-select').val();
+            this.fetchCreditCards(false, filter);
+        }
     }
 }
 
