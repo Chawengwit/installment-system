@@ -1,4 +1,4 @@
-import { showNotification } from '../utils/AppUtils.js';
+import { showNotification, openModal, closeModal } from '../utils/AppUtils.js';
 
 class PageDashboard {
     constructor() {
@@ -13,11 +13,17 @@ class PageDashboard {
 
     destroy() {
         this.$mainContent.off("click", ".btn-refresh-dashboard");
+        this.$mainContent.off("click", "#add-plan-btn");
+        this.$mainContent.off("click", ".modal_close");
+
         console.log("Dashboard page destroyed");
     }
 
     bindEvents() {
         this.$mainContent.on("click", ".btn-refresh-dashboard", this.handleRefresh);
+        this.$mainContent.on("click", "#add-plan-btn", () => openModal('add-new-plan-modal'));
+        this.$mainContent.on("click", ".modal_close", () => closeModal('add-new-plan-modal'));
+
     }
 
     handleRefresh() {
