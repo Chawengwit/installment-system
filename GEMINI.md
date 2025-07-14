@@ -70,6 +70,20 @@ Page-specific JavaScript is structured as an ES Module exporting a class, follow
 ### SCSS Patterns (e.g., `frontend/scss/_customers.scss`)
 Page-specific SCSS defines styles for the page's unique components (e.g., `customer-grid`, `customer-card`, `customer-table-view`, `customer-section-details`). It consistently uses SCSS variables for styling and includes responsive adjustments using media queries.
 
+### Multi-step Form Pattern (Derived from Dashboard Page)
+The Dashboard page (`frontend/public/pages/dashboard.html`, `frontend/js/pages/dashboard.js`, `frontend/scss/_dashboard.scss`) introduces a multi-step form pattern, particularly useful for complex data entry workflows.
+*   **HTML Structure:**
+    *   **Progress Indicator (`progress-indicator`):** A visual component to show the user's progress through the steps.
+    *   **Form Steps (`form-step`):** Each step is a distinct `div` with a unique ID, controlled by JavaScript to show/hide.
+    *   **Navigation Buttons:** "Next" and "Previous" buttons to move between steps.
+*   **JavaScript Patterns:**
+    *   **`currentStep` property:** Manages the active step in the form.
+    *   **`showStep(stepNumber)` method:** Handles displaying the correct step and updating the progress indicator.
+    *   **`nextStep()` and `prevStep()` methods:** Control the flow between steps.
+    *   **Form Submission:** Final step handles the overall form submission.
+*   **SCSS Patterns:**
+    *   Dedicated styles for `progress-indicator`, `form-step`, and their active/completed states.
+
 ### General Reusability Guidelines for New Pages
 When creating new pages or refactoring existing ones, strictly adapt the following patterns:
 *   **HTML Structure:** Follow the established header, search/filter, content display, and modal patterns.
