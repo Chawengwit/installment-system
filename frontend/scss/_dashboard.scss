@@ -406,36 +406,44 @@
         background-color: rgba(37, 99, 235, 0.05);
     }
 
-    &.card-option_brand {
+    .card-option_brand {
         font-size: var(--font-size-xl);
         color: var(--color-primary);
     }
 
-    &.card-option_info {
+    .card-option_info {
         flex: 1;
     }
 
-    &.card-option_name {
+    .card-option_name {
         font-weight: 600;
         color: var(--color-gray-900);
         margin-bottom: var(--spacing-xs);
     }
 
-    &.card-option_number {
+    .card-option_number {
         color: var(--color-gray-600);
         font-size: var(--font-size-sm);
         margin: 0;
     }
 
-    &.card-option_limit {
+    .card-option_limit {
         text-align: right;
+
+        .card-available-amount {
+            color: var(--color-success);
+            font-weight: bold;
+            font-size: var(--font-size-sm);
+        }
+
+        .card-available-text {
+            color: var(--color-gray-700);
+            font-weight: normal;
+            font-size: var(--font-size-sm);
+        }
     }
 
-    &.card-option_available {
-        color: var(--color-success);
-        font-weight: 500;
-        font-size: var(--font-size-sm);
-    }
+
 }
 
 // Installment Terms
