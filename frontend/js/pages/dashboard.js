@@ -360,7 +360,7 @@ class PageDashboard {
                     <span class="card-option_number">**** **** **** ${String(card.card_number).slice(-4)}</span>
                 </div>
                 <div class="card-option_limit">
-                    <span class="card-option_available"><span class="card-available-amount">${card.credit_limit - card.used_amount}</span> <span class="card-available-text">available</span></span>
+                    <span class="card-option_available"><span class="card-available-amount">${(card.credit_limit - card.used_amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span> <span class="card-available-text">available</span></span>
                 </div>
             </div>
         `;
