@@ -559,6 +559,37 @@
     </div>
 </div>
 
+<!-- Add Card Modal -->
+<div class="modal" id="add-card-modal">
+    <div class="modal_overlay"></div>
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3 class="modal_title">Add New Credit Card</h3>
+            <button class="modal_close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form class="form customer-detail" id="add-card-form">
+            <div class="form_group">
+                <label class="form_label">Card Name *</label>
+                <input type="text" class="form_input" name="cardName" placeholder="e.g., KBank Visa Business" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Card Number *</label>
+                <input type="text" class="form_input" name="cardNumber" placeholder="**** **** **** 1234" maxlength="19" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Credit Limit ($) *</label>
+                <input type="number" class="form_input" name="creditLimit" placeholder="25000.00" step="0.01" min="0" required>
+            </div>
+            <div class="form_actions">
+                <button type="button" class="btn btn-secondary" id="cancel-add-card">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Card</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Loading Overlay -->
 <!-- <div class="loading-overlay" id="loading-overlay">
     <div class="spinner"></div>
