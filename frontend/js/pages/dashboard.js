@@ -14,7 +14,7 @@ class PageDashboard {
 
     init() {
         this.bindEvents();
-        this.fetchInstallments(true);
+        // this.fetchInstallments(true);
         this.setupCustomerModals();
     }
 
@@ -81,7 +81,7 @@ class PageDashboard {
         this.$mainContent.on("input", "#add-new-plan-modal #customer-search-input", debounce(this.fetchCustomersForModal.bind(this), 300));
 
         // Customer selection within modal
-        this.$mainContent.on("click", "#add-new-plan-modal .customer-selector", this.handleCustomerSelection.bind(this));
+        // this.$mainContent.on("click", "#add-new-plan-modal .customer-selector", this.handleCustomerSelection.bind(this));
 
         // File upload event
         this.$mainContent.on("click", "#add-new-plan-modal .file-upload_area", (event) => {
@@ -258,37 +258,37 @@ class PageDashboard {
         this.hasMore = true;
         const searchTerm = $('#dashboard-search').val().toLowerCase();
         const status = $('#dashboard-status-filter').val();
-        this.fetchInstallments(true, searchTerm, status);
+        // this.fetchInstallments(true, searchTerm, status);
     }
 
-    async fetchInstallments(clearExisting = false, search = '', status = 'all') {
-        if (this.isLoading || !this.hasMore) {
-            return;
-        }
+    // async fetchInstallments(clearExisting = false, search = '', status = 'all') {
+    //     if (this.isLoading || !this.hasMore) {
+    //         return;
+    //     }
 
-        this.isLoading = true;
-        $('#infinite-scroll-loading').show();
+    //     this.isLoading = true;
+    //     $('#infinite-scroll-loading').show();
 
-        const offset = (this.currentPage - 1) * this.installmentsPerPage;
-        try {
-            // This will need to be implemented in the backend
-            const response = await fetch(`/api/installments?search=${search}&status=${status}&limit=${this.installmentsPerPage}&offset=${offset}`);
-            if (!response.ok) throw new Error('Failed to fetch installment plans');
-            const data = await response.json();
+    //     const offset = (this.currentPage - 1) * this.installmentsPerPage;
+    //     try {
+    //         // This will need to be implemented in the backend
+    //         const response = await fetch(`/api/installments?search=${search}&status=${status}&limit=${this.installmentsPerPage}&offset=${offset}`);
+    //         if (!response.ok) throw new Error('Failed to fetch installment plans');
+    //         const data = await response.json();
 
-            this.totalInstallments = data.totalInstallments;
-            this.hasMore = (this.currentPage * this.installmentsPerPage) < this.totalInstallments;
+    //         this.totalInstallments = data.totalInstallments;
+    //         this.hasMore = (this.currentPage * this.installmentsPerPage) < this.totalInstallments;
 
-            this.renderInstallments(data.installments, clearExisting);
-            this.currentPage++;
-        } catch (error) {
-            console.error('Error fetching installment plans:', error);
-            showNotification(error.message, 'error');
-        } finally {
-            this.isLoading = false;
-            $('#infinite-scroll-loading').hide();
-        }
-    }
+    //         this.renderInstallments(data.installments, clearExisting);
+    //         this.currentPage++;
+    //     } catch (error) {
+    //         console.error('Error fetching installment plans:', error);
+    //         showNotification(error.message, 'error');
+    //     } finally {
+    //         this.isLoading = false;
+    //         $('#infinite-scroll-loading').hide();
+    //     }
+    // }
 
     renderInstallments(installments, clearExisting) {
         const installmentGrid = $('#installments-grid');
@@ -354,7 +354,7 @@ class PageDashboard {
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollHeight - scrollPos < 200 && !this.isLoading && this.hasMore) {
-            this.fetchInstallments(false, $('#dashboard-search').val().toLowerCase(), $('#dashboard-status-filter').val());
+            // this.fetchInstallments(false, $('#dashboard-search').val().toLowerCase(), $('#dashboard-status-filter').val());
         }
     }
 }
