@@ -83,11 +83,6 @@ class PageDashboard {
         // Customer selection within modal
         // this.$mainContent.on("click", "#add-new-plan-modal .customer-selector", this.handleCustomerSelection.bind(this));
 
-        // File upload event
-        this.$mainContent.on("click", "#add-new-plan-modal .file-upload_area", (event) => {
-            $(event.currentTarget).siblings('.file-upload_input').trigger('click');
-        });
-
         // Add new customer from dashboard modal
         this.$mainContent.on("click", "#add-customer-from-dashboard-btn", () => {
             openModal('add-customer-modal');
