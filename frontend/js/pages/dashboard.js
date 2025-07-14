@@ -11,6 +11,7 @@ class PageDashboard {
         this.hasMore = true;
         this.currentStep = 1; // Added for multi-step form
         this.selectedCustomerId = null;
+        this.selectedCreditCardId = null;
     }
 
     init() {
@@ -91,6 +92,20 @@ class PageDashboard {
 
         this.$mainContent.on("change", "#add-new-plan-modal #product-images", this.handleImageUpload.bind(this));
 
+        // Add new credit card from dashboard modal
+        this.$mainContent.on("click", "#add-credit-card-from-dashboard-btn", () => {
+            openModal('add-card-modal');
+        });
+
+        // Credit card search within modal
+        this.$mainContent.on("input", "#add-new-plan-modal #credit-card-search-input", debounce(this.fetchCreditCardsForModal.bind(this), 300));
+
+        // Credit card selection within modal
+        this.$mainContent.on("click", "#add-new-plan-modal .card-option", this.handleCreditCardSelection.bind(this));
+
+        // Payment method selection
+        this.$mainContent.on("change", "#add-new-plan-modal input[name='payment-method']", this.handlePaymentMethodChange.bind(this));
+
         // Form submission for new plan
         this.$mainContent.on("submit", "#installment-plan-form", this.handleFormSubmission.bind(this));
 
@@ -165,6 +180,8 @@ class PageDashboard {
 
         if (stepNumber === 3) {
             this.fetchCustomersForModal();
+        } else if (stepNumber === 4) {
+            this.fetchCreditCardsForModal();
         }
 
         $('#add-new-plan-modal .progress-indicator_step').removeClass('progress-indicator_step-active progress-indicator_step-completed');
@@ -263,6 +280,87 @@ class PageDashboard {
                     <div class="customer-selector" data-customer-id="${customer.id}">
                         <i class="fas fa-check"></i>
                     </div>
+                </div>
+            </div>
+        `;
+    }
+
+    async fetchCreditCardsForModal(event) {
+        const search = event ? $(event.target).val().toLowerCase() : '';
+        const cardOptionsContainer = $('#add-new-plan-modal .card-selection');
+        cardOptionsContainer.html('<p>Loading credit cards...</p>');
+
+        try {
+            let cards = [];
+            if (this.selectedCreditCardId) {
+                const selectedCardResponse = await fetch(`/api/credit-cards/${this.selectedCreditCardId}`);
+                if (!selectedCardResponse.ok) throw new Error('Failed to fetch selected credit card details');
+                const selectedCard = await selectedCardResponse.json();
+                if (selectedCard) {
+                    cards.push(selectedCard);
+                }
+            }
+
+            const response = await fetch(`/api/credit-cards?search=${search}&limit=5`);
+            if (!response.ok) throw new Error('Failed to fetch credit cards for modal');
+            const data = await response.json();
+
+            const filteredCards = data.credit_cards.filter(card => card.id !== this.selectedCreditCardId);
+            cards = cards.concat(filteredCards);
+
+            cardOptionsContainer.html('');
+            if (cards && cards.length > 0) {
+                cards.forEach(card => {
+                    const isSelected = (this.selectedCreditCardId && this.selectedCreditCardId === card.id);
+                    cardOptionsContainer.append(this.createCreditCardOption(card, isSelected));
+                });
+            } else {
+                cardOptionsContainer.html('<p>No credit cards found.</p>');
+            }
+        } catch (error) {
+            console.error('Error fetching credit cards for modal:', error);
+            cardOptionsContainer.html('<p class="text-danger">Error loading credit cards.</p>');
+            showNotification(error.message, 'error');
+        }
+    }
+
+    handleCreditCardSelection(event) {
+        const $selectedOption = $(event.currentTarget);
+        const cardId = $selectedOption.data('card-id');
+
+        $('#add-new-plan-modal .card-option').removeClass('card-option-selected');
+
+        $selectedOption.addClass('card-option-selected');
+
+        this.selectedCreditCardId = cardId;
+
+        showNotification(`Credit Card selected: ${$selectedOption.find('.card-option_name').text()}`, 'info');
+    }
+
+    handlePaymentMethodChange(event) {
+        const selectedMethod = $(event.currentTarget).val();
+        if (selectedMethod === 'credit-card') {
+            $('#credit-card-select').show();
+            this.fetchCreditCardsForModal(); // Fetch cards when credit card option is selected
+        } else {
+            $('#credit-card-select').hide();
+            this.selectedCreditCardId = null; // Clear selection if not credit card
+        }
+    }
+
+    createCreditCardOption(card, isSelected) {
+        const selectedClass = isSelected ? 'card-option-selected' : '';
+        return `
+            <div class="card-option ${selectedClass}" data-card-id="${card.id}">
+                <div class="card-option_brand">
+                    <i class="fab fa-cc-visa"></i>
+                </div>
+                <div class="card-option_info">
+                    <span class="card-option_name">${card.card_name}</span>
+                    <span class="card-option_number">**** **** **** ${String(card.card_number).slice(-4)}</span>
+                </div>
+                <div class="card-option_limit">
+                    <span class="card-option_available">${card.credit_limit - card.used_amount} available</span>
                 </div>
             </div>
         `;
