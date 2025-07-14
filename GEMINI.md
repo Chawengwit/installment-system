@@ -44,7 +44,7 @@ All commands should be run from the `backend` directory.
 
 ## Reusable Page Structure and Patterns (Derived from Customers Page)
 
-The Customers page (`frontend/public/pages/customers.html`, `frontend/js/pages/customers.js`, `frontend/scss/_customers.scss`) serves as a comprehensive template for building other pages in the application. It demonstrates a consistent structure, stage management, and reusable patterns for both UI and logic.
+The Customers page (`frontend/public/pages/customers.html`, `frontend/js/pages/customers.js`, `frontend/scss/_customers.scss`) and the Credit Cards page (`frontend/public/pages/credit-cards.html`, `frontend/js/pages/credit-cards.js`, `frontend/scss/_credit-cards.scss`) serve as comprehensive templates for building other pages in the application. They demonstrate a consistent structure, stage management, and reusable patterns for both UI and logic.
 
 ### HTML Structure (e.g., `frontend/public/pages/customers.html`)
 *   **Page Header (`page-header`):** Consistent layout for page titles, subtitles, and primary actions (e.g., "Create Customer", "Toggle View").
