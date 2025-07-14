@@ -10,6 +10,7 @@ class PageDashboard {
         this.isLoading = false;
         this.hasMore = true;
         this.currentStep = 1; // Added for multi-step form
+        this.selectedCustomerId = null;
     }
 
     init() {
@@ -81,7 +82,7 @@ class PageDashboard {
         this.$mainContent.on("input", "#add-new-plan-modal #customer-search-input", debounce(this.fetchCustomersForModal.bind(this), 300));
 
         // Customer selection within modal
-        // this.$mainContent.on("click", "#add-new-plan-modal .customer-selector", this.handleCustomerSelection.bind(this));
+        this.$mainContent.on("click", "#add-new-plan-modal .customer-option", this.handleCustomerSelection.bind(this));
 
         // Add new customer from dashboard modal
         this.$mainContent.on("click", "#add-customer-from-dashboard-btn", () => {
@@ -226,6 +227,25 @@ class PageDashboard {
             customerOptionsContainer.html('<p class="text-danger">Error loading customers.</p>');
             showNotification(error.message, 'error');
         }
+    }
+
+    handleCustomerSelection(event) {
+        const $selectedOption = $(event.currentTarget);
+        const customerId = $selectedOption.data('customer-id');
+
+        // Remove selected class from all options
+        $('#add-new-plan-modal .customer-option').removeClass('customer-option-selected');
+
+        // Add selected class to the clicked option
+        $selectedOption.addClass('customer-option-selected');
+
+        // Store the selected customer ID
+        this.selectedCustomerId = customerId;
+
+        // Optionally, update a hidden input or display area with the selected customer's name/ID
+        // For example, if you have an input field for the selected customer:
+        // $('#selected-customer-display').text($selectedOption.find('.customer-option_name').text());
+        showNotification(`Customer selected: ${$selectedOption.find('.customer-option_name').text()}`, 'info');
     }
 
     createCustomerOption(customer, isSelected) {
