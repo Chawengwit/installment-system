@@ -295,44 +295,13 @@
         margin: 0;
     }
 
-    .customer-option_status {
-        margin-left: auto;
-
-        .customer-selector {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid var(--color-gray-300);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition-fast);
-
-            i {
-                color: var(--color-white);
-                font-size: var(--font-size-sm);
-                opacity: 0;
-                transition: var(--transition-fast);
-            }
-
-            &:hover {
-                border-color: var(--color-primary);
-            }
-        }
-    }
-
     &.customer-option-selected {
         border-color: var(--color-primary);
         background-color: rgba(37, 99, 235, 0.05);
 
-        .customer-selector {
-            background-color: var(--color-primary);
-            border-color: var(--color-primary);
-
-            i {
-                opacity: 1;
-            }
+        i {
+            color: var(--color-primary);
+            opacity: 1;
         }
     }
 }

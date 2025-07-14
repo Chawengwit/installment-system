@@ -276,11 +276,6 @@ class PageDashboard {
                     <h4 class="customer-option_name">${customer.name}</h4>
                     <p class="customer-option_details">${customer.phone} • ${customer.activePlans || 0} active plans</p>
                 </div>
-                <div class="customer-option_status">
-                    <div class="customer-selector" data-customer-id="${customer.id}">
-                        <i class="fas fa-check"></i>
-                    </div>
-                </div>
             </div>
         `;
     }
