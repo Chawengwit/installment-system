@@ -24,22 +24,54 @@ class PageDashboard {
     setupCreditCardModals() {
         this.$mainContent.on("submit", "#dashboard-add-card-form", this.handleAddCreditCard.bind(this));
         this.$mainContent.on("click", "#cancel-add-card", () => closeModal('add-card-modal'));
+
+        // Clear errors on input
+        this.$mainContent.on('input', '#dashboard-add-card-form .form_input', function() {
+            $(this).removeClass('form_input-error');
+            $(this).next('.error-message').remove();
+        });
     }
 
     async handleAddCreditCard(event) {
         event.preventDefault();
         const form = $(event.currentTarget);
-        const cardName = form.find('[name="cardName"]').val();
-        const cardNumber = form.find('[name="cardNumber"]').val();
-        const creditLimit = form.find('[name="creditLimit"]').val();
+        const cardNameInput = form.find('[name="cardName"]');
+        const cardNumberInput = form.find('[name="cardNumber"]');
+        const creditLimitInput = form.find('[name="creditLimit"]');
 
-        if (!cardName || !cardNumber || !creditLimit) {
-            showNotification('Please fill in all required fields.', 'error');
-            return;
+        // Clear previous errors
+        form.find('.form_input').removeClass('form_input-error');
+        form.find('.error-message').remove();
+
+        const cardName = cardNameInput.val();
+        const cardNumber = cardNumberInput.val();
+        const creditLimit = creditLimitInput.val();
+
+        let hasError = false;
+
+        if (!cardName) {
+            cardNameInput.addClass('form_input-error');
+            cardNameInput.after('<p class="error-message">Card name is required.</p>');
+            hasError = true;
         }
 
-        if (cardNumber.replace(/\s/g, '').length < 13) {
-            showNotification('Card number is too short.', 'error');
+        if (!cardNumber) {
+            cardNumberInput.addClass('form_input-error');
+            cardNumberInput.after('<p class="error-message">Card number is required.</p>');
+            hasError = true;
+        } else if (cardNumber.replace(/\s/g, '').length < 13) {
+            cardNumberInput.addClass('form_input-error');
+            cardNumberInput.after('<p class="error-message">Card number is too short.</p>');
+            hasError = true;
+        }
+
+        if (!creditLimit) {
+            creditLimitInput.addClass('form_input-error');
+            creditLimitInput.after('<p class="error-message">Credit limit is required.</p>');
+            hasError = true;
+        }
+
+        if (hasError) {
             return;
         }
 
@@ -58,7 +90,19 @@ class PageDashboard {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to add credit card');
+                const errorMessage = errorData.error || 'Failed to add credit card';
+
+                if (response.status === 409) {
+                    cardNumberInput.addClass('form_input-error');
+                    cardNumberInput.after(`<p class="error-message">${errorMessage}</p>`);
+                } else if (errorData.field) {
+                    const errorInput = form.find(`[name="${errorData.field}"]`);
+                    errorInput.addClass('form_input-error');
+                    errorInput.after(`<p class="error-message">${errorMessage}</p>`);
+                } else {
+                    showNotification(errorMessage, 'error');
+                }
+                return;
             }
 
             showNotification('Credit card added successfully!', 'success');

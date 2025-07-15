@@ -1,17 +1,9 @@
-
 .error-message {
-  color: #d9534f;
-  font-size: 0.875em;
-  margin-top: 0.25rem;
-  display: block;
+    color: #dc3545; // Red color for error messages
+    font-size: 0.875em;
+    margin-top: 0.25rem;
 }
 
-.form_input.is-invalid,
-.form_select.is-invalid,
-.form_textarea.is-invalid {
-  border-color: #d9534f;
-  &:focus {
-    border-color: #d9534f;
-    box-shadow: 0 0 0 2px var(--color-danger-light);
-  }
+.form_input-error {
+    border-color: #dc3545 !important; // Red border for error inputs
 }
