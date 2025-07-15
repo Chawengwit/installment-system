@@ -35,15 +35,15 @@ const fileExists = async (filePath) => {
 
 // Helper function to check for duplicate phone or ID card number
 const checkDuplicateCustomer = async (phone, idCardNumber, customerId = null) => {
-    let query = 'SELECT id FROM customers WHERE (phone = $1 OR id_card_number = $2)';
+    let sqlQuery = 'SELECT id FROM customers WHERE (phone = $1 OR id_card_number = $2)';
     const params = [phone, idCardNumber];
 
     if (customerId) {
-        query += ' AND id != $3';
+        sqlQuery += ' AND id != $3';
         params.push(customerId);
     }
 
-    const result = await query(query, params);
+    const result = await query(sqlQuery, params);
     return result.rows.length > 0;
 };
 

@@ -72,6 +72,40 @@
         </div>
     </section>
 
+    <section class="installment-list">
+        <div class="installment-grid" id="installments-grid">
+            <div class="loading-overlay" style="display: none;">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <div class="installment-table-view" id="installment-table-view" style="display: none;">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="installment-table-body">
+                        <!-- Installment table rows will be rendered here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Infinite Scroll Loading Indicator -->
+    <div id="infinite-scroll-loading" style="display: none; text-align: center; padding: 20px;">
+        <div class="loading-spinner" style="margin:0 auto;"></div>
+        <p>Loading more installments...</p>
+    </div>
+
     <div class="modal" id="add-new-plan-modal">
         <div class="modal_overlay"></div>
         <div class="modal_content">
@@ -155,7 +189,7 @@
 
                                 <div class="form_group">
                                     <label class="form_label">Serial Number *</label>
-                                    <input type="text" class="form_input" id="product-name" placeholder="e.g., SNA00001" required>
+                                    <input type="text" class="form_input" id="product-serial-number" placeholder="e.g., SNA00001" required>
                                 </div>
                                 
                                 <div class="form_row">
@@ -178,11 +212,11 @@
                                     <label class="form_label">Product Images</label>
                                     <div class="file-upload">
                                         <input type="file" class="file-upload_input" id="product-images" multiple accept="image/*">
-                                        <div class="file-upload_area">
+                                        <label for="product-images" class="file-upload_area">
                                             <i class="fas fa-cloud-upload-alt file-upload_icon"></i>
                                             <p class="file-upload_text">Drag & drop images here or click to browse</p>
                                             <p class="file-upload_hint">Support: JPG, PNG, GIF (Max 5MB each)</p>
-                                        </div>
+                                        </label>
                                         <div class="image-list-container" id="product-image-list"></div>
                                     </div>
                                 </div>
@@ -316,7 +350,7 @@
                                         <input type="text" id="customer-search-input" placeholder="Search by name or phone...">
                                         <i class="fas fa-search search-icon"></i>
                                     </div>
-                                    <a class="btn btn-primary" id="add-plan-btn" onclick="openModal('add-customer-modal')">
+                                    <a class="btn btn-primary" id="add-customer-from-dashboard-btn">
                                         <i class="fas fa-plus"></i>Add Customer
                                     </a>
                                 </div>
@@ -346,58 +380,16 @@
                                 <p class="form-step_description">Choose how the customer will make payments</p>
                             </div>
                             
-                            <div class="payment-methods">
-                                <div class="payment-method">
-                                    <input type="radio" id="cash" name="payment-method" value="cash" class="payment-method_radio">
-                                    <label for="cash" class="payment-method_label">
-                                        <div class="payment-method_icon">
-                                            <i class="fas fa-money-bill-wave"></i>
-                                        </div>
-                                        <div class="payment-method_content">
-                                            <span class="payment-method_title">Cash Payment</span>
-                                            <span class="payment-method_description">Customer pays in cash at your location</span>
-                                        </div>
-                                        <div class="payment-method_check">
-                                            <i class="fas fa-check"></i>
-                                        </div>
-                                    </label>
+                            <div class="form_group credit-card-details" id="credit-card-select">
+                                <div class="search-section">
+                                    <div class="search-bar">
+                                        <input type="text" id="credit-card-search-input" placeholder="Search credit cards by name or number...">
+                                        <i class="fas fa-search search-icon"></i>
+                                    </div>
+                                    <a class="btn btn-primary" id="add-credit-card-from-dashboard-btn">
+                                        <i class="fas fa-plus"></i>Add Card
+                                    </a>
                                 </div>
-                                
-                                <div class="payment-method">
-                                    <input type="radio" id="credit-card" name="payment-method" value="credit-card" class="payment-method_radio">
-                                    <label for="credit-card" class="payment-method_label">
-                                        <div class="payment-method_icon">
-                                            <i class="fas fa-credit-card"></i>
-                                        </div>
-                                        <div class="payment-method_content">
-                                            <span class="payment-method_title">Credit Card</span>
-                                            <span class="payment-method_description">Automatic charges to customer's credit card</span>
-                                        </div>
-                                        <div class="payment-method_check">
-                                            <i class="fas fa-check"></i>
-                                        </div>
-                                    </label>
-                                </div>
-
-                                <div class="payment-method">
-                                    <input type="radio" id="bank-transfer" name="payment-method" value="bank-transfer" class="payment-method_radio">
-                                    <label for="bank-transfer" class="payment-method_label">
-                                        <div class="payment-method_icon">
-                                            <i class="fas fa-university"></i>
-                                        </div>
-                                        <div class="payment-method_content">
-                                            <span class="payment-method_title">Bank Transfer</span>
-                                            <span class="payment-method_description">Customer transfers money to your account</span>
-                                        </div>
-                                        <div class="payment-method_check">
-                                            <i class="fas fa-check"></i>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <div class="form_group credit-card-details" id="credit-card-select" style="display: none;">
-                                <label class="form_label">Select Credit Card</label>
                                 <div class="card-selection">
                                     <div class="card-option" data-card-id="1">
                                         <div class="card-option_brand">
@@ -524,6 +516,90 @@
 
         </div>
     </div>
+
+<!-- Add Customer Modal -->
+<div class="modal" id="add-customer-modal">
+    <div class="modal_overlay"></div>
+    <div class="modal_content">
+        <div class="loading-overlay" style="display: none;">
+            <div class="loading-spinner"></div>
+        </div>
+        <div class="modal_header">
+            <h3 class="modal_title">Add New Customer</h3>
+            <button class="modal_close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form class="form customer-detail" id="add-customer-form">
+            <div class="form_group">
+                <label class="form_label">Full Name *</label>
+                <input type="text" class="form_input" name="name" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Phone Number *</label>
+                <input type="tel" class="form_input" name="phone" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">ID Card Number *</label>
+                <input type="text" class="form_input" name="id_card_number" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Address</label>
+                <textarea class="form_textarea" name="address" rows="3"></textarea>
+            </div>
+            <div class="form_group">
+                <label class="form_label">ID Card Photo</label>
+                <input type="file" class="form_file" name="idCard" accept="image/*">
+            </div>
+            <div class="form_actions">
+                <button type="button" class="btn btn-secondary" id="cancel-add-customer">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Customer</button>
+            </div>
+        </form>
+    </div>
 </div>
 
+<!-- Add Card Modal -->
+<div class="modal" id="add-card-modal">
+    <div class="modal_overlay"></div>
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3 class="modal_title">Add New Credit Card</h3>
+            <button class="modal_close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form class="form customer-detail" id="dashboard-add-card-form">
+            <div class="form_group">
+                <label class="form_label">Card Name *</label>
+                <input type="text" class="form_input" name="cardName" placeholder="e.g., KBank Visa Business" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Card Number *</label>
+                <input type="text" class="form_input" name="cardNumber" placeholder="**** **** **** 1234" maxlength="19" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Credit Limit ($) *</label>
+                <input type="number" class="form_input" name="creditLimit" placeholder="25000.00" step="0.01" min="0" required>
+            </div>
+            <div class="form_actions">
+                <button type="button" class="btn btn-secondary" id="cancel-add-card">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Card</button>
+            </div>
+        </form>
+    </div>
+</div>
 
+<!-- Loading Overlay -->
+<!-- <div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+</div> -->
+
+<!-- Infinite Scroll Loading Indicator -->
+<!-- <div class="infinite-scroll-loading" id="infinite-scroll-loading">
+    <div class="spinner"></div>
+    <p>Loading more installments...</p>
+</div> -->
+
+<!-- <script type="module" src="../js/main.js"></script>
+<script type="module" src="../js/pages/dashboard.js"></script> -->

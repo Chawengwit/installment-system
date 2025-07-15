@@ -10,11 +10,188 @@ class PageDashboard {
         this.isLoading = false;
         this.hasMore = true;
         this.currentStep = 1; // Added for multi-step form
+        this.selectedCustomerId = null;
+        this.selectedCreditCardId = null;
     }
 
     init() {
         this.bindEvents();
-        this.fetchInstallments(true);
+        // this.fetchInstallments(true);
+        this.setupCustomerModals();
+        this.setupCreditCardModals();
+    }
+
+    setupCreditCardModals() {
+        this.$mainContent.on("submit", "#dashboard-add-card-form", this.handleAddCreditCard.bind(this));
+        this.$mainContent.on("click", "#cancel-add-card", () => closeModal('add-card-modal'));
+
+        // Clear errors on input
+        this.$mainContent.on('input', '#dashboard-add-card-form .form_input', function() {
+            $(this).removeClass('form_input-error');
+            $(this).next('.error-message').remove();
+        });
+    }
+
+    async handleAddCreditCard(event) {
+        event.preventDefault();
+        const form = $(event.currentTarget);
+        const cardNameInput = form.find('[name="cardName"]');
+        const cardNumberInput = form.find('[name="cardNumber"]');
+        const creditLimitInput = form.find('[name="creditLimit"]');
+
+        // Clear previous errors
+        form.find('.form_input').removeClass('form_input-error');
+        form.find('.error-message').remove();
+
+        const cardName = cardNameInput.val();
+        const cardNumber = cardNumberInput.val();
+        const creditLimit = creditLimitInput.val();
+
+        let hasError = false;
+
+        if (!cardName) {
+            cardNameInput.addClass('form_input-error');
+            cardNameInput.after('<p class="error-message">Card name is required.</p>');
+            hasError = true;
+        }
+
+        if (!cardNumber) {
+            cardNumberInput.addClass('form_input-error');
+            cardNumberInput.after('<p class="error-message">Card number is required.</p>');
+            hasError = true;
+        } else if (cardNumber.replace(/\s/g, '').length < 13) {
+            cardNumberInput.addClass('form_input-error');
+            cardNumberInput.after('<p class="error-message">Card number is too short.</p>');
+            hasError = true;
+        }
+
+        if (!creditLimit) {
+            creditLimitInput.addClass('form_input-error');
+            creditLimitInput.after('<p class="error-message">Credit limit is required.</p>');
+            hasError = true;
+        }
+
+        if (hasError) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/credit-cards', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    card_name: cardName,
+                    card_number: cardNumber,
+                    credit_limit: creditLimit
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                const errorMessage = errorData.error || 'Failed to add credit card';
+
+                if (response.status === 409) {
+                    cardNumberInput.addClass('form_input-error');
+                    cardNumberInput.after(`<p class="error-message">${errorMessage}</p>`);
+                } else if (errorData.field) {
+                    const errorInput = form.find(`[name="${errorData.field}"]`);
+                    errorInput.addClass('form_input-error');
+                    errorInput.after(`<p class="error-message">${errorMessage}</p>`);
+                } else {
+                    showNotification(errorMessage, 'error');
+                }
+                return;
+            }
+
+            showNotification('Credit card added successfully!', 'success');
+            closeModal('add-card-modal');
+            form[0].reset();
+            this.fetchCreditCardsForModal();
+        } catch (error) {
+            console.error('Error adding credit card:', error);
+            showNotification(error.message, 'error');
+        }
+    }
+
+    setupCustomerModals() {
+        // Add Customer Modal
+        this.$mainContent.on("submit", "#add-customer-form", this.handleAddCustomer.bind(this));
+        this.$mainContent.on("click", "#cancel-add-customer", () => closeModal('add-customer-modal'));
+
+        // Clear errors on input
+        this.$mainContent.on('input', '#add-customer-form .form_input', function() {
+            $(this).removeClass('form_input-error');
+        });
+
+        // Edit Customer Modal (if applicable, though not directly used in dashboard for editing)
+        // this.$mainContent.on("submit", "#edit-customer-form", this.handleEditCustomer.bind(this));
+        // this.$mainContent.on("click", "#cancel-edit-customer", () => closeModal('edit-customer-modal'));
+    }
+
+    async handleAddCustomer(event) {
+        event.preventDefault();
+        const form = $(event.currentTarget);
+        const nameInput = form.find('[name="name"]');
+        const phoneInput = form.find('[name="phone"]');
+        const idCardNumberInput = form.find('[name="id_card_number"]');
+
+        // Clear previous errors
+        form.find('.form_input').removeClass('form_input-error');
+
+        const name = nameInput.val();
+        const phone = phoneInput.val();
+        const idCardNumber = idCardNumberInput.val();
+
+        if (!name || !phone || !idCardNumber) {
+            if (!name) nameInput.addClass('form_input-error');
+            if (!phone) phoneInput.addClass('form_input-error');
+            if (!idCardNumber) idCardNumberInput.addClass('form_input-error');
+            showNotification('Name, phone, and ID card number are required.', 'error');
+            return;
+        }
+
+        const formData = new FormData(form[0]);
+
+        try {
+            const response = await fetch('/api/customers', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                const errorMessage = errorData.error || 'An unexpected error occurred. Please try again.';
+
+                if (response.status === 409) { // Duplicate customer
+                    phoneInput.addClass('form_input-error');
+                    idCardNumberInput.addClass('form_input-error');
+                } else if (response.status === 400) { // Validation error from backend
+                    nameInput.addClass('form_input-error');
+                    phoneInput.addClass('form_input-error');
+                    idCardNumberInput.addClass('form_input-error');
+                }
+
+                showNotification(errorMessage, 'error');
+                return;
+            }
+
+            const newCustomer = await response.json();
+            showNotification('Customer added successfully!', 'success');
+            closeModal('add-customer-modal');
+            form[0].reset();
+
+            if ($('#add-new-plan-modal').hasClass('modal-active')) {
+                this.selectedCustomerId = newCustomer.id; // Select the new customer
+                $('#add-new-plan-modal #customer-search-input').val(''); // Clear search input
+                this.fetchCustomersForModal();
+            }
+        } catch (error) {
+            console.error('Error adding customer:', error);
+            const friendlyErrorMessage = "Could not connect to the server. Please check your connection and try again.";
+            showNotification(friendlyErrorMessage, 'error');
+        }
     }
 
     destroy() {
@@ -27,7 +204,10 @@ class PageDashboard {
             openModal('add-new-plan-modal');
             this.showStep(1); // Show first step when modal opens
         });
-        this.$mainContent.on("click", ".modal_close", () => closeModal('add-new-plan-modal'));
+        this.$mainContent.on("click", ".modal_close", (event) => {
+            const modalId = $(event.currentTarget).closest('.modal').attr('id');
+            closeModal(modalId);
+        });
         this.$mainContent.on("input", "#dashboard-search", debounce(this.handleSearch.bind(this), 300));
         this.$mainContent.on("change", "#dashboard-status-filter", this.handleSearch.bind(this));
         this.$mainContent.on("click", "#toggle-view-btn", this.toggleView.bind(this));
@@ -36,14 +216,40 @@ class PageDashboard {
         this.$mainContent.on("click", "#add-new-plan-modal .btn[data-action='next']", this.nextStep.bind(this));
         this.$mainContent.on("click", "#add-new-plan-modal .btn[data-action='prev']", this.prevStep.bind(this));
 
+        // Clear errors on input for multi-step form
+        this.$mainContent.on('input change', '#add-new-plan-modal .form_input, #add-new-plan-modal .form_select', function() {
+            $(this).removeClass('form_input-error');
+        });
+
         // Customer search within modal
         this.$mainContent.on("input", "#add-new-plan-modal #customer-search-input", debounce(this.fetchCustomersForModal.bind(this), 300));
 
-        // File upload event
-        this.$mainContent.on("click", "#add-new-plan-modal .file-upload_area", function() {
-            $(this).siblings('.file-upload_input').trigger('click');
+        // Customer selection within modal
+        this.$mainContent.on("click", "#add-new-plan-modal .customer-option", this.handleCustomerSelection.bind(this));
+
+        // Add new customer from dashboard modal
+        this.$mainContent.on("click", "#add-customer-from-dashboard-btn", () => {
+            openModal('add-customer-modal');
         });
+
         this.$mainContent.on("change", "#add-new-plan-modal #product-images", this.handleImageUpload.bind(this));
+
+        // Add new credit card from dashboard modal
+        this.$mainContent.on("click", "#add-credit-card-from-dashboard-btn", () => {
+            openModal('add-card-modal');
+        });
+
+        // Credit card search within modal
+        this.$mainContent.on("input", "#add-new-plan-modal #credit-card-search-input", debounce(this.fetchCreditCardsForModal.bind(this), 300));
+
+        // Credit card selection within modal
+        this.$mainContent.on("click", "#add-new-plan-modal .card-option", this.handleCreditCardSelection.bind(this));
+
+        // Payment method selection
+        this.$mainContent.on("change", "#add-new-plan-modal input[name='payment-method']", this.handlePaymentMethodChange.bind(this));
+
+        // Form submission for new plan
+        this.$mainContent.on("submit", "#installment-plan-form", this.handleFormSubmission.bind(this));
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
     }
@@ -53,11 +259,22 @@ class PageDashboard {
         const previewContainer = $('#product-image-list');
 
         Array.from(files).forEach(file => {
+            // Create a unique identifier for the file (e.g., filename + size)
+            const fileIdentifier = `${file.name}-${file.size}`;
+
+            // Check if an image with this identifier already exists in the preview
+            const existingImage = previewContainer.find(`.image-list-item[data-file-id="${fileIdentifier}"]`);
+
+            if (existingImage.length > 0) {
+                showNotification(`Image "${file.name}" is already added.`, 'info');
+                return; // Skip this file
+            }
+
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const imageItem = $(
-                        `<div class="image-list-item">
+                        `<div class="image-list-item" data-file-id="${fileIdentifier}">
                             <img src="${e.target.result}" class="uploaded-image-preview">
                             <button type="button" class="remove-image-btn"><i class="fas fa-times-circle"></i></button>
                         </div>`
@@ -80,6 +297,24 @@ class PageDashboard {
         event.target.value = '';
     }
 
+    
+
+    clearAddPlanForm() {
+        $('#installment-plan-form')[0].reset();
+        $('#product-image-list').empty();
+        $('#add-new-plan-modal .customer-option').removeClass('customer-option-selected');
+        this.selectedCustomerId = null;
+        this.showStep(1);
+    }
+
+    async handleFormSubmission(event) {
+        event.preventDefault();
+        // TODO: Implement form submission logic for the new installment plan
+        showNotification('Installment plan submitted (placeholder)!', 'success');
+        closeModal('add-new-plan-modal');
+        this.clearAddPlanForm();
+    }
+
     showStep(stepNumber) {
         this.currentStep = stepNumber;
         $('#add-new-plan-modal .form-step').removeClass('form-step-active');
@@ -87,6 +322,8 @@ class PageDashboard {
 
         if (stepNumber === 3) {
             this.fetchCustomersForModal();
+        } else if (stepNumber === 4) {
+            this.fetchCreditCardsForModal();
         }
 
         $('#add-new-plan-modal .progress-indicator_step').removeClass('progress-indicator_step-active progress-indicator_step-completed');
@@ -99,9 +336,84 @@ class PageDashboard {
     }
 
     nextStep() {
-        if (this.currentStep < 5) { // Assuming 5 steps
-            this.showStep(this.currentStep + 1);
+        if (this.validateStep(this.currentStep)) {
+            if (this.currentStep < 5) { // Assuming 5 steps
+                this.showStep(this.currentStep + 1);
+            }
         }
+    }
+
+    validateStep(stepNumber) {
+        let isValid = true;
+        const currentStepElement = $('#step-' + stepNumber);
+
+        // Clear previous errors
+        currentStepElement.find('.form_input, .form_select').removeClass('form_input-error');
+
+        switch (stepNumber) {
+            case 1: // Product Details
+                const productName = currentStepElement.find('#product-name').val();
+                const productSerialNumber = currentStepElement.find('#product-serial-number').val();
+                const productPrice = currentStepElement.find('#product-price').val();
+
+                if (!productName) {
+                    currentStepElement.find('#product-name').addClass('form_input-error');
+                    isValid = false;
+                }
+                if (!productSerialNumber) {
+                    currentStepElement.find('#product-serial-number').addClass('form_input-error');
+                    isValid = false;
+                }
+                if (!productPrice || parseFloat(productPrice) <= 0) {
+                    currentStepElement.find('#product-price').addClass('form_input-error');
+                    isValid = false;
+                }
+                if (!isValid) showNotification('Please fill in all required product details.', 'error');
+                break;
+            case 2: // Installment Terms
+                const installmentMonths = currentStepElement.find('#installment-months').val();
+                const interestRate = currentStepElement.find('#interest-rate').val();
+                const paymentDueDate = currentStepElement.find('#payment-due-date').val();
+
+                if (!installmentMonths) {
+                    currentStepElement.find('#installment-months').addClass('form_input-error');
+                    isValid = false;
+                }
+                if (!interestRate) {
+                    currentStepElement.find('#interest-rate').addClass('form_input-error');
+                    isValid = false;
+                }
+                if (!paymentDueDate) {
+                    currentStepElement.find('#payment-due-date').addClass('form_input-error');
+                    isValid = false;
+                }
+                if (!isValid) showNotification('Please fill in all required installment terms.', 'error');
+                break;
+            case 3: // Customer Selection
+                if (!this.selectedCustomerId) {
+                    showNotification('Please select a customer.', 'error');
+                    isValid = false;
+                }
+                break;
+            case 4: // Payment Method
+                const cardSelectionContainer = currentStepElement.find('.card-selection');
+
+                // Clear previous errors
+                cardSelectionContainer.removeClass('card-selection-error');
+                cardSelectionContainer.find('.error-message').remove();
+
+                console.log("selected >> ", this.selectedCreditCardId);
+
+                if (!this.selectedCreditCardId) {
+                    console.log(">> Show Error <<");
+
+                    showNotification('Please select a credit card.', 'error');
+                    
+                    isValid = false;
+                }
+                break;
+        }
+        return isValid;
     }
 
     prevStep() {
@@ -116,14 +428,30 @@ class PageDashboard {
         customerOptionsContainer.html('<p>Loading customers...</p>');
 
         try {
-            const response = await fetch(`/api/customers?search=${search}&limit=5`); // Limit to 5 customers
+            let customers = [];
+            // If a customer is already selected, fetch their details and add them to the top
+            if (this.selectedCustomerId) {
+                const selectedCustomerResponse = await fetch(`/api/customers/${this.selectedCustomerId}`);
+                if (!selectedCustomerResponse.ok) throw new Error('Failed to fetch selected customer details');
+                const selectedCustomer = await selectedCustomerResponse.json();
+                if (selectedCustomer) {
+                    customers.push(selectedCustomer);
+                }
+            }
+
+            const response = await fetch(`/api/customers?search=${search}&limit=5&sortBy=created_at&sortOrder=DESC`); // Limit to 5 customers
             if (!response.ok) throw new Error('Failed to fetch customers for modal');
             const data = await response.json();
 
+            // Filter out the already selected customer from the search results to avoid duplication
+            const filteredCustomers = data.customers.filter(customer => customer.id !== this.selectedCustomerId);
+            customers = customers.concat(filteredCustomers);
+
             customerOptionsContainer.html(''); // Clear loading message
-            if (data.customers && data.customers.length > 0) {
-                data.customers.forEach(customer => {
-                    customerOptionsContainer.append(this.createCustomerOption(customer));
+            if (customers && customers.length > 0) {
+                customers.forEach(customer => {
+                    const isSelected = (this.selectedCustomerId && this.selectedCustomerId === customer.id);
+                    customerOptionsContainer.append(this.createCustomerOption(customer, isSelected));
                 });
             } else {
                 customerOptionsContainer.html('<p>No customers found.</p>');
@@ -135,9 +463,29 @@ class PageDashboard {
         }
     }
 
-    createCustomerOption(customer) {
+    handleCustomerSelection(event) {
+        const $selectedOption = $(event.currentTarget);
+        const customerId = $selectedOption.data('customer-id');
+
+        // Remove selected class from all options
+        $('#add-new-plan-modal .customer-option').removeClass('customer-option-selected');
+
+        // Add selected class to the clicked option
+        $selectedOption.addClass('customer-option-selected');
+
+        // Store the selected customer ID
+        this.selectedCustomerId = customerId;
+
+        // Optionally, update a hidden input or display area with the selected customer's name/ID
+        // For example, if you have an input field for the selected customer:
+        // $('#selected-customer-display').text($selectedOption.find('.customer-option_name').text());
+        showNotification(`Customer selected: ${$selectedOption.find('.customer-option_name').text()}`, 'info');
+    }
+
+    createCustomerOption(customer, isSelected) {
+        const selectedClass = isSelected ? 'customer-option-selected' : '';
         return `
-            <div class="customer-option" data-customer-id="${customer.id}">
+            <div class="customer-option ${selectedClass}" data-customer-id="${customer.id}">
                 <div class="customer-option_avatar">
                     <i class="fas fa-user"></i>
                 </div>
@@ -145,8 +493,94 @@ class PageDashboard {
                     <h4 class="customer-option_name">${customer.name}</h4>
                     <p class="customer-option_details">${customer.phone} • ${customer.activePlans || 0} active plans</p>
                 </div>
-                <div class="customer-option_status">
-                    <span class="badge badge-info">Available</span>
+            </div>
+        `;
+    }
+
+    async fetchCreditCardsForModal(event) {
+        const search = event ? $(event.target).val().toLowerCase() : '';
+        const cardOptionsContainer = $('#add-new-plan-modal .card-selection');
+        cardOptionsContainer.html('<p>Loading credit cards...</p>');
+
+        try {
+            let cards = [];
+            if (this.selectedCreditCardId) {
+                const selectedCardResponse = await fetch(`/api/credit-cards/${this.selectedCreditCardId}`);
+                if (!selectedCardResponse.ok) throw new Error('Failed to fetch selected credit card details');
+                const selectedCard = await selectedCardResponse.json();
+                if (selectedCard) {
+                    cards.push(selectedCard);
+                }
+            }
+
+            const response = await fetch(`/api/credit-cards?search=${search}&limit=5`);
+            if (!response.ok) throw new Error('Failed to fetch credit cards for modal');
+            const data = await response.json();
+
+            const filteredCards = data.credit_cards.filter(card => card.id !== this.selectedCreditCardId);
+            cards = cards.concat(filteredCards);
+
+            cardOptionsContainer.html('');
+            if (cards && cards.length > 0) {
+                cards.forEach(card => {
+                    const isSelected = (this.selectedCreditCardId && this.selectedCreditCardId === card.id);
+                    cardOptionsContainer.append(this.createCreditCardOption(card, isSelected));
+                });
+            } else {
+                cardOptionsContainer.html('<p>No credit cards found.</p>');
+            }
+        } catch (error) {
+            console.error('Error fetching credit cards for modal:', error);
+            cardOptionsContainer.html('<p class="text-danger">Error loading credit cards.</p>');
+            showNotification(error.message, 'error');
+        }
+    }
+
+    handleCreditCardSelection(event) {
+        const $selectedOption = $(event.currentTarget);
+        const cardId = $selectedOption.data('card-id');
+
+        $('#add-new-plan-modal .card-option').removeClass('card-option-selected');
+
+        $selectedOption.addClass('card-option-selected');
+
+        this.selectedCreditCardId = cardId;
+
+        // Remove error styling from the container
+        const cardSelectionContainer = $('#add-new-plan-modal .card-selection');
+        cardSelectionContainer.find('.error-message').remove();
+
+        showNotification(`Credit Card selected: ${$selectedOption.find('.card-option_name').text()}`, 'info');
+    }
+
+    handlePaymentMethodChange(event) {
+        const selectedMethod = $(event.currentTarget).val();
+        const creditCardSelectContainer = $('#credit-card-select');
+        const cardSelectionContainer = $('#add-new-plan-modal .card-selection');
+
+        if (selectedMethod === 'credit-card') {
+            creditCardSelectContainer.show();
+            this.fetchCreditCardsForModal(); // Fetch cards when credit card option is selected
+        } else {
+            creditCardSelectContainer.hide();
+            this.selectedCreditCardId = null; // Clear selection if not credit card
+            cardSelectionContainer.find('.error-message').remove();
+        }
+    }
+
+    createCreditCardOption(card, isSelected) {
+        const selectedClass = isSelected ? 'card-option-selected' : '';
+        return `
+            <div class="card-option ${selectedClass}" data-card-id="${card.id}">
+                <div class="card-option_brand">
+                    <i class="fab fa-cc-visa"></i>
+                </div>
+                <div class="card-option_info">
+                    <span class="card-option_name">${card.card_name}</span>
+                    <span class="card-option_number">**** **** **** ${String(card.card_number).slice(-4)}</span>
+                </div>
+                <div class="card-option_limit">
+                    <span class="card-option_available"><span class="card-available-amount">${(card.credit_limit - card.used_amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span> <span class="card-available-text">available</span></span>
                 </div>
             </div>
         `;
@@ -157,37 +591,37 @@ class PageDashboard {
         this.hasMore = true;
         const searchTerm = $('#dashboard-search').val().toLowerCase();
         const status = $('#dashboard-status-filter').val();
-        this.fetchInstallments(true, searchTerm, status);
+        // this.fetchInstallments(true, searchTerm, status);
     }
 
-    async fetchInstallments(clearExisting = false, search = '', status = 'all') {
-        if (this.isLoading || !this.hasMore) {
-            return;
-        }
+    // async fetchInstallments(clearExisting = false, search = '', status = 'all') {
+    //     if (this.isLoading || !this.hasMore) {
+    //         return;
+    //     }
 
-        this.isLoading = true;
-        $('#infinite-scroll-loading').show();
+    //     this.isLoading = true;
+    //     $('#infinite-scroll-loading').show();
 
-        const offset = (this.currentPage - 1) * this.installmentsPerPage;
-        try {
-            // This will need to be implemented in the backend
-            const response = await fetch(`/api/installments?search=${search}&status=${status}&limit=${this.installmentsPerPage}&offset=${offset}`);
-            if (!response.ok) throw new Error('Failed to fetch installment plans');
-            const data = await response.json();
+    //     const offset = (this.currentPage - 1) * this.installmentsPerPage;
+    //     try {
+    //         // This will need to be implemented in the backend
+    //         const response = await fetch(`/api/installments?search=${search}&status=${status}&limit=${this.installmentsPerPage}&offset=${offset}`);
+    //         if (!response.ok) throw new Error('Failed to fetch installment plans');
+    //         const data = await response.json();
 
-            this.totalInstallments = data.totalInstallments;
-            this.hasMore = (this.currentPage * this.installmentsPerPage) < this.totalInstallments;
+    //         this.totalInstallments = data.totalInstallments;
+    //         this.hasMore = (this.currentPage * this.installmentsPerPage) < this.totalInstallments;
 
-            this.renderInstallments(data.installments, clearExisting);
-            this.currentPage++;
-        } catch (error) {
-            console.error('Error fetching installment plans:', error);
-            showNotification(error.message, 'error');
-        } finally {
-            this.isLoading = false;
-            $('#infinite-scroll-loading').hide();
-        }
-    }
+    //         this.renderInstallments(data.installments, clearExisting);
+    //         this.currentPage++;
+    //     } catch (error) {
+    //         console.error('Error fetching installment plans:', error);
+    //         showNotification(error.message, 'error');
+    //     } finally {
+    //         this.isLoading = false;
+    //         $('#infinite-scroll-loading').hide();
+    //     }
+    // }
 
     renderInstallments(installments, clearExisting) {
         const installmentGrid = $('#installments-grid');
@@ -253,7 +687,7 @@ class PageDashboard {
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollHeight - scrollPos < 200 && !this.isLoading && this.hasMore) {
-            this.fetchInstallments(false, $('#dashboard-search').val().toLowerCase(), $('#dashboard-status-filter').val());
+            // this.fetchInstallments(false, $('#dashboard-search').val().toLowerCase(), $('#dashboard-status-filter').val());
         }
     }
 }
