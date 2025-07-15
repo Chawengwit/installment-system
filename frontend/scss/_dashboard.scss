@@ -155,7 +155,6 @@
 }
 
 .form-step {
-    padding: var(--spacing-2xl);
     display: none;
 
     &.form-step-active {
@@ -234,7 +233,7 @@
 .form_actions {
     display: flex;
     gap: var(--spacing-md);
-    justify-content: flex-end;
+    justify-content: center;
     margin-top: var(--spacing-xl);
 }
 

@@ -7,3 +7,9 @@
 .form_input-error {
     border-color: #dc3545 !important; // Red border for error inputs
 }
+
+.selection-error {
+    border: 1px solid #dc3545; // Red border for selection errors
+    padding: 10px;
+    border-radius: 5px;
+}

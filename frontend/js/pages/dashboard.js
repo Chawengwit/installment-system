@@ -396,12 +396,20 @@ class PageDashboard {
                 }
                 break;
             case 4: // Payment Method
-                // Assuming credit card is the only payment method for now that requires selection
-                if ($('input[name="payment-method"]:checked').val() === 'credit-card') {
-                    if (!this.selectedCreditCardId) {
-                        showNotification('Please select a credit card.', 'error');
-                        isValid = false;
-                    }
+                const cardSelectionContainer = currentStepElement.find('.card-selection');
+
+                // Clear previous errors
+                cardSelectionContainer.removeClass('card-selection-error');
+                cardSelectionContainer.find('.error-message').remove();
+
+                console.log("selected >> ", this.selectedCreditCardId);
+
+                if (!this.selectedCreditCardId) {
+                    console.log(">> Show Error <<");
+
+                    showNotification('Please select a credit card.', 'error');
+                    
+                    isValid = false;
                 }
                 break;
         }
@@ -538,17 +546,25 @@ class PageDashboard {
 
         this.selectedCreditCardId = cardId;
 
+        // Remove error styling from the container
+        const cardSelectionContainer = $('#add-new-plan-modal .card-selection');
+        cardSelectionContainer.find('.error-message').remove();
+
         showNotification(`Credit Card selected: ${$selectedOption.find('.card-option_name').text()}`, 'info');
     }
 
     handlePaymentMethodChange(event) {
         const selectedMethod = $(event.currentTarget).val();
+        const creditCardSelectContainer = $('#credit-card-select');
+        const cardSelectionContainer = $('#add-new-plan-modal .card-selection');
+
         if (selectedMethod === 'credit-card') {
-            $('#credit-card-select').show();
+            creditCardSelectContainer.show();
             this.fetchCreditCardsForModal(); // Fetch cards when credit card option is selected
         } else {
-            $('#credit-card-select').hide();
+            creditCardSelectContainer.hide();
             this.selectedCreditCardId = null; // Clear selection if not credit card
+            cardSelectionContainer.find('.error-message').remove();
         }
     }
 
