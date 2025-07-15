@@ -372,11 +372,22 @@ class PageDashboard {
                 break;
             case 2: // Installment Terms
                 const installmentMonths = currentStepElement.find('#installment-months').val();
+                const interestRate = currentStepElement.find('#interest-rate').val();
+                const paymentDueDate = currentStepElement.find('#payment-due-date').val();
+
                 if (!installmentMonths) {
                     currentStepElement.find('#installment-months').addClass('form_input-error');
                     isValid = false;
                 }
-                if (!isValid) showNotification('Please select installment duration.', 'error');
+                if (!interestRate) {
+                    currentStepElement.find('#interest-rate').addClass('form_input-error');
+                    isValid = false;
+                }
+                if (!paymentDueDate) {
+                    currentStepElement.find('#payment-due-date').addClass('form_input-error');
+                    isValid = false;
+                }
+                if (!isValid) showNotification('Please fill in all required installment terms.', 'error');
                 break;
             case 3: // Customer Selection
                 if (!this.selectedCustomerId) {
