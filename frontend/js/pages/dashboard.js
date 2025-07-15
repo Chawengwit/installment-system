@@ -216,6 +216,11 @@ class PageDashboard {
         this.$mainContent.on("click", "#add-new-plan-modal .btn[data-action='next']", this.nextStep.bind(this));
         this.$mainContent.on("click", "#add-new-plan-modal .btn[data-action='prev']", this.prevStep.bind(this));
 
+        // Clear errors on input for multi-step form
+        this.$mainContent.on('input change', '#add-new-plan-modal .form_input, #add-new-plan-modal .form_select', function() {
+            $(this).removeClass('form_input-error');
+        });
+
         // Customer search within modal
         this.$mainContent.on("input", "#add-new-plan-modal #customer-search-input", debounce(this.fetchCustomersForModal.bind(this), 300));
 
@@ -331,9 +336,65 @@ class PageDashboard {
     }
 
     nextStep() {
-        if (this.currentStep < 5) { // Assuming 5 steps
-            this.showStep(this.currentStep + 1);
+        if (this.validateStep(this.currentStep)) {
+            if (this.currentStep < 5) { // Assuming 5 steps
+                this.showStep(this.currentStep + 1);
+            }
         }
+    }
+
+    validateStep(stepNumber) {
+        let isValid = true;
+        const currentStepElement = $('#step-' + stepNumber);
+
+        // Clear previous errors
+        currentStepElement.find('.form_input, .form_select').removeClass('form_input-error');
+
+        switch (stepNumber) {
+            case 1: // Product Details
+                const productName = currentStepElement.find('#product-name').val();
+                const productSerialNumber = currentStepElement.find('#product-serial-number').val();
+                const productPrice = currentStepElement.find('#product-price').val();
+
+                if (!productName) {
+                    currentStepElement.find('#product-name').addClass('form_input-error');
+                    isValid = false;
+                }
+                if (!productSerialNumber) {
+                    currentStepElement.find('#product-serial-number').addClass('form_input-error');
+                    isValid = false;
+                }
+                if (!productPrice || parseFloat(productPrice) <= 0) {
+                    currentStepElement.find('#product-price').addClass('form_input-error');
+                    isValid = false;
+                }
+                if (!isValid) showNotification('Please fill in all required product details.', 'error');
+                break;
+            case 2: // Installment Terms
+                const installmentMonths = currentStepElement.find('#installment-months').val();
+                if (!installmentMonths) {
+                    currentStepElement.find('#installment-months').addClass('form_input-error');
+                    isValid = false;
+                }
+                if (!isValid) showNotification('Please select installment duration.', 'error');
+                break;
+            case 3: // Customer Selection
+                if (!this.selectedCustomerId) {
+                    showNotification('Please select a customer.', 'error');
+                    isValid = false;
+                }
+                break;
+            case 4: // Payment Method
+                // Assuming credit card is the only payment method for now that requires selection
+                if ($('input[name="payment-method"]:checked').val() === 'credit-card') {
+                    if (!this.selectedCreditCardId) {
+                        showNotification('Please select a credit card.', 'error');
+                        isValid = false;
+                    }
+                }
+                break;
+        }
+        return isValid;
     }
 
     prevStep() {
