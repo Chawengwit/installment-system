@@ -120,6 +120,11 @@ class PageDashboard {
         this.$mainContent.on("submit", "#add-customer-form", this.handleAddCustomer.bind(this));
         this.$mainContent.on("click", "#cancel-add-customer", () => closeModal('add-customer-modal'));
 
+        // Clear errors on input
+        this.$mainContent.on('input', '#add-customer-form .form_input', function() {
+            $(this).removeClass('form_input-error');
+        });
+
         // Edit Customer Modal (if applicable, though not directly used in dashboard for editing)
         // this.$mainContent.on("submit", "#edit-customer-form", this.handleEditCustomer.bind(this));
         // this.$mainContent.on("click", "#cancel-edit-customer", () => closeModal('edit-customer-modal'));
@@ -128,6 +133,25 @@ class PageDashboard {
     async handleAddCustomer(event) {
         event.preventDefault();
         const form = $(event.currentTarget);
+        const nameInput = form.find('[name="name"]');
+        const phoneInput = form.find('[name="phone"]');
+        const idCardNumberInput = form.find('[name="id_card_number"]');
+
+        // Clear previous errors
+        form.find('.form_input').removeClass('form_input-error');
+
+        const name = nameInput.val();
+        const phone = phoneInput.val();
+        const idCardNumber = idCardNumberInput.val();
+
+        if (!name || !phone || !idCardNumber) {
+            if (!name) nameInput.addClass('form_input-error');
+            if (!phone) phoneInput.addClass('form_input-error');
+            if (!idCardNumber) idCardNumberInput.addClass('form_input-error');
+            showNotification('Name, phone, and ID card number are required.', 'error');
+            return;
+        }
+
         const formData = new FormData(form[0]);
 
         try {
@@ -135,20 +159,38 @@ class PageDashboard {
                 method: 'POST',
                 body: formData
             });
+
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to add customer');
+                const errorMessage = errorData.error || 'An unexpected error occurred. Please try again.';
+
+                if (response.status === 409) { // Duplicate customer
+                    phoneInput.addClass('form_input-error');
+                    idCardNumberInput.addClass('form_input-error');
+                } else if (response.status === 400) { // Validation error from backend
+                    nameInput.addClass('form_input-error');
+                    phoneInput.addClass('form_input-error');
+                    idCardNumberInput.addClass('form_input-error');
+                }
+
+                showNotification(errorMessage, 'error');
+                return;
             }
+
+            const newCustomer = await response.json();
             showNotification('Customer added successfully!', 'success');
             closeModal('add-customer-modal');
             form[0].reset();
-            // Optionally re-fetch customers for the modal if it's open
+
             if ($('#add-new-plan-modal').hasClass('modal-active')) {
+                this.selectedCustomerId = newCustomer.id; // Select the new customer
+                $('#add-new-plan-modal #customer-search-input').val(''); // Clear search input
                 this.fetchCustomersForModal();
             }
         } catch (error) {
             console.error('Error adding customer:', error);
-            showNotification(error.message, 'error');
+            const friendlyErrorMessage = "Could not connect to the server. Please check your connection and try again.";
+            showNotification(friendlyErrorMessage, 'error');
         }
     }
 
@@ -317,7 +359,7 @@ class PageDashboard {
                 }
             }
 
-            const response = await fetch(`/api/customers?search=${search}&limit=5`); // Limit to 5 customers
+            const response = await fetch(`/api/customers?search=${search}&limit=5&sortBy=created_at&sortOrder=DESC`); // Limit to 5 customers
             if (!response.ok) throw new Error('Failed to fetch customers for modal');
             const data = await response.json();
 
