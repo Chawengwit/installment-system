@@ -18,6 +18,57 @@ class PageDashboard {
         this.bindEvents();
         // this.fetchInstallments(true);
         this.setupCustomerModals();
+        this.setupCreditCardModals();
+    }
+
+    setupCreditCardModals() {
+        this.$mainContent.on("submit", "#dashboard-add-card-form", this.handleAddCreditCard.bind(this));
+        this.$mainContent.on("click", "#cancel-add-card", () => closeModal('add-card-modal'));
+    }
+
+    async handleAddCreditCard(event) {
+        event.preventDefault();
+        const form = $(event.currentTarget);
+        const cardName = form.find('[name="cardName"]').val();
+        const cardNumber = form.find('[name="cardNumber"]').val();
+        const creditLimit = form.find('[name="creditLimit"]').val();
+
+        if (!cardName || !cardNumber || !creditLimit) {
+            showNotification('Please fill in all required fields.', 'error');
+            return;
+        }
+
+        if (cardNumber.replace(/\s/g, '').length < 13) {
+            showNotification('Card number is too short.', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/credit-cards', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    card_name: cardName,
+                    card_number: cardNumber,
+                    credit_limit: creditLimit
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to add credit card');
+            }
+
+            showNotification('Credit card added successfully!', 'success');
+            closeModal('add-card-modal');
+            form[0].reset();
+            this.fetchCreditCardsForModal();
+        } catch (error) {
+            console.error('Error adding credit card:', error);
+            showNotification(error.message, 'error');
+        }
     }
 
     setupCustomerModals() {
