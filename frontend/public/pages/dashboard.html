@@ -270,10 +270,15 @@
 
                                 <!-- Calculation Summary -->
                                 <div class="calculation-summary" id="calculation-summary">
-                                    <h4 class="calculation-summary_title">
-                                        <i class="fas fa-calculator"></i>
-                                        Payment Summary
-                                    </h4>
+                                    <div class="calculation-summary_header">
+                                        <h4 class="calculation-summary_title">
+                                            <i class="fas fa-calculator"></i>
+                                            Payment Summary
+                                        </h4>
+                                        <button type="button" class="btn btn-outline btn-small" id="copy-summary-btn">
+                                            <i class="fas fa-copy"></i> Copy
+                                        </button>
+                                    </div>
                                     <div class="calculation-summary_grid">
                                         <div class="calculation-summary_item">
                                             <span class="calculation-summary_label">Product Price:</span>
@@ -303,7 +308,7 @@
                                             <span class="calculation-summary_label">Monthly Payment:</span>
                                             <span class="calculation-summary_value" id="summary-monthly">฿0.00</span>
                                         </div>
-                                        <div class="calculation-summary_item">
+                                        <div class="calculation-summary_item calculation-summary_item-number-payments">
                                             <span class="calculation-summary_label">Number of Payments:</span>
                                             <span class="calculation-summary_value" id="summary-payments">0</span>
                                         </div>
@@ -477,10 +482,7 @@
                                     <div class="contract-preview_content">
                                         <p>This installment agreement will be automatically generated with all the details above. The customer will receive a copy via email and SMS.</p>
                                         <div class="contract-preview_actions">
-                                            <button type="button" class="btn btn-outline btn-small">
-                                                <i class="fas fa-eye"></i> Preview Contract
-                                            </button>
-                                            <button type="button" class="btn btn-outline btn-small">
+                                            <button type="button" id="customize-term-btn" class="btn btn-outline btn-small">
                                                 <i class="fas fa-edit"></i> Customize Terms
                                             </button>
                                         </div>

@@ -428,19 +428,19 @@
     padding: var(--spacing-xl);
     margin-top: var(--spacing-xl);
 
-    .calculation-summary_title {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-sm);
-        font-size: var(--font-size-lg);
-        font-weight: 600;
-        color: var(--color-gray-900);
-        margin-bottom: var(--spacing-lg);
+    .calculation-summary_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
 
-        i {
-            color: var(--color-primary);
-        }
+.calculation-summary_title {
+    margin: 0;
+    i {
+        color: var(--color-primary);
     }
+}
 
     .calculation-summary_grid {
         display: grid;
@@ -469,7 +469,7 @@
             margin-top: var(--spacing-sm);
         }
 
-        &.calculation-summary_item-monthly {
+        &.calculation-summary_item-monthly, &.calculation-summary_item-number-payments {
             grid-column: 1 / -1;
             color: var(--color-white);
             margin: var(--spacing-md) calc(-1 * var(--spacing-xl));
