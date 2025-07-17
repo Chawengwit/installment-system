@@ -348,6 +348,26 @@ class PageDashboard {
         }
     }
 
+    copySummaryToClipboard() {
+        const summaryText = [
+            `Product Price: ${$('#summary-price').text()}`,
+            `Down Payment: ${$('#summary-down-payment').text()}`,
+            `Financed Amount: ${$('#summary-financed').text()}`,
+            `Interest Rate: ${$('#summary-interest-rate').text()}`,
+            `Interest Amount: ${$('#summary-interest-amount').text()}`,
+            `Total Amount: ${$('#summary-total').text()}`,
+            `Monthly Payment: ${$('#summary-monthly').text()}`,
+            `Number of Payments: ${$('#summary-payments').text()}`,
+        ].join('\n');
+
+        navigator.clipboard.writeText(summaryText)
+            .then(() => showNotification('Summary copied to clipboard!', 'success'))
+            .catch(err => {
+                console.error('Failed to copy text: ', err);
+                showNotification('Failed to copy summary.', 'error');
+            });
+    }
+
     updateCalculationSummary() {
         const form = $('#installment-plan-form');
         const productPrice = parseFloat(form.find('#product-price').val()) || 0;
