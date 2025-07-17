@@ -381,13 +381,13 @@ class PageDashboard {
         const totalAmount = financedAmount + interestAmount;
         const monthlyPayment = installmentMonths > 0 ? totalAmount / installmentMonths : 0;
 
-        $('#summary-price').text(`฿${productPrice.toFixed(2)}`);
-        $('#summary-down-payment').text(`฿${downPayment.toFixed(2)}`);
-        $('#summary-financed').text(`฿${financedAmount.toFixed(2)}`);
+        $('#summary-price').text(`฿${productPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+        $('#summary-down-payment').text(`฿${downPayment.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+        $('#summary-financed').text(`฿${financedAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
         $('#summary-interest-rate').text(`${interestRate.toFixed(1)}%`);
-        $('#summary-interest-amount').text(`฿${interestAmount.toFixed(2)}`);
-        $('#summary-total').text(`฿${totalAmount.toFixed(2)}`);
-        $('#summary-monthly').text(`฿${monthlyPayment.toFixed(2)}`);
+        $('#summary-interest-amount').text(`฿${interestAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+        $('#summary-total').text(`฿${totalAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+        $('#summary-monthly').text(`฿${monthlyPayment.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
         $('#summary-payments').text(installmentMonths);
 
         $('#calculation-summary').show();

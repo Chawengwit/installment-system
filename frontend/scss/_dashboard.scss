@@ -437,6 +437,9 @@
 
 .calculation-summary_title {
     margin: 0;
+    i {
+        color: var(--color-primary);
+    }
 }
 
     .calculation-summary_grid {
@@ -466,7 +469,7 @@
             margin-top: var(--spacing-sm);
         }
 
-        &.calculation-summary_item-monthly {
+        &.calculation-summary_item-monthly, &.calculation-summary_item-number-payments {
             grid-column: 1 / -1;
             color: var(--color-white);
             margin: var(--spacing-md) calc(-1 * var(--spacing-xl));
