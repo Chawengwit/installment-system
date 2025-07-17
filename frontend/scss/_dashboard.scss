@@ -471,7 +471,7 @@
 
         &.calculation-summary_item-monthly {
             grid-column: 1 / -1;
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            // background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
             color: var(--color-white);
             margin: var(--spacing-md) calc(-1 * var(--spacing-xl));
             padding: var(--spacing-lg) var(--spacing-xl);

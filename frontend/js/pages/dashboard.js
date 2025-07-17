@@ -411,8 +411,6 @@ class PageDashboard {
                 cardSelectionContainer.removeClass('card-selection-error');
                 cardSelectionContainer.find('.error-message').remove();
 
-                console.log("selected >> ", this.selectedCreditCardId);
-
                 if (!this.selectedCreditCardId) {
                     console.log(">> Show Error <<");
 
