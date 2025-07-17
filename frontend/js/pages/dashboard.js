@@ -386,6 +386,13 @@ class PageDashboard {
                 if (!paymentDueDate) {
                     currentStepElement.find('#payment-due-date').addClass('form_input-error');
                     isValid = false;
+                } else {
+                    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+                    if (!dateRegex.test(paymentDueDate)) {
+                        currentStepElement.find('#payment-due-date').addClass('form_input-error');
+                        showNotification('Please enter the date in YYYY-MM-DD format.', 'error');
+                        isValid = false;
+                    }
                 }
                 if (!isValid) showNotification('Please fill in all required installment terms.', 'error');
                 break;
