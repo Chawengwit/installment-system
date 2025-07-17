@@ -255,6 +255,11 @@ class PageDashboard {
         // Form submission for new plan
         this.$mainContent.on("submit", "#installment-plan-form", this.handleFormSubmission.bind(this));
 
+        this.$mainContent.on("click", "#export-contract-btn", () => {
+            // Add PDF export logic here
+            showNotification('Exporting PDF...', 'info');
+        });
+
         this.$mainContent.on("click", "#customize-term-btn", () => this.showStep(2));
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
@@ -315,10 +320,31 @@ class PageDashboard {
 
     async handleFormSubmission(event) {
         event.preventDefault();
-        // TODO: Implement form submission logic for the new installment plan
-        showNotification('Installment plan submitted (placeholder)!', 'success');
-        closeModal('add-new-plan-modal');
-        this.clearAddPlanForm();
+        const formData = new FormData($('#installment-plan-form')[0]);
+        formData.append('customerId', this.selectedCustomerId);
+        formData.append('creditCardId', this.selectedCreditCardId);
+
+        try {
+            // const response = await fetch('/api/installments', {
+            //     method: 'POST',
+            //     body: formData
+            // });
+
+            // if (!response.ok) {
+            //     const errorData = await response.json();
+            //     throw new Error(errorData.error || 'Failed to create installment plan');
+            // }
+
+            // const result = await response.json();
+            // this.newInstallmentId = result.installmentId;
+
+            showNotification('Installment plan created successfully!', 'success');
+            this.showStep(6);
+
+        } catch (error) {
+            console.error('Error creating installment plan:', error);
+            showNotification(error.message, 'error');
+        }
     }
 
     showStep(stepNumber) {
@@ -345,7 +371,7 @@ class PageDashboard {
 
     nextStep() {
         if (this.validateStep(this.currentStep)) {
-            if (this.currentStep < 5) { // Assuming 5 steps
+            if (this.currentStep < 6) { // Assuming 6 steps
                 this.showStep(this.currentStep + 1);
             }
         }

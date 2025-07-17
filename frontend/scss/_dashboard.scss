@@ -568,6 +568,18 @@
     }
 }
 
+.completion-summary{
+    .complated-desc{
+        text-align: center;
+        margin: 0 var(--spacing-lg) var(--spacing-lg);
+    }
+    .completion-actions{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
 // Responsive Design
 @media (max-width: 768px) {
     .form-step {
