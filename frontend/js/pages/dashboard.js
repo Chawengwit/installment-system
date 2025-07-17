@@ -216,6 +216,9 @@ class PageDashboard {
         this.$mainContent.on("click", "#add-new-plan-modal .btn[data-action='next']", this.nextStep.bind(this));
         this.$mainContent.on("click", "#add-new-plan-modal .btn[data-action='prev']", this.prevStep.bind(this));
 
+        // Calculation summary
+        this.$mainContent.on('input', '#product-price, #down-payment, #installment-months, #interest-rate', this.updateCalculationSummary.bind(this));
+
         // Clear errors on input for multi-step form
         this.$mainContent.on('input change', '#add-new-plan-modal .form_input, #add-new-plan-modal .form_select', function() {
             $(this).removeClass('form_input-error');
@@ -343,6 +346,30 @@ class PageDashboard {
                 this.showStep(this.currentStep + 1);
             }
         }
+    }
+
+    updateCalculationSummary() {
+        const form = $('#installment-plan-form');
+        const productPrice = parseFloat(form.find('#product-price').val()) || 0;
+        const downPayment = parseFloat(form.find('#down-payment').val()) || 0;
+        const installmentMonths = parseInt(form.find('#installment-months').val(), 10) || 0;
+        const interestRate = parseFloat(form.find('#interest-rate').val()) || 0;
+
+        const financedAmount = productPrice - downPayment;
+        const interestAmount = financedAmount * (interestRate / 100);
+        const totalAmount = financedAmount + interestAmount;
+        const monthlyPayment = installmentMonths > 0 ? totalAmount / installmentMonths : 0;
+
+        $('#summary-price').text(`฿${productPrice.toFixed(2)}`);
+        $('#summary-down-payment').text(`฿${downPayment.toFixed(2)}`);
+        $('#summary-financed').text(`฿${financedAmount.toFixed(2)}`);
+        $('#summary-interest-rate').text(`${interestRate.toFixed(1)}%`);
+        $('#summary-interest-amount').text(`฿${interestAmount.toFixed(2)}`);
+        $('#summary-total').text(`฿${totalAmount.toFixed(2)}`);
+        $('#summary-monthly').text(`฿${monthlyPayment.toFixed(2)}`);
+        $('#summary-payments').text(installmentMonths);
+
+        $('#calculation-summary').show();
     }
 
     validateStep(stepNumber) {

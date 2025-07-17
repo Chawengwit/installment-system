@@ -451,7 +451,7 @@
     .calculation-summary_item {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
         padding: var(--spacing-sm) 0;
         border-bottom: 1px solid var(--color-gray-200);
 
@@ -471,10 +471,9 @@
 
         &.calculation-summary_item-monthly {
             grid-column: 1 / -1;
-            // background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
             color: var(--color-white);
             margin: var(--spacing-md) calc(-1 * var(--spacing-xl));
-            padding: var(--spacing-lg) var(--spacing-xl);
+            padding: 0 var(--spacing-xl);
             border-radius: var(--border-radius-lg);
             font-weight: 600;
             font-size: var(--font-size-xl);
