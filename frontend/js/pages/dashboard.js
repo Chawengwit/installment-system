@@ -324,6 +324,8 @@ class PageDashboard {
             this.fetchCustomersForModal();
         } else if (stepNumber === 4) {
             this.fetchCreditCardsForModal();
+        } else if (stepNumber === 5) {
+            this.updateReviewStep();
         }
 
         $('#add-new-plan-modal .progress-indicator_step').removeClass('progress-indicator_step-active progress-indicator_step-completed');
@@ -421,6 +423,25 @@ class PageDashboard {
                 break;
         }
         return isValid;
+    }
+
+    updateReviewStep() {
+        const form = $('#installment-plan-form');
+        const productName = form.find('#product-name').val();
+        const productPrice = form.find('#product-price').val();
+        const installmentMonths = form.find('#installment-months').val();
+        const interestRate = form.find('#interest-rate').val();
+        const paymentDueDate = form.find('#payment-due-date').val();
+        const customerName = $('#add-new-plan-modal .customer-option-selected .customer-option_name').text();
+        const customerPhone = $('#add-new-plan-modal .customer-option-selected .customer-option_details').text().split('•')[0].trim();
+        const cardName = $('#add-new-plan-modal .card-option-selected .card-option_name').text();
+
+        const monthlyPayment = ((parseFloat(productPrice) * (1 + parseFloat(interestRate) / 100)) / parseInt(installmentMonths, 10)).toFixed(2);
+
+        $('#review-customer').text(`${customerName} - ${customerPhone}`);
+        $('#review-product').text(`${productName} - ฿${productPrice}`);
+        $('#review-payment-method').text(`Credit Card - ${cardName}`);
+        $('#review-terms').text(`${installmentMonths} months - ฿${monthlyPayment}/month`);
     }
 
     prevStep() {
