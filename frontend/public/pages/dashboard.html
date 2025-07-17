@@ -243,16 +243,7 @@
                                 <div class="form_row">
                                     <div class="form_group">
                                         <label class="form_label">Number of Months *</label>
-                                        <select class="form_select" id="installment-months" required>
-                                            <option value="">Select duration...</option>
-                                            <option value="3">3 months</option>
-                                            <option value="6">6 months</option>
-                                            <option value="9">9 months</option>
-                                            <option value="12">12 months</option>
-                                            <option value="18">18 months</option>
-                                            <option value="24">24 months</option>
-                                            <option value="36">36 months</option>
-                                        </select>
+                                        <input type="number" class="form_input" id="installment-months" placeholder="e.g., 12" min="0" required>
                                     </div>
                                     <div class="form_group">
                                         <label class="form_label">Interest Rate (%)</label>
@@ -265,8 +256,8 @@
 
                                 <div class="form_row">
                                     <div class="form_group">
-                                        <label class="form_label">Payment Due Date *</label>
-                                        <input type="text" class="form_input" id="payment-due-date" placeholder="YYYY-MM-DD" required>
+                                        <label class="form_label">Payment Due Date (Day of Month) *</label>
+                                        <input type="number" class="form_input" id="payment-due-date" placeholder="e.g., 15" min="1" max="31" required>
                                     </div>
                                     <div class="form_group">
                                         <label class="form_label">Late Fee (฿)</label>

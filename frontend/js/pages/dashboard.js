@@ -387,10 +387,10 @@ class PageDashboard {
                     currentStepElement.find('#payment-due-date').addClass('form_input-error');
                     isValid = false;
                 } else {
-                    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-                    if (!dateRegex.test(paymentDueDate)) {
+                    const day = parseInt(paymentDueDate, 10);
+                    if (isNaN(day) || day < 1 || day > 31) {
                         currentStepElement.find('#payment-due-date').addClass('form_input-error');
-                        showNotification('Please enter the date in YYYY-MM-DD format.', 'error');
+                        showNotification('Please enter a valid day of the month (1-31).', 'error');
                         isValid = false;
                     }
                 }
