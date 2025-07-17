@@ -74,6 +74,26 @@ const createTables = async () => {
             CREATE INDEX IF NOT EXISTS idx_installments_customer_id ON installments(customer_id);
             CREATE INDEX IF NOT EXISTS idx_installments_credit_card_id ON installments(credit_card_id);
             CREATE INDEX IF NOT EXISTS idx_installments_status ON installments(status);
+
+            CREATE TABLE IF NOT EXISTS installment_payments (
+                id SERIAL PRIMARY KEY,
+                installment_id INTEGER REFERENCES installments(id) ON DELETE CASCADE,
+                term_number INTEGER NOT NULL,
+                due_date DATE NOT NULL,
+                paid_date DATE,
+                amount NUMERIC(12, 2) NOT NULL,
+                is_paid BOOLEAN DEFAULT FALSE,
+                slip_image TEXT,
+                notification_sent BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE (installment_id, term_number)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_payments_due_date ON installment_payments(due_date);
+            CREATE INDEX IF NOT EXISTS idx_payments_is_paid ON installment_payments(is_paid);
+            CREATE INDEX IF NOT EXISTS idx_payments_installment_id ON installment_payments(installment_id);
+            CREATE INDEX IF NOT EXISTS idx_payments_due_date_paid ON installment_payments(due_date, is_paid);
         `);
 
     } finally {

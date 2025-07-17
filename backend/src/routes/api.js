@@ -2,6 +2,7 @@ import { Router } from 'express';
 import productRoutes from './products.js';
 import customerRoutes from './customers.js';
 import creditCardRoutes from './credit-cards.js';
+import installmentRoutes from './installments.js';
 
 const router = Router();
 
@@ -12,5 +13,6 @@ router.get('/health', (req, res) => {
 router.use('/customers', customerRoutes);
 router.use('/products', productRoutes);
 router.use('/credit-cards', creditCardRoutes);
+router.use('/installments', installmentRoutes);
 
 export default router;
