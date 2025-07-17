@@ -255,6 +255,8 @@ class PageDashboard {
         // Form submission for new plan
         this.$mainContent.on("submit", "#installment-plan-form", this.handleFormSubmission.bind(this));
 
+        this.$mainContent.on("click", "#customize-term-btn", () => this.showStep(2));
+
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
     }
 
