@@ -216,6 +216,9 @@ class PageDashboard {
         this.$mainContent.on("click", "#add-new-plan-modal .btn[data-action='next']", this.nextStep.bind(this));
         this.$mainContent.on("click", "#add-new-plan-modal .btn[data-action='prev']", this.prevStep.bind(this));
 
+        // Calculation summary
+        this.$mainContent.on('input', '#product-price, #down-payment, #installment-months, #interest-rate', this.updateCalculationSummary.bind(this));
+
         // Clear errors on input for multi-step form
         this.$mainContent.on('input change', '#add-new-plan-modal .form_input, #add-new-plan-modal .form_select', function() {
             $(this).removeClass('form_input-error');
@@ -324,6 +327,8 @@ class PageDashboard {
             this.fetchCustomersForModal();
         } else if (stepNumber === 4) {
             this.fetchCreditCardsForModal();
+        } else if (stepNumber === 5) {
+            this.updateReviewStep();
         }
 
         $('#add-new-plan-modal .progress-indicator_step').removeClass('progress-indicator_step-active progress-indicator_step-completed');
@@ -341,6 +346,30 @@ class PageDashboard {
                 this.showStep(this.currentStep + 1);
             }
         }
+    }
+
+    updateCalculationSummary() {
+        const form = $('#installment-plan-form');
+        const productPrice = parseFloat(form.find('#product-price').val()) || 0;
+        const downPayment = parseFloat(form.find('#down-payment').val()) || 0;
+        const installmentMonths = parseInt(form.find('#installment-months').val(), 10) || 0;
+        const interestRate = parseFloat(form.find('#interest-rate').val()) || 0;
+
+        const financedAmount = productPrice - downPayment;
+        const interestAmount = financedAmount * (interestRate / 100);
+        const totalAmount = financedAmount + interestAmount;
+        const monthlyPayment = installmentMonths > 0 ? totalAmount / installmentMonths : 0;
+
+        $('#summary-price').text(`฿${productPrice.toFixed(2)}`);
+        $('#summary-down-payment').text(`฿${downPayment.toFixed(2)}`);
+        $('#summary-financed').text(`฿${financedAmount.toFixed(2)}`);
+        $('#summary-interest-rate').text(`${interestRate.toFixed(1)}%`);
+        $('#summary-interest-amount').text(`฿${interestAmount.toFixed(2)}`);
+        $('#summary-total').text(`฿${totalAmount.toFixed(2)}`);
+        $('#summary-monthly').text(`฿${monthlyPayment.toFixed(2)}`);
+        $('#summary-payments').text(installmentMonths);
+
+        $('#calculation-summary').show();
     }
 
     validateStep(stepNumber) {
@@ -386,6 +415,13 @@ class PageDashboard {
                 if (!paymentDueDate) {
                     currentStepElement.find('#payment-due-date').addClass('form_input-error');
                     isValid = false;
+                } else {
+                    const day = parseInt(paymentDueDate, 10);
+                    if (isNaN(day) || day < 1 || day > 31) {
+                        currentStepElement.find('#payment-due-date').addClass('form_input-error');
+                        showNotification('Please enter a valid day of the month (1-31).', 'error');
+                        isValid = false;
+                    }
                 }
                 if (!isValid) showNotification('Please fill in all required installment terms.', 'error');
                 break;
@@ -402,8 +438,6 @@ class PageDashboard {
                 cardSelectionContainer.removeClass('card-selection-error');
                 cardSelectionContainer.find('.error-message').remove();
 
-                console.log("selected >> ", this.selectedCreditCardId);
-
                 if (!this.selectedCreditCardId) {
                     console.log(">> Show Error <<");
 
@@ -414,6 +448,25 @@ class PageDashboard {
                 break;
         }
         return isValid;
+    }
+
+    updateReviewStep() {
+        const form = $('#installment-plan-form');
+        const productName = form.find('#product-name').val();
+        const productPrice = form.find('#product-price').val();
+        const installmentMonths = form.find('#installment-months').val();
+        const interestRate = form.find('#interest-rate').val();
+        const paymentDueDate = form.find('#payment-due-date').val();
+        const customerName = $('#add-new-plan-modal .customer-option-selected .customer-option_name').text();
+        const customerPhone = $('#add-new-plan-modal .customer-option-selected .customer-option_details').text().split('•')[0].trim();
+        const cardName = $('#add-new-plan-modal .card-option-selected .card-option_name').text();
+
+        const monthlyPayment = ((parseFloat(productPrice) * (1 + parseFloat(interestRate) / 100)) / parseInt(installmentMonths, 10)).toFixed(2);
+
+        $('#review-customer').text(`${customerName} - ${customerPhone}`);
+        $('#review-product').text(`${productName} - ฿${productPrice}`);
+        $('#review-payment-method').text(`Credit Card - ${cardName}`);
+        $('#review-terms').text(`${installmentMonths} months - ฿${monthlyPayment}/month`);
     }
 
     prevStep() {
