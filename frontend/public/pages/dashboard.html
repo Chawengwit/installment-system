@@ -157,11 +157,20 @@
                     <div class="progress-indicator_line"></div>
 
                     <div class="progress-indicator_step" data-step="5">
-                        <div class="progress-indicator_circle">
-                            <i class="fas fa-check"></i>
+                            <div class="progress-indicator_circle">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span class="progress-indicator_label">Review</span>
                         </div>
-                        <span class="progress-indicator_label">Review</span>
-                    </div>
+
+                        <div class="progress-indicator_line"></div>
+
+                        <div class="progress-indicator_step" data-step="6">
+                            <div class="progress-indicator_circle">
+                                <i class="fas fa-flag-checkered"></i>
+                            </div>
+                            <span class="progress-indicator_label">Complete</span>
+                        </div>
 
                 </div>
             </section>
@@ -497,6 +506,26 @@
                                 <button type="submit" class="btn btn-success" id="step-5-submit">
                                     <i class="fas fa-check"></i> Create Installment Plan
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 6: Completion -->
+                        <div class="form-step" id="step-6">
+                            <div class="form-step_header">
+                                <h3 class="form-step_title">
+                                    <span class="form-step_number">6</span>
+                                    Plan Created Successfully
+                                </h3>
+                                <p class="form-step_description">The installment plan is now active.</p>
+                            </div>
+                            
+                            <div class="completion-summary">
+                                <p class="complated-desc">The installment plan has been successfully created and is now active. You can view the details of the plan in the main dashboard.</p>
+                                <div class="completion-actions">
+                                    <button type="button" class="btn btn-primary" id="export-contract-btn">
+                                        <i class="fas fa-file-pdf"></i> Export Contract (PDF)
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </form>
