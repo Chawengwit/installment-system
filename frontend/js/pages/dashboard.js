@@ -324,19 +324,21 @@ class PageDashboard {
         formData.append('customerId', this.selectedCustomerId);
         formData.append('creditCardId', this.selectedCreditCardId);
 
+        console.log("Form data", FormData);
+
         try {
-            // const response = await fetch('/api/installments', {
-            //     method: 'POST',
-            //     body: formData
-            // });
+            const response = await fetch('/api/installments', {
+                method: 'POST',
+                body: formData
+            });
 
-            // if (!response.ok) {
-            //     const errorData = await response.json();
-            //     throw new Error(errorData.error || 'Failed to create installment plan');
-            // }
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to create installment plan');
+            }
 
-            // const result = await response.json();
-            // this.newInstallmentId = result.installmentId;
+            const result = await response.json();
+            this.newInstallmentId = result.installmentId;
 
             showNotification('Installment plan created successfully!', 'success');
             this.showStep(6);
