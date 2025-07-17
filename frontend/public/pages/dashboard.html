@@ -194,12 +194,12 @@
                                 
                                 <div class="form_row">
                                     <div class="form_group">
-                                        <label class="form_label">Product Price ($) *</label>
-                                        <input type="number" class="form_input" id="product-price" placeholder="0.00" step="0.01" min="0" required>
+                                        <label class="form_label">Product Price (฿) *</label>
+                                        <input type="number" class="form_input" id="product-price" placeholder="0.00" min="0" required>
                                     </div>
                                     <div class="form_group">
-                                        <label class="form_label">Down Payment ($)</label>
-                                        <input type="number" class="form_input" id="down-payment" placeholder="0.00" step="0.01" min="0">
+                                        <label class="form_label">Down Payment (฿)</label>
+                                        <input type="number" class="form_input" id="down-payment" placeholder="0.00" min="0">
                                     </div>
                                 </div>
 
@@ -258,7 +258,7 @@
                                         <label class="form_label">Interest Rate (%)</label>
                                         <div class="input-with-icon">
                                             <i class="fas fa-percentage input-with-icon_icon"></i>
-                                            <input type="number" class="form_input" id="interest-rate" placeholder="15.0" step="0.1" min="0" max="100">
+                                            <input type="number" class="form_input" id="interest-rate" placeholder="15.0" min="0" max="100">
                                         </div>
                                     </div>
                                 </div>
@@ -273,10 +273,10 @@
                                         </select>
                                     </div>
                                     <div class="form_group">
-                                        <label class="form_label">Late Fee ($)</label>
+                                        <label class="form_label">Late Fee (฿)</label>
                                         <div class="input-with-icon">
                                             <i class="fas fa-dollar-sign input-with-icon_icon"></i>
-                                            <input type="number" class="form_input" id="late-fee" placeholder="25.00" step="0.01" min="0">
+                                            <input type="number" class="form_input" id="late-fee" placeholder="25.00" min="0">
                                         </div>
                                     </div>
                                 </div>
@@ -290,15 +290,15 @@
                                     <div class="calculation-summary_grid">
                                         <div class="calculation-summary_item">
                                             <span class="calculation-summary_label">Product Price:</span>
-                                            <span class="calculation-summary_value" id="summary-price">$0.00</span>
+                                            <span class="calculation-summary_value" id="summary-price">฿0.00</span>
                                         </div>
                                         <div class="calculation-summary_item">
                                             <span class="calculation-summary_label">Down Payment:</span>
-                                            <span class="calculation-summary_value" id="summary-down-payment">$0.00</span>
+                                            <span class="calculation-summary_value" id="summary-down-payment">฿0.00</span>
                                         </div>
                                         <div class="calculation-summary_item">
                                             <span class="calculation-summary_label">Financed Amount:</span>
-                                            <span class="calculation-summary_value" id="summary-financed">$0.00</span>
+                                            <span class="calculation-summary_value" id="summary-financed">฿0.00</span>
                                         </div>
                                         <div class="calculation-summary_item">
                                             <span class="calculation-summary_label">Interest Rate:</span>
@@ -306,15 +306,15 @@
                                         </div>
                                         <div class="calculation-summary_item">
                                             <span class="calculation-summary_label">Interest Amount:</span>
-                                            <span class="calculation-summary_value" id="summary-interest-amount">$0.00</span>
+                                            <span class="calculation-summary_value" id="summary-interest-amount">฿0.00</span>
                                         </div>
                                         <div class="calculation-summary_item calculation-summary_item-total">
                                             <span class="calculation-summary_label">Total Amount:</span>
-                                            <span class="calculation-summary_value" id="summary-total">$0.00</span>
+                                            <span class="calculation-summary_value" id="summary-total">฿0.00</span>
                                         </div>
                                         <div class="calculation-summary_item calculation-summary_item-monthly">
                                             <span class="calculation-summary_label">Monthly Payment:</span>
-                                            <span class="calculation-summary_value" id="summary-monthly">$0.00</span>
+                                            <span class="calculation-summary_value" id="summary-monthly">฿0.00</span>
                                         </div>
                                         <div class="calculation-summary_item">
                                             <span class="calculation-summary_label">Number of Payments:</span>
@@ -400,7 +400,7 @@
                                             <span class="card-option_number">**** **** **** 1234</span>
                                         </div>
                                         <div class="card-option_limit">
-                                            <span class="card-option_available">$15,000 available</span>
+                                            <span class="card-option_available">฿15,000 available</span>
                                         </div>
                                     </div>
 
@@ -413,7 +413,7 @@
                                             <span class="card-option_number">**** **** **** 5678</span>
                                         </div>
                                         <div class="card-option_limit">
-                                            <span class="card-option_available">$8,500 available</span>
+                                            <span class="card-option_available">฿8,500 available</span>
                                         </div>
                                     </div>
                                 </div>
@@ -457,7 +457,7 @@
                                             Product Details
                                         </h4>
                                         <div class="review-section_content">
-                                            <p id="review-product">iPhone 14 Pro - $1,200.00</p>
+                                            <p id="review-product">iPhone 14 Pro - ฿1,200.00</p>
                                         </div>
                                     </div>
                                     
@@ -477,7 +477,7 @@
                                             Installment Terms
                                         </h4>
                                         <div class="review-section_content">
-                                            <p id="review-terms">12 months - $110.00/month</p>
+                                            <p id="review-terms">12 months - ฿110.00/month</p>
                                         </div>
                                     </div>
                                 </div>
@@ -579,8 +579,8 @@
                 <input type="text" class="form_input" name="cardNumber" placeholder="**** **** **** 1234" maxlength="19" required>
             </div>
             <div class="form_group">
-                <label class="form_label">Credit Limit ($) *</label>
-                <input type="number" class="form_input" name="creditLimit" placeholder="25000.00" step="0.01" min="0" required>
+                <label class="form_label">Credit Limit (฿) *</label>
+                <input type="number" class="form_input" name="creditLimit" placeholder="25000.00" min="0" required>
             </div>
             <div class="form_actions">
                 <button type="button" class="btn btn-secondary" id="cancel-add-card">Cancel</button>
