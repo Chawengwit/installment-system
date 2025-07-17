@@ -218,6 +218,7 @@ class PageDashboard {
 
         // Calculation summary
         this.$mainContent.on('input', '#product-price, #down-payment, #installment-months, #interest-rate', this.updateCalculationSummary.bind(this));
+        this.$mainContent.on("click", "#copy-summary-btn", this.copySummaryToClipboard.bind(this));
 
         // Clear errors on input for multi-step form
         this.$mainContent.on('input change', '#add-new-plan-modal .form_input, #add-new-plan-modal .form_select', function() {
