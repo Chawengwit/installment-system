@@ -94,3 +94,25 @@ When creating new pages or refactoring existing ones, strictly adapt the followi
 *   **Loading Indicators:** Incorporate `loading-overlay` for sections with asynchronous operations and `infinite-scroll-loading` for paginated content.
 *   **Utility Imports:** Import common utility functions from `frontend/js/utils/AppUtils.js` as needed.
 *   **SCSS Styling:** Create a dedicated SCSS partial (e.g., `_pagename.scss`) and import it into `main.scss`. Define styles for unique page components, adhering to the established naming conventions and variable usage.
+
+## Backend Route Patterns
+
+The backend routes, primarily located in `backend/src/routes/`, follow a consistent and modular pattern:
+
+*   **Modular Routing:** Each major resource (e.g., `customers`, `products`, `credit-cards`, `installments`) has its own dedicated route file (e.g., `customers.js`, `products.js`). These individual routers are then imported and mounted in `backend/src/routes/api.js`.
+*   **Express Router:** All route files utilize `express.Router()` to define their routes, promoting modularity and separation of concerns.
+*   **Database Interaction:**
+    *   Direct database queries are handled using `query` (or `pool.query` for transactions) from `../db/index.js`.
+    *   Error handling for database operations includes `try...catch` blocks to return appropriate HTTP status codes and informative error messages.
+    *   Transactions are employed for multi-step operations (e.g., creating an installment plan involves creating a product, an installment record, and multiple payment records) to ensure data consistency.
+*   **RESTful API Design:**
+    *   Routes generally adhere to RESTful conventions (e.g., `GET /resource`, `GET /resource/:id`, `POST /resource`, `PUT /resource/:id`, `DELETE /resource/:id`).
+    *   Appropriate HTTP status codes are returned for success (200 OK, 201 Created, 204 No Content) and errors (400 Bad Request, 404 Not Found, 409 Conflict, 500 Internal Server Error).
+*   **Input Validation:** Basic input validation is performed on incoming request bodies (e.g., checking for required fields) to ensure data integrity.
+*   **File Uploads (Multer):**
+    *   `multer` is integrated for handling `multipart/form-data` (file uploads).
+    *   `multer.diskStorage` is configured to save uploaded files to `public/uploads/` for persistent storage.
+    *   Helper functions are used for file-related operations (e.g., checking if a file exists).
+*   **Query Parameters for Filtering/Pagination/Sorting:** `GET` endpoints often accept query parameters for searching, sorting, limiting, and offsetting results, enabling flexible data retrieval.
+*   **Centralized API Entry Point (`api.js`):** The `backend/src/routes/api.js` file acts as the main entry point for all API routes, consolidating them under the `/api` prefix.
+*   **Frontend Route Handling (`frontend.js`):** A dedicated `backend/src/routes/frontend.js` file handles serving the main `index.html` for various frontend routes, enabling a Single-Page Application (SPA) architecture.
