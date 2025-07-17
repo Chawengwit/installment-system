@@ -52,7 +52,7 @@ const createTables = async () => {
             DO \$\$
             BEGIN
                 IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'installment_status_enum') THEN
-                    CREATE TYPE installment_status_enum AS ENUM ('active', 'paid', 'overdue', 'cancelled');
+                    CREATE TYPE installment_status_enum AS ENUM ('active', 'non-active', 'completed', 'deleted', 'paid', 'overdue', 'cancelled');
                 END IF;
             END\$\$;
 
