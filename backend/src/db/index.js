@@ -37,6 +37,17 @@ const createTables = async () => {
 
             CREATE INDEX IF NOT EXISTS idx_credit_card_name ON credit_cards(card_name);
             CREATE INDEX IF NOT EXISTS idx_credit_card_number ON credit_cards(card_number);
+
+            CREATE TABLE IF NOT EXISTS products (
+              id SERIAL PRIMARY KEY,
+              name VARCHAR(100) NOT NULL,
+              price NUMERIC(12, 2) NOT NULL,
+              serial_number VARCHAR(100) NOT NULL,
+              images JSONB,
+              description TEXT,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+              updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
         `);
 
     } finally {
