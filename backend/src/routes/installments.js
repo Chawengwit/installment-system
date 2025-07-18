@@ -30,8 +30,11 @@ router.get('/', async (req, res) => {
         }
 
         if (status !== 'all') {
-            whereClause += ` AND i.status = $${params.length + 1}`;
-            params.push(status);
+            if (status === 'today_duedate') {
+                whereClause += ` AND (SELECT ip.due_date FROM installment_payments ip WHERE ip.installment_id = i.id AND ip.is_paid = false ORDER BY ip.due_date ASC LIMIT 1) = CURRENT_DATE`;
+            } else if (status === 'over_due') {
+                whereClause += ` AND (SELECT ip.due_date FROM installment_payments ip WHERE ip.installment_id = i.id AND ip.is_paid = false ORDER BY ip.due_date ASC LIMIT 1) < CURRENT_DATE AND i.status = 'active'`;
+            } 
         }
 
         const countResult = await pool.query(`
