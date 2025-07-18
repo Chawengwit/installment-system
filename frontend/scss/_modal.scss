@@ -38,7 +38,7 @@
         display: flex; /* Added */
         flex-direction: column; /* Added */
         max-height: 90vh; /* Keep this */
-        overflow-y: hidden; /* Changed from auto to hidden */
+        overflow-y: auto; /* Changed from hidden to auto */
     }
 
     &_header {
