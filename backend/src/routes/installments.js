@@ -81,6 +81,63 @@ router.get('/', async (req, res) => {
     }
 });
 
+// GET /api/installments/:id
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const installmentQuery = `
+            SELECT
+                i.id,
+                i.total_amount,
+                i.monthly_payment,
+                i.interest_rate,
+                i.term_months,
+                i.status,
+                i.start_date,
+                i.due_date as payment_due_day,
+                i.late_fee,
+                c.name as customer_name,
+                c.phone as customer_phone,
+                c.id_card_number as customer_id_card_number,
+                p.name as product_name,
+                p.serial_number,
+                p.price as product_price,
+                p.description as product_description,
+                p.images as product_images,
+                cc.card_name,
+                cc.card_number,
+                cc.credit_limit
+            FROM installments i
+            JOIN customers c ON i.customer_id = c.id
+            JOIN products p ON i.product_id = p.id
+            JOIN credit_cards cc ON i.credit_card_id = cc.id
+            WHERE i.id = $1
+        `;
+        const installmentResult = await pool.query(installmentQuery, [id]);
+
+        if (installmentResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Installment plan not found' });
+        }
+
+        const installment = installmentResult.rows[0];
+
+        const paymentsQuery = `
+            SELECT term_number, due_date, amount, paid_amount, is_paid
+            FROM installment_payments
+            WHERE installment_id = $1
+            ORDER BY term_number ASC
+        `;
+        const paymentsResult = await pool.query(paymentsQuery, [id]);
+        installment.payment_schedule = paymentsResult.rows;
+
+        res.json({ installment });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch installment details' });
+    }
+});
+
 
 // POST /api/installments
 router.post('/', upload.array('productImages'), async (req, res) => {

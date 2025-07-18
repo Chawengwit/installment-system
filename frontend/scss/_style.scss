@@ -608,6 +608,16 @@ a{
         padding: var(--spacing-md);
         text-align: left;
         border-bottom: 1px solid var(--color-gray-200);
+
+        &:nth-child(4), // Period column
+        &:nth-child(5), // Due Date column
+        &:nth-child(6) { // Status column
+            text-align: center;
+        }
+
+        &:nth-child(3) { // Amount column
+            text-align: right;
+        }
     }
 
     th {
@@ -994,8 +1004,57 @@ a{
     font-weight: 600;
 }
 
-.amount-info {
-    font-weight: 600;
+.modal_body {
+    padding: var(--spacing-lg);
+}
+
+.installment-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+
+    .detail-section {
+        background-color: var(--color-gray-50);
+        border-radius: var(--border-radius-md);
+        padding: var(--spacing-md);
+
+        h4 {
+            font-size: var(--font-size-lg);
+            color: var(--color-gray-800);
+            margin-bottom: var(--spacing-md);
+
+            i {
+                margin-right: var(--spacing-sm);
+                color: var(--color-primary);
+            }
+        }
+
+        p {
+            margin-bottom: var(--spacing-sm);
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-700);
+
+            strong {
+                color: var(--color-gray-900);
+            }
+        }
+
+        .product-images-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+
+            img {
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: var(--border-radius-sm);
+                border: 1px solid var(--color-gray-200);
+            }
+        }
+    }
 }
 
 

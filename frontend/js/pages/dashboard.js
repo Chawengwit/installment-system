@@ -262,6 +262,7 @@ class PageDashboard {
         });
 
         this.$mainContent.on("click", "#customize-term-btn", () => this.showStep(2));
+        this.$mainContent.on("click", ".view-installment-btn", this.handleViewInstallment.bind(this));
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
     }
@@ -822,6 +823,85 @@ class PageDashboard {
             installmentGrid.hide();
             installmentTableView.show();
             toggleViewBtn.html('<i class="fas fa-th-large"></i> Card View');
+        }
+    }
+
+    async handleViewInstallment(event) {
+        const installmentId = $(event.currentTarget).data('id');
+        if (!installmentId) {
+            showNotification('Installment ID not found.', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/installments/${installmentId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch installment details.');
+            }
+            const data = await response.json();
+            const installment = data.installment;
+
+            // Populate Customer Information
+            $('#view-customer-name').text(installment.customer_name);
+            $('#view-customer-phone').text(installment.customer_phone);
+            $('#view-customer-id-card').text(installment.customer_id_card_number || 'N/A');
+
+            // Populate Product Details
+            $('#view-product-name').text(installment.product_name);
+            $('#view-product-serial').text(installment.product_serial_number);
+            $('#view-product-price').text(`฿${parseFloat(installment.product_price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+            $('#view-product-description').text(installment.product_description || 'N/A');
+            
+            const productImagesContainer = $('#view-product-images');
+            productImagesContainer.empty();
+            if (installment.product_images && installment.product_images.length > 0) {
+                installment.product_images.forEach(image => {
+                    productImagesContainer.append(`<img src="/uploads/${image}" alt="Product Image" class="img-thumbnail">`);
+                });
+            } else {
+                productImagesContainer.append('<p>No images available.</p>');
+            }
+
+            // Populate Plan Overview
+            $('#view-total-amount').text(`฿${parseFloat(installment.total_amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+            $('#view-monthly-payment').text(`฿${parseFloat(installment.monthly_payment).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+            $('#view-interest-rate').text(`${parseFloat(installment.interest_rate).toFixed(1)}%`);
+            $('#view-term-months').text(installment.term_months);
+            $('#view-status').text(installment.status);
+            $('#view-start-date').text(new Date(installment.start_date).toLocaleDateString());
+            $('#view-payment-due-day').text(installment.due_date); // This is the day of the month
+            $('#view-late-fee').text(`฿${parseFloat(installment.late_fee || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+
+            // Populate Payment Method
+            $('#view-card-name').text(installment.card_name);
+            $('#view-card-number').text(`**** **** **** ${String(installment.card_number).slice(-4)}`);
+            $('#view-credit-limit').text(`฿${parseFloat(installment.credit_limit).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+
+            // Populate Payment Schedule
+            const paymentScheduleBody = $('#view-payment-schedule-body');
+            paymentScheduleBody.empty();
+            if (installment.payment_schedule && installment.payment_schedule.length > 0) {
+                installment.payment_schedule.forEach(payment => {
+                    const paymentStatusClass = payment.is_paid ? 'status-completed' : (new Date(payment.due_date) < new Date() ? 'status-overdue' : 'status-pending');
+                    paymentScheduleBody.append(`
+                        <tr>
+                            <td>${payment.term_number}</td>
+                            <td>${new Date(payment.due_date).toLocaleDateString()}</td>
+                            <td>฿${parseFloat(payment.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td>฿${parseFloat(payment.paid_amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td><span class="status-badge ${paymentStatusClass}">${payment.is_paid ? 'Paid' : 'Pending'}</span></td>
+                        </tr>
+                    `);
+                });
+            } else {
+                paymentScheduleBody.append('<tr><td colspan="5">No payment schedule available.</td></tr>');
+            }
+
+            openModal('view-installment-modal');
+
+        } catch (error) {
+            console.error('Error viewing installment:', error);
+            showNotification(error.message, 'error');
         }
     }
 
