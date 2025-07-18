@@ -320,11 +320,28 @@ class PageDashboard {
 
     async handleFormSubmission(event) {
         event.preventDefault();
-        const formData = new FormData($('#installment-plan-form')[0]);
+        const form = $('#installment-plan-form');
+        const formData = new FormData();
+
+        formData.append('productName', form.find('#product-name').val());
+        formData.append('productSerialNumber', form.find('#product-serial-number').val());
+        formData.append('productPrice', form.find('#product-price').val());
+        formData.append('downPayment', form.find('#down-payment').val());
+        formData.append('productDescription', form.find('#product-description').val());
+        formData.append('installmentMonths', form.find('#installment-months').val());
+        formData.append('interestRate', form.find('#interest-rate').val());
+        formData.append('paymentDueDate', form.find('#payment-due-date').val());
+        formData.append('lateFee', form.find('#late-fee').val());
         formData.append('customerId', this.selectedCustomerId);
         formData.append('creditCardId', this.selectedCreditCardId);
 
-        console.log("Form data", FormData);
+        const imageInput = form.find('#product-images')[0];
+        const imageFiles = imageInput.files;
+        if (imageFiles) {
+            for (let i = 0; i < imageFiles.length; i++) {
+                formData.append('productImages', imageFiles[i]);
+            }
+        }
 
         try {
             const response = await fetch('/api/installments', {

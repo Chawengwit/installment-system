@@ -5,56 +5,70 @@ import { extname } from 'path';
 
 const router = Router();
 
-const upload = multer(); // Using memory storage for simplicity, as we are not saving the files in this route
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads/')
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + extname(file.originalname)) //Appending extension
+    }
+});
+
+const upload = multer({ storage: storage });
 
 // POST /api/installments
 router.post('/', upload.array('productImages'), async (req, res) => {
+    const {
+        productName,
+        productSerialNumber,
+        productPrice,
+        productDescription,
+        installmentMonths,
+        paymentDueDate,
+        customerId,
+        creditCardId
+    } = req.body;
+
+    // Sanitize optional numeric inputs
+    const downPayment = parseFloat(req.body.downPayment) || 0;
+    const interestRate = parseFloat(req.body.interestRate) || 0;
+    const lateFee = req.body.lateFee ? parseFloat(req.body.lateFee) : null; // Use null for empty string to allow DB default
+
+    const productImages = req.files ? req.files.map(file => file.filename) : [];
+
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
 
-        const {
-            productName,
-            productSerialNumber,
-            productPrice,
-            productDescription,
-            downPayment,
-            installmentMonths,
-            interestRate,
-            paymentDueDate,
-            lateFee,
-            customerId,
-            creditCardId
-        } = req.body;
-
-        const productImages = req.files ? req.files.map(file => '/uploads/' + file.filename) : [];
-
-        // 1. Create Product
+        // 1. Create new Product
         const productResult = await client.query(
             'INSERT INTO products (name, serial_number, price, description, images) VALUES ($1, $2, $3, $4, $5) RETURNING id',
             [productName, productSerialNumber, productPrice, productDescription, JSON.stringify(productImages)]
         );
         const productId = productResult.rows[0].id;
 
-        // 2. Create Installment Plan
-        const totalAmount = parseFloat(productPrice) - parseFloat(downPayment);
+        // 2. Create new Installment plan
+        const totalAmount = parseFloat(productPrice) - downPayment;
+        const monthlyPayment = (totalAmount * (1 + interestRate / 100)) / installmentMonths;
+
         const installmentResult = await client.query(
-            'INSERT INTO installments (customer_id, product_id, credit_card_id, start_date, total_amount, interest_rate, term_months, late_fee) VALUES ($1, $2, $3, NOW(), $4, $5, $6, $7) RETURNING id, start_date',
-            [customerId, productId, creditCardId, totalAmount, interestRate, installmentMonths, lateFee]
+            'INSERT INTO installments (customer_id, product_id, credit_card_id, due_date, monthly_payment, total_amount, interest_rate, term_months, status, late_fee, start_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW()) RETURNING id, start_date',
+            [customerId, productId, creditCardId, paymentDueDate, monthlyPayment, totalAmount, interestRate, installmentMonths, 'active', lateFee]
         );
         const installmentId = installmentResult.rows[0].id;
         const startDate = new Date(installmentResult.rows[0].start_date);
 
-        // 3. Create Installment Payments
-        const monthlyPayment = (totalAmount * (1 + interestRate / 100)) / installmentMonths;
+        // 3. Create installment payments
+        const paymentDay = parseInt(paymentDueDate, 10);
+
         for (let i = 1; i <= installmentMonths; i++) {
-            const dueDate = new Date(startDate);
-            dueDate.setMonth(dueDate.getMonth() + i);
-            dueDate.setDate(paymentDueDate);
+            const actualDueDate = new Date(startDate);
+            actualDueDate.setMonth(actualDueDate.getMonth() + i);
+            actualDueDate.setDate(paymentDay);
 
             await client.query(
-                'INSERT INTO installment_payments (installment_id, term_number, due_date, amount) VALUES ($1, $2, $3, $4)',
-                [installmentId, i, dueDate, monthlyPayment]
+                'INSERT INTO installment_payments (installment_id, term_number, due_date, amount, is_paid, notification_sent) VALUES ($1, $2, $3, $4, $5, $6)',
+                [installmentId, i, actualDueDate, monthlyPayment, false, false]
             );
         }
 

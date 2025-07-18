@@ -68,6 +68,7 @@ const createTables = async () => {
                 term_months INTEGER NOT NULL,
                 status installment_status_enum DEFAULT 'active',
                 late_fee NUMERIC(12, 2) DEFAULT 0,
+                start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
@@ -82,7 +83,8 @@ const createTables = async () => {
                 term_number INTEGER NOT NULL,
                 due_date DATE NOT NULL,
                 paid_date DATE,
-                paid_amount NUMERIC(12, 2) NOT NULL,
+                amount NUMERIC(12, 2) NOT NULL,
+                paid_amount NUMERIC(12, 2),
                 is_paid BOOLEAN DEFAULT FALSE,
                 slip_image TEXT,
                 notification_sent BOOLEAN DEFAULT FALSE,
