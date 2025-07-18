@@ -785,11 +785,16 @@ class PageDashboard {
             <tr data-installment-id="${installment.id}">
                 <td>
                     <div class="product-info">
-                        <span class="product-name">${installment.product_name}</span>
+                        <span class="product-name">${installment.product_name}</span><br>
                         <span class="product-serial">${installment.serial_number}</span>
                     </div>
                 </td>
-                <td>${installment.customer_name}</td>
+                <td>
+                    <div class="customer-info">
+                        <span class="customer-name">${installment.customer_name}</span><br>
+                        <a href="tel:${installment.customer_phone}" class="customer-phone">${installment.customer_phone}</a>
+                    </div>
+                </td>
                 <td>฿${parseFloat(installment.total_amount).toLocaleString()}</td>
                 <td>${nextDueDate}</td>
                 <td><span class="status-badge status-${statusClass}">${installment.status}</span></td>

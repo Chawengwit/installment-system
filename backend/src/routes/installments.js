@@ -53,6 +53,7 @@ router.get('/', async (req, res) => {
                 p.name as product_name,
                 p.serial_number,
                 c.name as customer_name,
+                c.phone as customer_phone,
                 i.total_amount,
                 i.status,
                 i.created_at,

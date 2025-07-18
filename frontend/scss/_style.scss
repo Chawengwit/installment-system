@@ -969,6 +969,27 @@ a{
     }
 }
 
+.product-info {
+    .product-name {
+        font-weight: 600;
+    }
+}
+
+.customer-info {
+    .customer-name {
+        font-weight: 600;
+    }
+
+    .customer-phone {
+        color: var(--color-primary);
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
 
 // Responsive utilities
 @media (max-width: 768px) {
