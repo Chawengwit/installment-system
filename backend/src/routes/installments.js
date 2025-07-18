@@ -16,6 +16,65 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// GET /api/installments
+router.get('/', async (req, res) => {
+    const { search = '', status = 'all', limit = 10, offset = 0, sortBy = 'created_at', sortOrder = 'DESC' } = req.query;
+
+    try {
+        let whereClause = 'WHERE 1 = 1';
+        const params = [];
+
+        if (search) {
+            whereClause += ` AND (c.name ILIKE $${params.length + 1} OR p.name ILIKE $${params.length + 1} OR p.serial_number ILIKE $${params.length + 1})`;
+            params.push(`%${search}%`);
+        }
+
+        if (status !== 'all') {
+            whereClause += ` AND i.status = $${params.length + 1}`;
+            params.push(status);
+        }
+
+        const countResult = await pool.query(`
+            SELECT COUNT(i.id) 
+            FROM installments i
+            JOIN customers c ON i.customer_id = c.id
+            JOIN products p ON i.product_id = p.id
+            ${whereClause}
+        `, params);
+
+        const totalInstallments = parseInt(countResult.rows[0].count, 10);
+
+        const query = `
+            SELECT 
+                i.id,
+                p.name as product_name,
+                p.serial_number,
+                c.name as customer_name,
+                i.total_amount,
+                i.status,
+                i.created_at,
+                (SELECT ip.due_date FROM installment_payments ip WHERE ip.installment_id = i.id AND ip.is_paid = false ORDER BY ip.due_date ASC LIMIT 1) as next_due_date
+            FROM installments i
+            JOIN customers c ON i.customer_id = c.id
+            JOIN products p ON i.product_id = p.id
+            ${whereClause}
+            ORDER BY i.created_at ${sortOrder}
+            LIMIT $${params.length + 1} OFFSET $${params.length + 2}
+        `;
+
+        params.push(limit, offset);
+
+        const result = await pool.query(query, params);
+
+        res.json({ installments: result.rows, totalInstallments });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch installment plans' });
+    }
+});
+
+
 // POST /api/installments
 router.post('/', upload.array('productImages'), async (req, res) => {
     const {

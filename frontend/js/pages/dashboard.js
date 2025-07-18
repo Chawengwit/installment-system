@@ -16,9 +16,10 @@ class PageDashboard {
 
     init() {
         this.bindEvents();
-        // this.fetchInstallments(true);
+        this.fetchInstallments(true);
         this.setupCustomerModals();
         this.setupCreditCardModals();
+        this.toggleView(false); // Show table view by default
     }
 
     setupCreditCardModals() {
@@ -712,37 +713,36 @@ class PageDashboard {
         this.hasMore = true;
         const searchTerm = $('#dashboard-search').val().toLowerCase();
         const status = $('#dashboard-status-filter').val();
-        // this.fetchInstallments(true, searchTerm, status);
+        this.fetchInstallments(true, searchTerm, status);
     }
 
-    // async fetchInstallments(clearExisting = false, search = '', status = 'all') {
-    //     if (this.isLoading || !this.hasMore) {
-    //         return;
-    //     }
+    async fetchInstallments(clearExisting = false, search = '', status = 'all') {
+        if (this.isLoading || !this.hasMore) {
+            return;
+        }
 
-    //     this.isLoading = true;
-    //     $('#infinite-scroll-loading').show();
+        this.isLoading = true;
+        $('#infinite-scroll-loading').show();
 
-    //     const offset = (this.currentPage - 1) * this.installmentsPerPage;
-    //     try {
-    //         // This will need to be implemented in the backend
-    //         const response = await fetch(`/api/installments?search=${search}&status=${status}&limit=${this.installmentsPerPage}&offset=${offset}`);
-    //         if (!response.ok) throw new Error('Failed to fetch installment plans');
-    //         const data = await response.json();
+        const offset = (this.currentPage - 1) * this.installmentsPerPage;
+        try {
+            const response = await fetch(`/api/installments?search=${search}&status=${status}&limit=${this.installmentsPerPage}&offset=${offset}`);
+            if (!response.ok) throw new Error('Failed to fetch installment plans');
+            const data = await response.json();
 
-    //         this.totalInstallments = data.totalInstallments;
-    //         this.hasMore = (this.currentPage * this.installmentsPerPage) < this.totalInstallments;
+            this.totalInstallments = data.totalInstallments;
+            this.hasMore = (this.currentPage * this.installmentsPerPage) < this.totalInstallments;
 
-    //         this.renderInstallments(data.installments, clearExisting);
-    //         this.currentPage++;
-    //     } catch (error) {
-    //         console.error('Error fetching installment plans:', error);
-    //         showNotification(error.message, 'error');
-    //     } finally {
-    //         this.isLoading = false;
-    //         $('#infinite-scroll-loading').hide();
-    //     }
-    // }
+            this.renderInstallments(data.installments, clearExisting);
+            this.currentPage++;
+        } catch (error) {
+            console.error('Error fetching installment plans:', error);
+            showNotification(error.message, 'error');
+        } finally {
+            this.isLoading = false;
+            $('#infinite-scroll-loading').hide();
+        }
+    }
 
     renderInstallments(installments, clearExisting) {
         const installmentGrid = $('#installments-grid');
@@ -779,16 +779,30 @@ class PageDashboard {
     }
 
     createInstallmentTableRow(installment) {
-        // Table row template to be filled
+        const statusClass = installment.status.replace(' ', '-').toLowerCase();
+        const nextDueDate = installment.next_due_date ? new Date(installment.next_due_date).toLocaleDateString() : 'N/A';
         return `
             <tr data-installment-id="${installment.id}">
-                
+                <td>
+                    <div class="product-info">
+                        <span class="product-name">${installment.product_name}</span>
+                        <span class="product-serial">${installment.serial_number}</span>
+                    </div>
+                </td>
+                <td>${installment.customer_name}</td>
+                <td>฿${parseFloat(installment.total_amount).toLocaleString()}</td>
+                <td>${nextDueDate}</td>
+                <td><span class="status-badge status-${statusClass}">${installment.status}</span></td>
+                <td class="text-right">
+                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                </td>
             </tr>
         `;
     }
 
-    toggleView() {
-        this.isCardView = !this.isCardView;
+    toggleView(isCard = this.isCardView) {
+        this.isCardView = isCard;
         const installmentGrid = $('#installments-grid');
         const installmentTableView = $('#installment-table-view');
         const toggleViewBtn = $('#toggle-view-btn');
@@ -808,7 +822,7 @@ class PageDashboard {
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollHeight - scrollPos < 200 && !this.isLoading && this.hasMore) {
-            // this.fetchInstallments(false, $('#dashboard-search').val().toLowerCase(), $('#dashboard-status-filter').val());
+            this.fetchInstallments(false, $('#dashboard-search').val().toLowerCase(), $('#dashboard-status-filter').val());
         }
     }
 }
