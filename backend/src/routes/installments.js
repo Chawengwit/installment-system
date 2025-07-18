@@ -195,6 +195,18 @@ router.post('/', upload.array('productImages'), async (req, res) => {
             );
         }
 
+        // Update credit card used_amount and installment_status
+        await client.query(
+            'UPDATE credit_cards SET used_amount = used_amount + $1, installment_status = TRUE, updated_at = NOW() WHERE id = $2',
+            [totalAmount, creditCardId]
+        );
+
+        // Update customer installment_status
+        await client.query(
+            'UPDATE customers SET installment_status = TRUE, updated_at = NOW() WHERE id = $1',
+            [customerId]
+        );
+
         await client.query('COMMIT');
         res.status(201).json({ message: 'Installment plan created successfully', installmentId });
 
