@@ -801,6 +801,7 @@ class PageDashboard {
                         <span class="total-amount">/ ฿${parseFloat(installment.total_amount).toLocaleString()}</span>
                     </div>
                 </td>
+                <td>${installment.next_due_date_term_number || 'N/A'} / ${installment.term_months}</td>
                 <td>${nextDueDate}</td>
                 <td><span class="status-badge status-${statusClass}">${installment.status}</span></td>
             </tr>
