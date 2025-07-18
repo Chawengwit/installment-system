@@ -55,6 +55,7 @@ router.get('/', async (req, res) => {
                 c.name as customer_name,
                 c.phone as customer_phone,
                 i.total_amount,
+                i.monthly_payment,
                 (SELECT SUM(ip.paid_amount) FROM installment_payments ip WHERE ip.installment_id = i.id) as total_paid_amount,
                 i.status,
                 i.created_at,
@@ -214,6 +215,46 @@ router.post('/', upload.array('productImages'), async (req, res) => {
         await client.query('ROLLBACK');
         console.error(err);
         res.status(500).json({ error: 'Failed to create installment plan' });
+    } finally {
+        client.release();
+    }
+});
+
+router.put('/installment-payments/:id/mark-paid', async (req, res) => {
+    const { id } = req.params;
+    const { paid_amount, installment_id } = req.body;
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        // 1. Update the specific installment payment
+        const updatePaymentQuery = `
+            UPDATE installment_payments
+            SET is_paid = TRUE, paid_date = NOW(), paid_amount = $1, updated_at = NOW()
+            WHERE id = $2 RETURNING installment_id;
+        `;
+        const updatePaymentResult = await client.query(updatePaymentQuery, [paid_amount, id]);
+
+        if (updatePaymentResult.rows.length === 0) {
+            throw new Error('Installment payment not found.');
+        }
+
+        // 2. Update the used_amount on the associated credit card
+        const updateCreditCardQuery = `
+            UPDATE credit_cards
+            SET used_amount = used_amount + $1, updated_at = NOW()
+            WHERE id = (SELECT credit_card_id FROM installments WHERE id = $2);
+        `;
+        await client.query(updateCreditCardQuery, [paid_amount, installment_id]);
+
+        await client.query('COMMIT');
+        res.status(200).json({ message: 'Payment marked as paid successfully' });
+
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error(err);
+        res.status(500).json({ error: 'Failed to mark payment as paid' });
     } finally {
         client.release();
     }

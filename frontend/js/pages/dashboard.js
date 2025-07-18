@@ -263,6 +263,7 @@ class PageDashboard {
 
         this.$mainContent.on("click", "#customize-term-btn", () => this.showStep(2));
         this.$mainContent.on("click", ".view-installment-btn", this.handleViewInstallment.bind(this));
+        this.$mainContent.on("click", ".mark-paid-btn", this.handleMarkPaymentAsPaid.bind(this));
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
     }
@@ -783,7 +784,7 @@ class PageDashboard {
 
     createInstallmentTableRow(installment) {
         const statusClass = installment.status.replace(' ', '-').toLowerCase();
-        const nextDueDate = installment.next_due_date ? new Date(installment.next_due_date).toLocaleDateString() : 'N/A';
+        const nextDueDate = installment.next_due_date ? new Intl.DateTimeFormat('en-GB').format(new Date(installment.next_due_date)) : 'N/A';
         return `
             <tr data-installment-id="${installment.id}">
                 <td>
@@ -805,7 +806,12 @@ class PageDashboard {
                     </div>
                 </td>
                 <td>${installment.next_due_date_term_number || 'N/A'} / ${installment.term_months}</td>
-                <td>${nextDueDate}</td>
+                <td class="text-center">
+                    <div class="due-date-info">
+                        <span class="monthly-payment">฿${parseFloat(installment.monthly_payment).toLocaleString()}</span><br>
+                        <span class="due-date">${nextDueDate}</span>
+                    </div>
+                </td>
                 <td><span class="status-badge status-${statusClass}">${installment.status}</span></td>
             </tr>
         `;
@@ -885,6 +891,7 @@ class PageDashboard {
             if (installment.payment_schedule && installment.payment_schedule.length > 0) {
                 installment.payment_schedule.forEach(payment => {
                     const paymentStatusClass = payment.is_paid ? 'status-completed' : (new Date(payment.due_date) < new Date() ? 'status-overdue' : 'status-pending');
+                    const actionsHtml = payment.is_paid ? '' : `<button class="btn btn-sm btn-success mark-paid-btn" data-payment-id="${payment.id}" data-installment-id="${installment.id}" data-payment-amount="${payment.amount}"><i class="fas fa-check"></i> Mark Paid</button>`;
                     paymentScheduleBody.append(`
                         <tr>
                             <td>${payment.term_number}</td>
@@ -892,6 +899,7 @@ class PageDashboard {
                             <td>฿${parseFloat(payment.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                             <td>฿${parseFloat(payment.paid_amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                             <td><span class="status-badge ${paymentStatusClass}">${payment.is_paid ? 'Paid' : 'Pending'}</span></td>
+                            <td class="text-right">${actionsHtml}</td>
                         </tr>
                     `);
                 });
@@ -903,6 +911,45 @@ class PageDashboard {
 
         } catch (error) {
             console.error('Error viewing installment:', error);
+            showNotification(error.message, 'error');
+        }
+    }
+
+    async handleMarkPaymentAsPaid(event) {
+        const paymentId = $(event.currentTarget).data('payment-id');
+        const installmentId = $(event.currentTarget).data('installment-id');
+        const paymentAmount = $(event.currentTarget).data('payment-amount');
+
+        if (!paymentId || !installmentId || !paymentAmount) {
+            showNotification('Missing payment details.', 'error');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to mark this payment as paid?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/installment-payments/${paymentId}/mark-paid`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ paid_amount: paymentAmount, installment_id: installmentId })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to mark payment as paid.');
+            }
+
+            showNotification('Payment marked as paid successfully!', 'success');
+            // Re-fetch installment details to update the modal and table
+            this.handleViewInstallment({ currentTarget: $(`button[data-id="${installmentId}"]`) });
+            this.fetchInstallments(true); // Refresh main table
+
+        } catch (error) {
+            console.error('Error marking payment as paid:', error);
             showNotification(error.message, 'error');
         }
     }

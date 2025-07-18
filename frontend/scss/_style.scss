@@ -610,9 +610,12 @@ a{
         border-bottom: 1px solid var(--color-gray-200);
 
         &:nth-child(4), // Period column
-        &:nth-child(5), // Due Date column
-        &:nth-child(6) { // Status column
+        &:nth-child(5) { // Due Date column
             text-align: center;
+
+            .monthly-payment {
+                font-weight: 600;
+            }
         }
 
         &:nth-child(3) { // Amount column
