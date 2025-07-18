@@ -360,6 +360,8 @@ class PageDashboard {
             this.newInstallmentId = result.installmentId;
 
             showNotification('Installment plan created successfully!', 'success');
+            this.fetchInstallments(true); // Refresh the installment list
+            this.clearAddPlanForm(); // Clear the form for next use
             this.showStep(6);
 
         } catch (error) {
