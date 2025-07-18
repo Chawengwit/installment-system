@@ -795,13 +795,14 @@ class PageDashboard {
                         <a href="tel:${installment.customer_phone}" class="customer-phone">${installment.customer_phone}</a>
                     </div>
                 </td>
-                <td>฿${parseFloat(installment.total_amount).toLocaleString()}</td>
+                <td>
+                    <div class="amount-info">
+                        <span class="paid-amount">฿${parseFloat(installment.total_paid_amount || 0).toLocaleString()}</span>
+                        <span class="total-amount">/ ฿${parseFloat(installment.total_amount).toLocaleString()}</span>
+                    </div>
+                </td>
                 <td>${nextDueDate}</td>
                 <td><span class="status-badge status-${statusClass}">${installment.status}</span></td>
-                <td class="text-right">
-                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
-                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
-                </td>
             </tr>
         `;
     }
