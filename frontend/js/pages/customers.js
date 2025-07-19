@@ -294,6 +294,9 @@ class PageCustomers {
             form.find('[name="id"]').val(customer.id);
             form.find('[name="name"]').val(customer.name);
             form.find('[name="phone"]').val(customer.phone);
+            form.find('[name="nickname"]').val(customer.nickname);
+            form.find('[name="line_id"]').val(customer.line_id);
+            form.find('[name="facebook"]').val(customer.facebook);
             form.find('[name="id_card_number"]').val(customer.id_card_number);
             form.find('[name="address"]').val(customer.address);
 

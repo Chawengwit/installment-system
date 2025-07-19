@@ -94,6 +94,10 @@ router.get('/', async (req, res) => {
                     customer.id_card_image = null; // Set to null if file doesn't exist
                 }
             }
+            if (customer.social_media) {
+                customer.line_id = customer.social_media.line_id;
+                customer.facebook = customer.social_media.facebook;
+            }
             return customer;
         }));
         res.json({ customers, totalCustomers });
@@ -105,11 +109,11 @@ router.get('/', async (req, res) => {
 
 // POST /api/customers
 router.post('/', upload.single('idCard'), async (req, res) => {
-    const { name, phone, address, id_card_number } = req.body;
+    const { name, phone, address, id_card_number, nickname, line_id, facebook } = req.body;
     const id_card_image = (req.file && req.file.path) ? '/uploads/' + basename(req.file.path) : null;
 
-    if (!name || !phone || !id_card_number) {
-        return res.status(400).json({ error: 'Name, phone, and ID card number are required' });
+    if (!name || !id_card_number) {
+        return res.status(400).json({ error: 'Name, and ID card number are required' });
     }
 
     try {
@@ -118,9 +122,11 @@ router.post('/', upload.single('idCard'), async (req, res) => {
             return res.status(409).json({ error: 'Customer with this phone or ID card number already exists.' });
         }
 
+        const social_media = { line_id, facebook };
+
         const result = await query(
-            'INSERT INTO customers (name, phone, address, id_card_image, id_card_number) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [name, phone, address || null, id_card_image, id_card_number]
+            'INSERT INTO customers (name, phone, address, id_card_image, id_card_number, nickname, social_media) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            [name, phone || null, address || null, id_card_image, id_card_number, nickname || null, social_media]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -166,6 +172,10 @@ router.get('/:id', async (req, res) => {
                 customer.id_card_image = null; // Set to null if file doesn't exist
             }
         }
+        if (customer.social_media) {
+            customer.line_id = customer.social_media.line_id;
+            customer.facebook = customer.social_media.facebook;
+        }
         res.json(customer);
     } catch (err) {
         console.error(err);
@@ -176,7 +186,7 @@ router.get('/:id', async (req, res) => {
 // PUT /api/customers/:id
 router.put('/:id', upload.single('idCard'), async (req, res) => {
     const { id } = req.params;
-    const { name, phone, address, id_card_number } = req.body;
+    const { name, phone, address, id_card_number, nickname, line_id, facebook } = req.body;
     let id_card_image;
 
     try {
@@ -196,9 +206,11 @@ router.put('/:id', upload.single('idCard'), async (req, res) => {
             return res.status(409).json({ error: 'Customer with this phone or ID card number already exists.' });
         }
 
+        const social_media = { line_id, facebook };
+
         const result = await query(
-            'UPDATE customers SET name = $1, phone = $2, address = $3, id_card_image = $4, id_card_number = $5, updated_at = CURRENT_TIMESTAMP WHERE id = $6 RETURNING *',
-            [name, phone, address || null, id_card_image, id_card_number, id]
+            'UPDATE customers SET name = $1, phone = $2, address = $3, id_card_image = $4, id_card_number = $5, nickname = $6, social_media = $7, updated_at = CURRENT_TIMESTAMP WHERE id = $8 RETURNING *',
+            [name, phone || null, address || null, id_card_image, id_card_number, nickname || null, social_media, id]
         );
 
         if (result.rowCount === 0) {

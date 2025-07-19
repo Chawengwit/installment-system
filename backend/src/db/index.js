@@ -19,6 +19,8 @@ const createTables = async () => {
                 address TEXT,
                 id_card_image TEXT,
                 id_card_number VARCHAR(50) NOT NULL DEFAULT '',
+                nickname VARCHAR(100),
+                social_media JSONB,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 installment_status BOOLEAN NOT NULL DEFAULT FALSE
