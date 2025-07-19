@@ -131,7 +131,7 @@ class PageCustomers {
                 <div class="customer-section-details">
                     <div class="customer-section-details_item">
                         <span class="label">Active Plans:</span>
-                        <span class="value">0</span>
+                        <span class="value">${customer.active_plans_count}</span>
                     </div>
                     <div class="customer-section-details_item">
                         <span class="label">Total Amount:</span>
@@ -153,7 +153,7 @@ class PageCustomers {
                 <td data-label="Name">${customer.name}</td>
                 <td data-label="Line ID">${customer.line_id || 'N/A'}</td>
                 <td data-label="Phone"><a href="tel:${customer.phone}">${customer.phone || 'N/A'}</a></td>
-                <td data-label="Active Plans">0</td>
+                <td data-label="Active Plans">${customer.active_plans_count}</td>
                 <td data-label="Total Amount">$0</td>
                 <td data-label="Actions">
                     <button class="btn btn-small btn-primary btn-view-customer"><i class="fas fa-eye"></i></button>

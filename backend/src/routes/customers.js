@@ -98,6 +98,10 @@ router.get('/', async (req, res) => {
                 customer.line_id = customer.social_media.line_id;
                 customer.facebook = customer.social_media.facebook;
             }
+
+            const installmentQuery = await query('SELECT COUNT(*) FROM installments WHERE customer_id = $1 AND status = $2', [customer.id, 'active']);
+            customer.active_plans_count = parseInt(installmentQuery.rows[0].count, 10);
+
             return customer;
         }));
         res.json({ customers, totalCustomers });
