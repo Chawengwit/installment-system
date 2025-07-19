@@ -124,8 +124,8 @@ class PageCustomers {
                     <div class="customer-card_avatar"><i class="fas fa-user"></i></div>
                     <div class="customer-card_info">
                         <h3 class="customer-card_name">${customer.name}</h3>
-                        <p class="customer-card_id-card-number">ID: ${customer.id_card_number}</p>
-                        <p class="customer-card_phone"><a href="tel:${customer.phone}">${customer.phone}</a></p>
+                        <p class="customer-card_line-id">Line ID: ${customer.line_id || 'N/A'}</p>
+                        <p class="customer-card_phone"><a href="tel:${customer.phone}">${customer.phone || 'N/A'}</a></p>
                     </div>
                 </div>
                 <div class="customer-section-details">
@@ -151,8 +151,8 @@ class PageCustomers {
         return `
             <tr data-customer-id="${customer.id}">
                 <td data-label="Name">${customer.name}</td>
-                <td data-label="ID Card Number">${customer.id_card_number}</td>
-                <td data-label="Phone"><a href="tel:${customer.phone}">${customer.phone}</a></td>
+                <td data-label="Line ID">${customer.line_id || 'N/A'}</td>
+                <td data-label="Phone"><a href="tel:${customer.phone}">${customer.phone || 'N/A'}</a></td>
                 <td data-label="Active Plans">0</td>
                 <td data-label="Total Amount">$0</td>
                 <td data-label="Actions">
