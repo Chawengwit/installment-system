@@ -197,13 +197,6 @@ class PageCustomers {
             $('#detail-customer-line-id').text(customer.line_id || 'N/A');
             $('#detail-customer-facebook').text(customer.facebook || 'N/A');
 
-            const idCardImage = $('#detail-id-card-image');
-            if (customer.id_card_image) {
-                idCardImage.attr('src', customer.id_card_image).show();
-            } else {
-                idCardImage.hide();
-            }
-
             openModal("customer-detail-modal");
         } catch (error) {
             console.error('Error fetching customer details:', error);
