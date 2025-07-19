@@ -181,10 +181,34 @@ class PageCustomers {
         }
     }
 
-    handleViewCustomer(e) {
+    async handleViewCustomer(e) {
         e.stopPropagation();
         const customerId = $(e.currentTarget).closest("[data-customer-id]").data("customer-id");
-        openModal("customer-detail-modal");
+        try {
+            const response = await fetch(`/api/customers/${customerId}`);
+            if (!response.ok) throw new Error('Failed to fetch customer data');
+            const customer = await response.json();
+
+            // Populate modal with customer data
+            $('#detail-customer-name').text(customer.name + (customer.nickname ? ` (${customer.nickname})` : ''));
+            $('#detail-customer-phone').text(customer.phone || 'N/A');
+            $('#detail-customer-address').text(customer.address || 'N/A');
+            $('#detail-customer-id-card-number').text(customer.id_card_number || 'N/A');
+            $('#detail-customer-line-id').text(customer.line_id || 'N/A');
+            $('#detail-customer-facebook').text(customer.facebook || 'N/A');
+
+            const idCardImage = $('#detail-id-card-image');
+            if (customer.id_card_image) {
+                idCardImage.attr('src', customer.id_card_image).show();
+            } else {
+                idCardImage.hide();
+            }
+
+            openModal("customer-detail-modal");
+        } catch (error) {
+            console.error('Error fetching customer details:', error);
+            showNotification(error.message, 'error');
+        }
     }
 
     async handleAddCustomer(event) {
