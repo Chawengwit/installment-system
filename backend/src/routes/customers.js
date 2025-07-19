@@ -228,6 +228,7 @@ router.get('/:id/installments', async (req, res) => {
                 i.id AS installment_id,
                 i.total_amount,
                 i.term_months,
+                i.status,
                 p.name AS product_name,
                 COUNT(ip.id) FILTER (WHERE ip.is_paid = true) AS paid_terms,
                 SUM(ip.amount) FILTER (WHERE ip.is_paid = false) AS outstanding_debt

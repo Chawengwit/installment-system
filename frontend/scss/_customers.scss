@@ -135,6 +135,16 @@
 .customer-detail {
     padding: var(--spacing-lg);
 
+    .outstanding-debt-value {
+        color: var(--color-success);
+        font-weight: 600;
+    }
+
+    .total-amount-value {
+        color: var(--color-danger);
+        font-weight: 600;
+    }
+
     .customer-detail_info {
         display: flex;
         align-items: center;

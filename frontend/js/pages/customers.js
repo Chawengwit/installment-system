@@ -210,17 +210,25 @@ class PageCustomers {
             } else {
                 installments.forEach(installment => {
                     const progress = (installment.paid_terms / installment.term_months) * 100;
+                    let statusClass = '';
+                    if (installment.status === 'active') {
+                        statusClass = 'badge-primary';
+                    } else if (installment.status === 'completed') {
+                        statusClass = 'badge-success';
+                    } else if (installment.status === 'non-active') {
+                        statusClass = 'badge-danger';
+                    }
                     installmentHistoryBody.append(`
                         <tr>
                             <td data-label="Product">${installment.product_name}</td>
-                            <td data-label="Outstanding debt">${parseFloat(installment.outstanding_debt).toLocaleString()}</td>
+                            <td data-label="Amount"><span class="outstanding-debt-value">${parseFloat(installment.outstanding_debt).toLocaleString()}</span>/<span class="total-amount-value">${parseFloat(installment.total_amount).toLocaleString()}</span></td>
                             <td data-label="Progress">
                                 <div class="progress">
                                     <div class="progress_bar" style="width: ${progress}%"></div>
                                 </div>
                                 <span class="progress_text">${installment.paid_terms}/${installment.term_months} payments</span>
                             </td>
-                            <td data-label="Status"><span class="badge badge-success">Active</span></td>
+                            <td data-label="Status"><span class="badge ${statusClass}">${installment.status}</span></td>
                         </tr>
                     `);
                 });

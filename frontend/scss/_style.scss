@@ -357,6 +357,11 @@ a{
     color: var(--color-danger);
 }
 
+.badge-primary {
+    background-color: rgba(37, 99, 235, 0.1);
+    color: var(--color-primary);
+}
+
 /* Modals */
 .modal {
     position: fixed;
