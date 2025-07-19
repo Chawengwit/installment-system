@@ -197,6 +197,35 @@ class PageCustomers {
             $('#detail-customer-line-id').text(customer.line_id || 'N/A');
             $('#detail-customer-facebook').text(customer.facebook || 'N/A');
 
+            // Fetch and display installment history
+            const installmentHistoryBody = $('#installment-history-body');
+            installmentHistoryBody.empty(); // Clear previous entries
+
+            const installmentsResponse = await fetch(`/api/customers/${customerId}/installments`);
+            if (!installmentsResponse.ok) throw new Error('Failed to fetch installment history');
+            const installments = await installmentsResponse.json();
+
+            if (installments.length === 0) {
+                installmentHistoryBody.append('<tr><td colspan="4">No installment history found.</td></tr>');
+            } else {
+                installments.forEach(installment => {
+                    const progress = (installment.paid_terms / installment.term_months) * 100;
+                    installmentHistoryBody.append(`
+                        <tr>
+                            <td data-label="Product">${installment.product_name}</td>
+                            <td data-label="Outstanding debt">${parseFloat(installment.outstanding_debt).toLocaleString()}</td>
+                            <td data-label="Progress">
+                                <div class="progress">
+                                    <div class="progress_bar" style="width: ${progress}%"></div>
+                                </div>
+                                <span class="progress_text">${installment.paid_terms}/${installment.term_months} payments</span>
+                            </td>
+                            <td data-label="Status"><span class="badge badge-success">Active</span></td>
+                        </tr>
+                    `);
+                });
+            }
+
             openModal("customer-detail-modal");
         } catch (error) {
             console.error('Error fetching customer details:', error);

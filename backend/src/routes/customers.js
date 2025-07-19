@@ -218,6 +218,40 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// GET /api/customers/:id/installments
+router.get('/:id/installments', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const installmentsResult = await query(
+            `SELECT
+                i.id AS installment_id,
+                i.total_amount,
+                i.term_months,
+                p.name AS product_name,
+                COUNT(ip.id) FILTER (WHERE ip.is_paid = true) AS paid_terms,
+                SUM(ip.amount) FILTER (WHERE ip.is_paid = false) AS outstanding_debt
+            FROM
+                installments i
+            JOIN
+                products p ON i.product_id = p.id
+            LEFT JOIN
+                installment_payments ip ON i.id = ip.installment_id
+            WHERE
+                i.customer_id = $1
+            GROUP BY
+                i.id, p.name
+            ORDER BY
+                i.created_at DESC`,
+            [id]
+        );
+        res.json(installmentsResult.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch customer installments' });
+    }
+});
+
 // PUT /api/customers/:id
 router.put('/:id', upload.single('idCard'), async (req, res) => {
     const { id } = req.params;
