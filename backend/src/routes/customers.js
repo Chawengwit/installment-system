@@ -63,13 +63,16 @@ router.get('/', async (req, res) => {
         countParams.push(`%${search}%`);
     }
 
-    const validSortBy = ['name', 'created_at'];
+    const validSortBy = ['name', 'created_at', 'active_at', 'outstanding_debt'];
     const orderBy = validSortBy.includes(sortBy) ? sortBy : 'created_at';
 
     const validSortOrder = ['ASC', 'DESC'];
     const order = validSortOrder.includes(sortOrder?.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
 
-    customerQuery += ` ORDER BY ${orderBy} ${order}`;
+    // Only add ORDER BY for columns that exist in the database
+    if (orderBy === 'name' || orderBy === 'created_at') {
+        customerQuery += ` ORDER BY ${orderBy} ${order}`;
+    }
 
     // Add limit and offset for pagination
     if (limit) {
@@ -86,7 +89,7 @@ router.get('/', async (req, res) => {
         const countResult = await query(countQuery, countParams);
         const totalCustomers = parseInt(countResult.rows[0].count, 10);
 
-        const customers = await Promise.all(customersResult.rows.map(async customer => {
+        let customers = await Promise.all(customersResult.rows.map(async customer => {
             if (customer.id_card_image) {
                 const imagePath = join(__dirname, '..', '..', 'public', customer.id_card_image);
                 const exists = await fileExists(imagePath);
@@ -104,15 +107,34 @@ router.get('/', async (req, res) => {
 
             const outstandingDebtQuery = await query(
                 `SELECT SUM(ip.amount) as total_debt
-                 FROM installment_payments ip
-                 JOIN installments i ON ip.installment_id = i.id
-                 WHERE i.customer_id = $1 AND ip.is_paid = false`,
+                FROM installment_payments ip
+                JOIN installments i ON ip.installment_id = i.id
+                WHERE i.customer_id = $1 AND ip.is_paid = false`,
                 [customer.id]
             );
             customer.outstanding_debt = parseFloat(outstandingDebtQuery.rows[0].total_debt) || 0;
 
             return customer;
         }));
+
+        if (sortBy === 'active_at') {
+            customers.sort((a, b) => {
+                if (order === 'ASC') {
+                    return a.active_plans_count - b.active_plans_count;
+                } else {
+                    return b.active_plans_count - a.active_plans_count;
+                }
+            });
+        } else if (sortBy === 'outstanding_debt') {
+            customers.sort((a, b) => {
+                if (order === 'ASC') {
+                    return a.outstanding_debt - b.outstanding_debt;
+                } else {
+                    return b.outstanding_debt - a.outstanding_debt;
+                }
+            });
+        }
+
         res.json({ customers, totalCustomers });
     } catch (err) {
         console.error(err);
