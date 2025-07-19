@@ -102,6 +102,15 @@ router.get('/', async (req, res) => {
             const installmentQuery = await query('SELECT COUNT(*) FROM installments WHERE customer_id = $1 AND status = $2', [customer.id, 'active']);
             customer.active_plans_count = parseInt(installmentQuery.rows[0].count, 10);
 
+            const outstandingDebtQuery = await query(
+                `SELECT SUM(ip.amount) as total_debt
+                 FROM installment_payments ip
+                 JOIN installments i ON ip.installment_id = i.id
+                 WHERE i.customer_id = $1 AND ip.is_paid = false`,
+                [customer.id]
+            );
+            customer.outstanding_debt = parseFloat(outstandingDebtQuery.rows[0].total_debt) || 0;
+
             return customer;
         }));
         res.json({ customers, totalCustomers });

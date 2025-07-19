@@ -134,8 +134,8 @@ class PageCustomers {
                         <span class="value">${customer.active_plans_count}</span>
                     </div>
                     <div class="customer-section-details_item">
-                        <span class="label">Total Amount:</span>
-                        <span class="value">$0</span>
+                        <span class="label">Outstanding debt:</span>
+                        <span class="value">${customer.outstanding_debt.toLocaleString()}</span>
                     </div>
                 </div>
                 <div class="customer-card_actions">
@@ -154,7 +154,7 @@ class PageCustomers {
                 <td data-label="Line ID">${customer.line_id || 'N/A'}</td>
                 <td data-label="Phone"><a href="tel:${customer.phone}">${customer.phone || 'N/A'}</a></td>
                 <td data-label="Active Plans">${customer.active_plans_count}</td>
-                <td data-label="Total Amount">$0</td>
+                <td data-label="Outstanding debt">${customer.outstanding_debt.toLocaleString()}</td>
                 <td data-label="Actions">
                     <button class="btn btn-small btn-primary btn-view-customer"><i class="fas fa-eye"></i></button>
                     <button class="btn btn-small btn-secondary btn-edit-customer"><i class="fas fa-edit"></i></button>
