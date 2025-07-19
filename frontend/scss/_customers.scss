@@ -45,11 +45,17 @@
     font-weight: 600;
     color: var(--color-gray-900);
     margin-bottom: var(--spacing-xs);
+
+    .nickname-display {
+        font-weight: normal;
+    }
 }
 
+.customer-card_line-id,
 .customer-card_phone {
     color: var(--color-gray-600);
     font-size: var(--font-size-sm);
+    font-weight: normal;
     margin: 0;
 }
 

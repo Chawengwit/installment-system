@@ -123,7 +123,7 @@ class PageCustomers {
                 <div class="customer-card_header">
                     <div class="customer-card_avatar"><i class="fas fa-user"></i></div>
                     <div class="customer-card_info">
-                        <h3 class="customer-card_name">${customer.name}</h3>
+                        <h3 class="customer-card_name">${customer.name} ${customer.nickname ? `<span class="nickname-display">(${customer.nickname})</span>` : ''}</h3>
                         <p class="customer-card_line-id">Line ID: ${customer.line_id || 'N/A'}</p>
                         <p class="customer-card_phone"><a href="tel:${customer.phone}">${customer.phone || 'N/A'}</a></p>
                     </div>
@@ -150,7 +150,7 @@ class PageCustomers {
     createCustomerTableRow(customer) {
         return `
             <tr data-customer-id="${customer.id}">
-                <td data-label="Name">${customer.name}</td>
+                <td data-label="Name">${customer.name} ${customer.nickname ? `<span class="nickname-display">(${customer.nickname})</span>` : ''}</td>
                 <td data-label="Line ID">${customer.line_id || 'N/A'}</td>
                 <td data-label="Phone"><a href="tel:${customer.phone}">${customer.phone || 'N/A'}</a></td>
                 <td data-label="Active Plans">${customer.active_plans_count}</td>
