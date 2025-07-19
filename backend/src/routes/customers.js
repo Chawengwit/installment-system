@@ -57,8 +57,8 @@ router.get('/', async (req, res) => {
     const countParams = [];
 
     if (search) {
-        customerQuery += ' WHERE name ILIKE $1 OR phone ILIKE $1 OR id_card_number ILIKE $1';
-        countQuery += ' WHERE name ILIKE $1 OR phone ILIKE $1 OR id_card_number ILIKE $1';
+        customerQuery += ' WHERE name ILIKE $1 OR phone ILIKE $1 OR id_card_number ILIKE $1 OR nickname ILIKE $1';
+        countQuery += ' WHERE name ILIKE $1 OR phone ILIKE $1 OR id_card_number ILIKE $1 OR nickname ILIKE $1';
         queryParams.push(`%${search}%`);
         countParams.push(`%${search}%`);
     }
