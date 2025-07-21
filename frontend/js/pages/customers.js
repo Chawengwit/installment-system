@@ -205,6 +205,9 @@ class PageCustomers {
             if (!installmentsResponse.ok) throw new Error('Failed to fetch installment history');
             const installments = await installmentsResponse.json();
 
+            console.log("=====");
+            console.log(installments);
+
             if (installments.length === 0) {
                 installmentHistoryBody.append('<tr><td colspan="4">No installment history found.</td></tr>');
             } else {
@@ -221,7 +224,7 @@ class PageCustomers {
                     installmentHistoryBody.append(`
                         <tr>
                             <td data-label="Product">${installment.product_name}</td>
-                            <td data-label="Amount"><span class="outstanding-debt-value">${parseFloat(installment.outstanding_debt).toLocaleString()}</span>/<span class="total-amount-value">${parseFloat(installment.total_amount).toLocaleString()}</span></td>
+                            <td data-label="Amount"><span class="outstanding-debt-value">฿${parseFloat(installment.outstanding_debt).toLocaleString()}</span></td>
                             <td data-label="Progress">
                                 <div class="progress">
                                     <div class="progress_bar" style="width: ${progress}%"></div>
