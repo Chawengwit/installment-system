@@ -114,6 +114,24 @@ router.put('/:id', async (req, res) => {
     }
 });
 
+router.get('/:id/installments', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const { rows } = await query(`
+            SELECT i.id, i.status, i.total_amount, p.name as product_name, c.name as customer_name
+            FROM installments i
+            JOIN products p ON i.product_id = p.id
+            JOIN customers c ON i.customer_id = c.id
+            WHERE i.credit_card_id = $1
+            ORDER BY i.created_at DESC
+        `, [id]);
+        res.json(rows);
+    } catch (error) {
+        console.error(`Error fetching installments for credit card ${id}:`, error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 // DELETE a credit card by ID
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
