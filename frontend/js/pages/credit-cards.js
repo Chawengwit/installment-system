@@ -305,11 +305,18 @@ class PageCreditCards {
                     } else if (installment.status === 'non-active') {
                         statusClass = 'badge-danger';
                     }
+                    const progress = (installment.paid_terms / installment.term_months) * 100;
                     installmentHistoryBody.append(`
                         <tr>
                             <td data-label="Product">${installment.product_name}</td>
                             <td data-label="Customer">${installment.customer_name}</td>
                             <td data-label="Amount"><span class="outstanding-debt-value">฿${parseFloat(installment.outstanding_debt).toLocaleString()}</span></td>
+                            <td data-label="Progress">
+                                <div class="progress">
+                                    <div class="progress_bar" style="width: ${progress}%"></div>
+                                </div>
+                                <span class="progress_text">${installment.paid_terms}/${installment.term_months} payments</span>
+                            </td>
                             <td data-label="Status"><span class="badge ${statusClass}">${installment.status}</span></td>
                         </tr>
                     `);
