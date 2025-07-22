@@ -205,9 +205,6 @@ class PageCustomers {
             if (!installmentsResponse.ok) throw new Error('Failed to fetch installment history');
             const installments = await installmentsResponse.json();
 
-            console.log("=====");
-            console.log(installments);
-
             if (installments.length === 0) {
                 installmentHistoryBody.append('<tr><td colspan="4">No installment history found.</td></tr>');
             } else {

@@ -134,9 +134,6 @@ class PageCreditCards {
                         </button>
                     </div>
                 </div>
-                <div class="credit-card_number">
-                    **** **** **** ${String(card.card_number).slice(-4)}
-                </div>
                 <div class="credit-card_details">
                     
                     <div class="credit-card_detail-item">
@@ -158,12 +155,8 @@ class PageCreditCards {
         const formData = new FormData(form);
         const data = {
             card_name: formData.get('cardName'),
-            card_number: formData.get('cardNumber'),
             credit_limit: formData.get('creditLimit')
         };
-
-        // Clear previous highlights
-        $(form).find('input[name="cardNumber"]').removeClass('is-invalid');
 
         try {
             const response = await fetch('/api/credit-cards', {
@@ -176,9 +169,6 @@ class PageCreditCards {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                if (response.status === 409) {
-                    this.highlightInvalidFields(form, errorData.error);
-                }
                 throw new Error(errorData.error || 'Failed to create credit card');
             }
 
@@ -203,7 +193,6 @@ class PageCreditCards {
             const form = $('#edit-card-form');
             form.find('[name="id"]').val(card.id);
             form.find('[name="card_name"]').val(card.card_name);
-            form.find('[name="card_number"]').val(card.card_number);
             form.find('[name="credit_limit"]').val(card.credit_limit);
 
             openModal('edit-card-modal');
@@ -220,13 +209,9 @@ class PageCreditCards {
         const data = {
             id: formData.get('id'),
             card_name: formData.get('card_name'),
-            card_number: formData.get('card_number'),
             credit_limit: formData.get('credit_limit')
         };
         const cardId = data.id;
-
-        // Clear previous highlights
-        $(form).find('input[name="card_number"]').removeClass('is-invalid');
 
         try {
             const response = await fetch(`/api/credit-cards/${cardId}`, {
@@ -239,9 +224,6 @@ class PageCreditCards {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                if (response.status === 409) {
-                    this.highlightInvalidFields(form, errorData.error);
-                }
                 throw new Error(errorData.error || 'Failed to update credit card');
             }
 
@@ -253,19 +235,6 @@ class PageCreditCards {
         } catch (error) {
             showNotification(error.message, 'error');
         }
-    }
-
-    highlightInvalidFields(form, errorMessage) {
-        if (errorMessage.includes('Credit card number already exists')) {
-            // For add form, name is 'cardNumber', for edit form, name is 'card_number'
-            const inputName = form.id === 'add-card-form' ? 'cardNumber' : 'card_number';
-            $(form).find(`input[name="${inputName}"]`).addClass('is-invalid');
-        }
-
-        // Remove highlight on input
-        $(form).find('input[name="cardNumber"], input[name="card_number"]').on('input', function() {
-            $(this).removeClass('is-invalid');
-        });
     }
 
     handleDeleteCard(e) {
