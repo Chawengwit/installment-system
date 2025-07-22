@@ -16,9 +16,10 @@ class PageDashboard {
 
     init() {
         this.bindEvents();
-        // this.fetchInstallments(true);
+        this.fetchInstallments(true);
         this.setupCustomerModals();
         this.setupCreditCardModals();
+        this.toggleView(false); // Show table view by default
     }
 
     setupCreditCardModals() {
@@ -261,6 +262,8 @@ class PageDashboard {
         });
 
         this.$mainContent.on("click", "#customize-term-btn", () => this.showStep(2));
+        this.$mainContent.on("click", ".view-installment-btn", this.handleViewInstallment.bind(this));
+        this.$mainContent.on("click", ".mark-paid-btn", this.handleMarkPaymentAsPaid.bind(this));
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
     }
@@ -320,25 +323,46 @@ class PageDashboard {
 
     async handleFormSubmission(event) {
         event.preventDefault();
-        const formData = new FormData($('#installment-plan-form')[0]);
+        const form = $('#installment-plan-form');
+        const formData = new FormData();
+
+        formData.append('productName', form.find('#product-name').val());
+        formData.append('productSerialNumber', form.find('#product-serial-number').val());
+        formData.append('productPrice', form.find('#product-price').val());
+        formData.append('downPayment', form.find('#down-payment').val());
+        formData.append('productDescription', form.find('#product-description').val());
+        formData.append('installmentMonths', form.find('#installment-months').val());
+        formData.append('interestRate', form.find('#interest-rate').val());
+        formData.append('paymentDueDate', form.find('#payment-due-date').val());
+        formData.append('lateFee', form.find('#late-fee').val());
         formData.append('customerId', this.selectedCustomerId);
         formData.append('creditCardId', this.selectedCreditCardId);
 
+        const imageInput = form.find('#product-images')[0];
+        const imageFiles = imageInput.files;
+        if (imageFiles) {
+            for (let i = 0; i < imageFiles.length; i++) {
+                formData.append('productImages', imageFiles[i]);
+            }
+        }
+
         try {
-            // const response = await fetch('/api/installments', {
-            //     method: 'POST',
-            //     body: formData
-            // });
+            const response = await fetch('/api/installments', {
+                method: 'POST',
+                body: formData
+            });
 
-            // if (!response.ok) {
-            //     const errorData = await response.json();
-            //     throw new Error(errorData.error || 'Failed to create installment plan');
-            // }
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to create installment plan');
+            }
 
-            // const result = await response.json();
-            // this.newInstallmentId = result.installmentId;
+            const result = await response.json();
+            this.newInstallmentId = result.installmentId;
 
             showNotification('Installment plan created successfully!', 'success');
+            this.fetchInstallments(true); // Refresh the installment list
+            this.clearAddPlanForm(); // Clear the form for next use
             this.showStep(6);
 
         } catch (error) {
@@ -693,37 +717,36 @@ class PageDashboard {
         this.hasMore = true;
         const searchTerm = $('#dashboard-search').val().toLowerCase();
         const status = $('#dashboard-status-filter').val();
-        // this.fetchInstallments(true, searchTerm, status);
+        this.fetchInstallments(true, searchTerm, status);
     }
 
-    // async fetchInstallments(clearExisting = false, search = '', status = 'all') {
-    //     if (this.isLoading || !this.hasMore) {
-    //         return;
-    //     }
+    async fetchInstallments(clearExisting = false, search = '', status = 'all') {
+        if (this.isLoading || !this.hasMore) {
+            return;
+        }
 
-    //     this.isLoading = true;
-    //     $('#infinite-scroll-loading').show();
+        this.isLoading = true;
+        $('#infinite-scroll-loading').show();
 
-    //     const offset = (this.currentPage - 1) * this.installmentsPerPage;
-    //     try {
-    //         // This will need to be implemented in the backend
-    //         const response = await fetch(`/api/installments?search=${search}&status=${status}&limit=${this.installmentsPerPage}&offset=${offset}`);
-    //         if (!response.ok) throw new Error('Failed to fetch installment plans');
-    //         const data = await response.json();
+        const offset = (this.currentPage - 1) * this.installmentsPerPage;
+        try {
+            const response = await fetch(`/api/installments?search=${search}&status=${status}&limit=${this.installmentsPerPage}&offset=${offset}`);
+            if (!response.ok) throw new Error('Failed to fetch installment plans');
+            const data = await response.json();
 
-    //         this.totalInstallments = data.totalInstallments;
-    //         this.hasMore = (this.currentPage * this.installmentsPerPage) < this.totalInstallments;
+            this.totalInstallments = data.totalInstallments;
+            this.hasMore = (this.currentPage * this.installmentsPerPage) < this.totalInstallments;
 
-    //         this.renderInstallments(data.installments, clearExisting);
-    //         this.currentPage++;
-    //     } catch (error) {
-    //         console.error('Error fetching installment plans:', error);
-    //         showNotification(error.message, 'error');
-    //     } finally {
-    //         this.isLoading = false;
-    //         $('#infinite-scroll-loading').hide();
-    //     }
-    // }
+            this.renderInstallments(data.installments, clearExisting);
+            this.currentPage++;
+        } catch (error) {
+            console.error('Error fetching installment plans:', error);
+            showNotification(error.message, 'error');
+        } finally {
+            this.isLoading = false;
+            $('#infinite-scroll-loading').hide();
+        }
+    }
 
     renderInstallments(installments, clearExisting) {
         const installmentGrid = $('#installments-grid');
@@ -760,16 +783,42 @@ class PageDashboard {
     }
 
     createInstallmentTableRow(installment) {
-        // Table row template to be filled
+        const statusClass = installment.status.replace(' ', '-').toLowerCase();
+        const nextDueDate = installment.next_due_date ? new Intl.DateTimeFormat('en-GB').format(new Date(installment.next_due_date)) : 'N/A';
         return `
             <tr data-installment-id="${installment.id}">
-                
+                <td>
+                    <div class="product-info">
+                        <span class="product-name">${installment.product_name}</span><br>
+                        <span class="product-serial">${installment.serial_number}</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="customer-info">
+                        <span class="customer-name">${installment.customer_name}</span><br>
+                        <a href="tel:${installment.customer_phone}" class="customer-phone">${installment.customer_phone}</a>
+                    </div>
+                </td>
+                <td>
+                    <div class="amount-info">
+                        <span class="paid-amount">฿${parseFloat(installment.total_paid_amount || 0).toLocaleString()}</span>
+                        <span class="total-amount">/ ฿${parseFloat(installment.total_amount).toLocaleString()}</span>
+                    </div>
+                </td>
+                <td>${installment.next_due_date_term_number || 'N/A'} / ${installment.term_months}</td>
+                <td class="text-center">
+                    <div class="due-date-info">
+                        <span class="monthly-payment">฿${parseFloat(installment.monthly_payment).toLocaleString()}</span><br>
+                        <span class="due-date">${nextDueDate}</span>
+                    </div>
+                </td>
+                <td><span class="status-badge status-${statusClass}">${installment.status}</span></td>
             </tr>
         `;
     }
 
-    toggleView() {
-        this.isCardView = !this.isCardView;
+    toggleView(isCard = this.isCardView) {
+        this.isCardView = isCard;
         const installmentGrid = $('#installments-grid');
         const installmentTableView = $('#installment-table-view');
         const toggleViewBtn = $('#toggle-view-btn');
@@ -785,11 +834,131 @@ class PageDashboard {
         }
     }
 
+    async handleViewInstallment(event) {
+        const installmentId = $(event.currentTarget).data('id');
+        if (!installmentId) {
+            showNotification('Installment ID not found.', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/installments/${installmentId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch installment details.');
+            }
+            const data = await response.json();
+            const installment = data.installment;
+
+            // Populate Customer Information
+            $('#view-customer-name').text(installment.customer_name);
+            $('#view-customer-phone').text(installment.customer_phone);
+            $('#view-customer-id-card').text(installment.customer_id_card_number || 'N/A');
+
+            // Populate Product Details
+            $('#view-product-name').text(installment.product_name);
+            $('#view-product-serial').text(installment.product_serial_number);
+            $('#view-product-price').text(`฿${parseFloat(installment.product_price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+            $('#view-product-description').text(installment.product_description || 'N/A');
+            
+            const productImagesContainer = $('#view-product-images');
+            productImagesContainer.empty();
+            if (installment.product_images && installment.product_images.length > 0) {
+                installment.product_images.forEach(image => {
+                    productImagesContainer.append(`<img src="/uploads/${image}" alt="Product Image" class="img-thumbnail">`);
+                });
+            } else {
+                productImagesContainer.append('<p>No images available.</p>');
+            }
+
+            // Populate Plan Overview
+            $('#view-total-amount').text(`฿${parseFloat(installment.total_amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+            $('#view-monthly-payment').text(`฿${parseFloat(installment.monthly_payment).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+            $('#view-interest-rate').text(`${parseFloat(installment.interest_rate).toFixed(1)}%`);
+            $('#view-term-months').text(installment.term_months);
+            $('#view-status').text(installment.status);
+            $('#view-start-date').text(new Date(installment.start_date).toLocaleDateString());
+            $('#view-payment-due-day').text(installment.due_date); // This is the day of the month
+            $('#view-late-fee').text(`฿${parseFloat(installment.late_fee || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+
+            // Populate Payment Method
+            $('#view-card-name').text(installment.card_name);
+            $('#view-card-number').text(`**** **** **** ${String(installment.card_number).slice(-4)}`);
+            $('#view-credit-limit').text(`฿${parseFloat(installment.credit_limit).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+
+            // Populate Payment Schedule
+            const paymentScheduleBody = $('#view-payment-schedule-body');
+            paymentScheduleBody.empty();
+            if (installment.payment_schedule && installment.payment_schedule.length > 0) {
+                installment.payment_schedule.forEach(payment => {
+                    const paymentStatusClass = payment.is_paid ? 'status-completed' : (new Date(payment.due_date) < new Date() ? 'status-overdue' : 'status-pending');
+                    const actionsHtml = payment.is_paid ? '' : `<button class="btn btn-sm btn-success mark-paid-btn" data-payment-id="${payment.id}" data-installment-id="${installment.id}" data-payment-amount="${payment.amount}"><i class="fas fa-check"></i> Mark Paid</button>`;
+                    paymentScheduleBody.append(`
+                        <tr>
+                            <td>${payment.term_number}</td>
+                            <td>${new Date(payment.due_date).toLocaleDateString()}</td>
+                            <td>฿${parseFloat(payment.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td>฿${parseFloat(payment.paid_amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                            <td><span class="status-badge ${paymentStatusClass}">${payment.is_paid ? 'Paid' : 'Pending'}</span></td>
+                            <td class="text-right">${actionsHtml}</td>
+                        </tr>
+                    `);
+                });
+            } else {
+                paymentScheduleBody.append('<tr><td colspan="5">No payment schedule available.</td></tr>');
+            }
+
+            openModal('view-installment-modal');
+
+        } catch (error) {
+            console.error('Error viewing installment:', error);
+            showNotification(error.message, 'error');
+        }
+    }
+
+    async handleMarkPaymentAsPaid(event) {
+        const paymentId = $(event.currentTarget).data('payment-id');
+        const installmentId = $(event.currentTarget).data('installment-id');
+        const paymentAmount = $(event.currentTarget).data('payment-amount');
+
+        if (!paymentId || !installmentId || !paymentAmount) {
+            showNotification('Missing payment details.', 'error');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to mark this payment as paid?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/installment-payments/${paymentId}/mark-paid`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ paid_amount: paymentAmount, installment_id: installmentId })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to mark payment as paid.');
+            }
+
+            showNotification('Payment marked as paid successfully!', 'success');
+            // Re-fetch installment details to update the modal and table
+            this.handleViewInstallment({ currentTarget: $(`button[data-id="${installmentId}"]`) });
+            this.fetchInstallments(true); // Refresh main table
+
+        } catch (error) {
+            console.error('Error marking payment as paid:', error);
+            showNotification(error.message, 'error');
+        }
+    }
+
     handleScroll() {
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollHeight - scrollPos < 200 && !this.isLoading && this.hasMore) {
-            // this.fetchInstallments(false, $('#dashboard-search').val().toLowerCase(), $('#dashboard-status-filter').val());
+            this.fetchInstallments(false, $('#dashboard-search').val().toLowerCase(), $('#dashboard-status-filter').val());
         }
     }
 }

@@ -1,0 +1,44 @@
+.filters {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background-color: var(--color-gray-100);
+    border-radius: var(--border-radius-lg);
+
+    .filters_group {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+    }
+
+    .filters_label {
+        font-size: var(--font-size-sm);
+        color: var(--color-gray-700);
+    }
+
+    .filters_select {
+        padding: var(--spacing-sm) var(--spacing-md);
+        border: 1px solid var(--color-gray-300);
+        border-radius: var(--border-radius-md);
+        background-color: var(--color-white);
+        font-size: var(--font-size-sm);
+        color: var(--color-gray-800);
+        cursor: pointer;
+        transition: var(--transition-fast);
+
+        &:hover {
+            border-color: var(--color-gray-400);
+        }
+
+        &:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+        }
+    }
+
+    .filters_actions {
+        margin-left: auto;
+    }
+}

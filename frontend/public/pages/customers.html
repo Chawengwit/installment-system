@@ -19,7 +19,7 @@
     <!-- Search and Filters -->
     <section class="search-section">
         <div class="search-bar">
-            <input type="text" id="customer-search" placeholder="Search customers by name, phone, or ID card number...">
+            <input type="text" id="customer-search" placeholder="Search customers by name, nickname, phone, or ID card number...">
             <i class="fas fa-search search-icon"></i>
         </div>
         <button class="btn btn-secondary search-bar_filter-btn">
@@ -32,6 +32,8 @@
             <select class="filters_select">
                 <option value="created_at">Create Date</option>
                 <option value="name">Name</option>
+                <option value="active_at">Active plan</option>
+                <option value="outstanding_debt">Outstanding debt</option>
             </select>
         </div>
         <div class="filters_group">
@@ -62,10 +64,10 @@
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>ID Card Number</th>
+                            <th>Line ID</th>
                             <th>Phone</th>
                             <th>Active Plans</th>
-                            <th>Total Amount</th>
+                            <th>Outstanding debt</th>
                             <th class="text-right">Actions</th>
                         </tr>
                     </thead>
@@ -103,12 +105,24 @@
                 <input type="text" class="form_input" name="name" required>
             </div>
             <div class="form_group">
-                <label class="form_label">Phone Number *</label>
-                <input type="tel" class="form_input" name="phone" required>
+                <label class="form_label">Nickname</label>
+                <input type="text" class="form_input" name="nickname">
+            </div>
+            <div class="form_group">
+                <label class="form_label">Phone Number</label>
+                <input type="tel" class="form_input" name="phone">
             </div>
             <div class="form_group">
                 <label class="form_label">ID Card Number *</label>
                 <input type="text" class="form_input" name="id_card_number" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Line ID</label>
+                <input type="text" class="form_input" name="line_id">
+            </div>
+            <div class="form_group">
+                <label class="form_label">Facebook</label>
+                <input type="text" class="form_input" name="facebook">
             </div>
             <div class="form_group">
                 <label class="form_label">Address</label>
@@ -142,9 +156,12 @@
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="customer-detail_data">
-                    <h4 class="customer-detail_name" id="detail-customer-name">John Smith</h4>
-                    <p class="customer-detail_contact" id="detail-customer-phone">+66 23-123-4567</p>
-                    <p class="customer-detail_address" id="detail-customer-address">123 Main St, City, State 12345</p>
+                    <h4 class="customer-detail_name" id="detail-customer-name"></h4>
+                    <p class="customer-detail_contact">Phone: <span id="detail-customer-phone"></span></p>
+                    <p class="customer-detail_contact">Line ID: <span id="detail-customer-line-id"></span></p>
+                    <p class="customer-detail_contact">Facebook: <span id="detail-customer-facebook"></span></p>
+                    <p class="customer-detail_contact">ID Card Number: <span id="detail-customer-id-card-number"></span></p>
+                    <p class="customer-detail_address">Address: <span id="detail-customer-address"></span></p>
                 </div>
             </div>
             
@@ -155,41 +172,12 @@
                         <thead>
                             <tr>
                                 <th>Product</th>
-                                <th>Amount</th>
+                                <th>Outstanding Debt</th>
                                 <th>Progress</th>
                                 <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="installment-history-body">
-                            <tr>
-                                <td data-label="Product">iPhone 14 Pro</td>
-                                <td data-label="Amount">$1,200</td>
-                                <td data-label="Progress">
-                                    <div class="progress">
-                                        <div class="progress_bar" style="width: 60%"></div>
-                                    </div>
-                                    <span class="progress_text">6/10 payments</span>
-                                </td>
-                                <td data-label="Status"><span class="badge badge-success">Current</span></td>
-                                <td class="table-actions" data-label="Actions">
-                                    <button class="btn btn-small btn-primary">View</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="Product">MacBook Air</td>
-                                <td data-label="Amount">$1,250</td>
-                                <td data-label="Progress">
-                                    <div class="progress">
-                                        <div class="progress_bar" style="width: 25%"></div>
-                                    </div>
-                                    <span class="progress_text">3/12 payments</span>
-                                </td>
-                                <td data-label="Status"><span class="badge badge-success">Current</span></td>
-                                <td class="table-actions" data-label="Actions">
-                                    <button class="btn btn-small btn-primary">View</button>
-                                </td>
-                            </tr>
+                        </tr>
+                    </thead>
+                    <tbody id="installment-history-body">
                         </tbody>
                     </table>
                 </div>
@@ -238,8 +226,20 @@
                 <input type="text" class="form_input" name="name" required>
             </div>
             <div class="form_group">
-                <label class="form_label">Phone Number *</label>
-                <input type="tel" class="form_input" name="phone" required>
+                <label class="form_label">Phone Number</label>
+                <input type="tel" class="form_input" name="phone">
+            </div>
+            <div class="form_group">
+                <label class="form_label">Nickname</label>
+                <input type="text" class="form_input" name="nickname">
+            </div>
+            <div class="form_group">
+                <label class="form_label">Line ID</label>
+                <input type="text" class="form_input" name="line_id">
+            </div>
+            <div class="form_group">
+                <label class="form_label">Facebook</label>
+                <input type="text" class="form_input" name="facebook">
             </div>
             <div class="form_group">
                 <label class="form_label">ID Card Number *</label>

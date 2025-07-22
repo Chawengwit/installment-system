@@ -123,19 +123,19 @@ class PageCustomers {
                 <div class="customer-card_header">
                     <div class="customer-card_avatar"><i class="fas fa-user"></i></div>
                     <div class="customer-card_info">
-                        <h3 class="customer-card_name">${customer.name}</h3>
-                        <p class="customer-card_id-card-number">ID: ${customer.id_card_number}</p>
-                        <p class="customer-card_phone"><a href="tel:${customer.phone}">${customer.phone}</a></p>
+                        <h3 class="customer-card_name">${customer.name} ${customer.nickname ? `<span class="nickname-display">(${customer.nickname})</span>` : ''}</h3>
+                        <p class="customer-card_line-id">Line ID: ${customer.line_id || 'N/A'}</p>
+                        <p class="customer-card_phone"><a href="tel:${customer.phone}">${customer.phone || 'N/A'}</a></p>
                     </div>
                 </div>
                 <div class="customer-section-details">
                     <div class="customer-section-details_item">
                         <span class="label">Active Plans:</span>
-                        <span class="value">0</span>
+                        <span class="value">${customer.active_plans_count}</span>
                     </div>
                     <div class="customer-section-details_item">
-                        <span class="label">Total Amount:</span>
-                        <span class="value">$0</span>
+                        <span class="label">Outstanding debt:</span>
+                        <span class="value">${customer.outstanding_debt.toLocaleString()}</span>
                     </div>
                 </div>
                 <div class="customer-card_actions">
@@ -150,11 +150,11 @@ class PageCustomers {
     createCustomerTableRow(customer) {
         return `
             <tr data-customer-id="${customer.id}">
-                <td data-label="Name">${customer.name}</td>
-                <td data-label="ID Card Number">${customer.id_card_number}</td>
-                <td data-label="Phone"><a href="tel:${customer.phone}">${customer.phone}</a></td>
-                <td data-label="Active Plans">0</td>
-                <td data-label="Total Amount">$0</td>
+                <td data-label="Name">${customer.name} ${customer.nickname ? `<span class="nickname-display">(${customer.nickname})</span>` : ''}</td>
+                <td data-label="Line ID">${customer.line_id || 'N/A'}</td>
+                <td data-label="Phone"><a href="tel:${customer.phone}">${customer.phone || 'N/A'}</a></td>
+                <td data-label="Active Plans">${customer.active_plans_count}</td>
+                <td data-label="Outstanding debt">${customer.outstanding_debt.toLocaleString()}</td>
                 <td data-label="Actions">
                     <button class="btn btn-small btn-primary btn-view-customer"><i class="fas fa-eye"></i></button>
                     <button class="btn btn-small btn-secondary btn-edit-customer"><i class="fas fa-edit"></i></button>
@@ -181,10 +181,64 @@ class PageCustomers {
         }
     }
 
-    handleViewCustomer(e) {
+    async handleViewCustomer(e) {
         e.stopPropagation();
         const customerId = $(e.currentTarget).closest("[data-customer-id]").data("customer-id");
-        openModal("customer-detail-modal");
+        try {
+            const response = await fetch(`/api/customers/${customerId}`);
+            if (!response.ok) throw new Error('Failed to fetch customer data');
+            const customer = await response.json();
+
+            // Populate modal with customer data
+            $('#detail-customer-name').text(customer.name + (customer.nickname ? ` (${customer.nickname})` : ''));
+            $('#detail-customer-phone').text(customer.phone || 'N/A');
+            $('#detail-customer-address').text(customer.address || 'N/A');
+            $('#detail-customer-id-card-number').text(customer.id_card_number || 'N/A');
+            $('#detail-customer-line-id').text(customer.line_id || 'N/A');
+            $('#detail-customer-facebook').text(customer.facebook || 'N/A');
+
+            // Fetch and display installment history
+            const installmentHistoryBody = $('#installment-history-body');
+            installmentHistoryBody.empty(); // Clear previous entries
+
+            const installmentsResponse = await fetch(`/api/customers/${customerId}/installments`);
+            if (!installmentsResponse.ok) throw new Error('Failed to fetch installment history');
+            const installments = await installmentsResponse.json();
+
+            if (installments.length === 0) {
+                installmentHistoryBody.append('<tr><td colspan="4">No installment history found.</td></tr>');
+            } else {
+                installments.forEach(installment => {
+                    const progress = (installment.paid_terms / installment.term_months) * 100;
+                    let statusClass = '';
+                    if (installment.status === 'active') {
+                        statusClass = 'badge-primary';
+                    } else if (installment.status === 'completed') {
+                        statusClass = 'badge-success';
+                    } else if (installment.status === 'non-active') {
+                        statusClass = 'badge-danger';
+                    }
+                    installmentHistoryBody.append(`
+                        <tr>
+                            <td data-label="Product">${installment.product_name}</td>
+                            <td data-label="Amount"><span class="outstanding-debt-value">฿${parseFloat(installment.outstanding_debt).toLocaleString()}</span></td>
+                            <td data-label="Progress">
+                                <div class="progress">
+                                    <div class="progress_bar" style="width: ${progress}%"></div>
+                                </div>
+                                <span class="progress_text">${installment.paid_terms}/${installment.term_months} payments</span>
+                            </td>
+                            <td data-label="Status"><span class="badge ${statusClass}">${installment.status}</span></td>
+                        </tr>
+                    `);
+                });
+            }
+
+            openModal("customer-detail-modal");
+        } catch (error) {
+            console.error('Error fetching customer details:', error);
+            showNotification(error.message, 'error');
+        }
     }
 
     async handleAddCustomer(event) {
@@ -294,6 +348,9 @@ class PageCustomers {
             form.find('[name="id"]').val(customer.id);
             form.find('[name="name"]').val(customer.name);
             form.find('[name="phone"]').val(customer.phone);
+            form.find('[name="nickname"]').val(customer.nickname);
+            form.find('[name="line_id"]').val(customer.line_id);
+            form.find('[name="facebook"]').val(customer.facebook);
             form.find('[name="id_card_number"]').val(customer.id_card_number);
             form.find('[name="address"]').val(customer.address);
 

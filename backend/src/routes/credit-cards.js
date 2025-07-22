@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
     }
 
     if (search) {
-        filters.push(`(card_name ILIKE $${paramIndex} OR card_number ILIKE $${paramIndex})`);
+        filters.push(`card_name ILIKE $${paramIndex}`);
         queryParams.push(`%${search}%`);
         paramIndex++;
     }
@@ -73,19 +73,15 @@ router.get('/:id', async (req, res) => {
 
 // POST a new credit card
 router.post('/', async (req, res) => {
-    const { card_name, card_number, credit_limit } = req.body;
-    if (!card_name || !card_number || !credit_limit) {
+    const { card_name, credit_limit } = req.body;
+    if (!card_name || !credit_limit) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
     try {
-        const existingCard = await query('SELECT id FROM credit_cards WHERE card_number = $1', [card_number]);
-        if (existingCard.rows.length > 0) {
-            return res.status(409).json({ error: 'Credit card number already exists' });
-        }
         const { rows } = await query(
-            'INSERT INTO credit_cards (card_name, card_number, credit_limit) VALUES ($1, $2, $3) RETURNING *',
-            [card_name, card_number, credit_limit]
+            'INSERT INTO credit_cards (card_name, credit_limit) VALUES ($1, $2) RETURNING *',
+            [card_name, credit_limit]
         );
         res.status(201).json(rows[0]);
     } catch (error) {
@@ -97,20 +93,16 @@ router.post('/', async (req, res) => {
 // PUT (update) a credit card by ID
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { card_name, card_number, credit_limit } = req.body;
+    const { card_name, credit_limit } = req.body;
 
-    if (!card_name || !card_number || !credit_limit) {
+    if (!card_name || !credit_limit) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
     try {
-        const existingCard = await query('SELECT id FROM credit_cards WHERE card_number = $1 AND id != $2', [card_number, id]);
-        if (existingCard.rows.length > 0) {
-            return res.status(409).json({ error: 'Credit card number already exists' });
-        }
         const { rows } = await query(
-            'UPDATE credit_cards SET card_name = $1, card_number = $2, credit_limit = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $4 RETURNING *',
-            [card_name, card_number, credit_limit, id]
+            'UPDATE credit_cards SET card_name = $1, credit_limit = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING *',
+            [card_name, credit_limit, id]
         );
         if (rows.length === 0) {
             return res.status(404).json({ error: 'Credit card not found' });

@@ -19,6 +19,8 @@ const createTables = async () => {
                 address TEXT,
                 id_card_image TEXT,
                 id_card_number VARCHAR(50) NOT NULL DEFAULT '',
+                nickname VARCHAR(100),
+                social_media JSONB,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 installment_status BOOLEAN NOT NULL DEFAULT FALSE
@@ -61,12 +63,14 @@ const createTables = async () => {
                 customer_id INTEGER REFERENCES customers(id) ON DELETE CASCADE,
                 product_id INTEGER REFERENCES products(id),
                 credit_card_id INTEGER REFERENCES credit_cards(id),
-                start_date DATE NOT NULL,
+                due_date NUMERIC(12, 0) NOT NULL,
+                monthly_payment NUMERIC(12, 2) NOT NULL,
                 total_amount NUMERIC(12, 2) NOT NULL,
                 interest_rate NUMERIC(5, 2) NOT NULL,
                 term_months INTEGER NOT NULL,
                 status installment_status_enum DEFAULT 'active',
                 late_fee NUMERIC(12, 2) DEFAULT 0,
+                start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
@@ -82,6 +86,7 @@ const createTables = async () => {
                 due_date DATE NOT NULL,
                 paid_date DATE,
                 amount NUMERIC(12, 2) NOT NULL,
+                paid_amount NUMERIC(12, 2),
                 is_paid BOOLEAN DEFAULT FALSE,
                 slip_image TEXT,
                 notification_sent BOOLEAN DEFAULT FALSE,

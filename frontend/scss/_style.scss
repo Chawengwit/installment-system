@@ -357,6 +357,11 @@ a{
     color: var(--color-danger);
 }
 
+.badge-primary {
+    background-color: rgba(37, 99, 235, 0.1);
+    color: var(--color-primary);
+}
+
 /* Modals */
 .modal {
     position: fixed;
@@ -504,7 +509,7 @@ a{
     margin-bottom: var(--spacing-xl);
 
     @media (max-width: 768px) {
-        flex-direction: column;
+        // flex-direction: column;
         align-items: flex-start;
     }
 }
@@ -608,6 +613,19 @@ a{
         padding: var(--spacing-md);
         text-align: left;
         border-bottom: 1px solid var(--color-gray-200);
+
+        &:nth-child(4), // Period column
+        &:nth-child(5) { // Due Date column
+            text-align: center;
+
+            .monthly-payment {
+                font-weight: 600;
+            }
+        }
+
+        &:nth-child(3) { // Amount column
+            text-align: right;
+        }
     }
 
     th {
@@ -965,6 +983,84 @@ a{
         
         &.amount-debit {
             color: var(--color-danger);
+        }
+    }
+}
+
+.product-info {
+    .product-name {
+        font-weight: 600;
+    }
+}
+
+.customer-info {
+    .customer-name {
+        font-weight: 600;
+    }
+
+    .customer-phone {
+        color: var(--color-primary);
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.amount-info {
+    font-weight: 600;
+}
+
+.modal_body {
+    padding: var(--spacing-lg);
+}
+
+.installment-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+
+    .detail-section {
+        background-color: var(--color-gray-50);
+        border-radius: var(--border-radius-md);
+        padding: var(--spacing-md);
+
+        h4 {
+            font-size: var(--font-size-lg);
+            color: var(--color-gray-800);
+            margin-bottom: var(--spacing-md);
+
+            i {
+                margin-right: var(--spacing-sm);
+                color: var(--color-primary);
+            }
+        }
+
+        p {
+            margin-bottom: var(--spacing-sm);
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-700);
+
+            strong {
+                color: var(--color-gray-900);
+            }
+        }
+
+        .product-images-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+
+            img {
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: var(--border-radius-sm);
+                border: 1px solid var(--color-gray-200);
+            }
         }
     }
 }
