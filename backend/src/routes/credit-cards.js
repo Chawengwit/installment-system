@@ -118,7 +118,13 @@ router.get('/:id/installments', async (req, res) => {
     const { id } = req.params;
     try {
         const { rows } = await query(`
-            SELECT i.id, i.status, i.total_amount, p.name as product_name, c.name as customer_name
+            SELECT 
+                i.id, 
+                i.status, 
+                i.total_amount, 
+                p.name as product_name, 
+                c.name as customer_name,
+                (SELECT SUM(amount) FROM installment_payments WHERE installment_id = i.id AND is_paid = false) as outstanding_debt
             FROM installments i
             JOIN products p ON i.product_id = p.id
             JOIN customers c ON i.customer_id = c.id

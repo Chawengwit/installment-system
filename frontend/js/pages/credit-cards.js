@@ -309,7 +309,7 @@ class PageCreditCards {
                         <tr>
                             <td data-label="Product">${installment.product_name}</td>
                             <td data-label="Customer">${installment.customer_name}</td>
-                            <td data-label="Amount"><span class="outstanding-debt-value">฿${parseFloat(installment.total_amount).toLocaleString()}</span></td>
+                            <td data-label="Amount"><span class="outstanding-debt-value">฿${parseFloat(installment.outstanding_debt).toLocaleString()}</span></td>
                             <td data-label="Status"><span class="badge ${statusClass}">${installment.status}</span></td>
                         </tr>
                     `);
