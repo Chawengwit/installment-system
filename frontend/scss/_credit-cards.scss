@@ -137,7 +137,23 @@
     }
 }
 
-#card-details-modal .customer-detail_avatar i {
-    font-size: 48px;
-    color: var(--color-primary);
+#card-details-modal .customer-detail_avatar {
+    background-color: unset;
+    i {
+        font-size: 48px;
+        color: var(--color-primary);
+    }
+}
+
+
+#card-details-modal .customer-detail_contact {
+    font-weight: 600;
+}
+
+#detail-card-used {
+    color: var(--color-danger);
+}
+
+#detail-card-available {
+    color: var(--color-success);
 }
