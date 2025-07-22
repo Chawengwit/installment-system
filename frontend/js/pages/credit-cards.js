@@ -31,6 +31,7 @@ class PageCreditCards {
         this.$mainContent.on("submit", "#edit-card-form", this.handleUpdateCard.bind(this));
         this.$mainContent.on("click", ".btn-edit-card", this.handleEditCard.bind(this));
         this.$mainContent.on("click", ".btn-delete-card", this.handleDeleteCard.bind(this));
+        this.$mainContent.on("click", ".btn-view-card", this.handleViewCard.bind(this));
         this.$mainContent.on("change", "#filter-card-select", this.handleFilterChange.bind(this));
         this.$mainContent.on("input", "#card-search-input", debounce(this.handleSearchInput.bind(this), 300));
     }
@@ -270,6 +271,55 @@ class PageCreditCards {
         if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100 && !this.isLoading && this.hasMore) {
             const filter = $('#filter-card-select').val();
             this.fetchCreditCards(false, filter);
+        }
+    }
+
+    async handleViewCard(e) {
+        const cardId = $(e.currentTarget).closest("[data-card-id]").data("card-id");
+        try {
+            const response = await fetch(`/api/credit-cards/${cardId}`);
+            if (!response.ok) throw new Error('Failed to fetch credit card data');
+            const card = await response.json();
+
+            $('#detail-card-name').text(card.card_name);
+            $('#detail-card-limit').text(`฿${card.credit_limit.toLocaleString()}`);
+            $('#detail-card-used').text(`฿${card.used_amount.toLocaleString()}`);
+            $('#detail-card-available').text(`฿${(card.credit_limit - card.used_amount).toLocaleString()}`);
+
+            const installmentHistoryBody = $('#installment-history-body');
+            installmentHistoryBody.empty();
+
+            const installmentsResponse = await fetch(`/api/credit-cards/${cardId}/installments`);
+            if (!installmentsResponse.ok) throw new Error('Failed to fetch installment history');
+            const installments = await installmentsResponse.json();
+
+            if (installments.length === 0) {
+                installmentHistoryBody.append('<tr><td colspan="4">No installment history found.</td></tr>');
+            } else {
+                installments.forEach(installment => {
+                    let statusClass = '';
+                    if (installment.status === 'active') {
+                        statusClass = 'badge-primary';
+                    } else if (installment.status === 'completed') {
+                        statusClass = 'badge-success';
+                    } else if (installment.status === 'non-active') {
+                        statusClass = 'badge-danger';
+                    }
+                    installmentHistoryBody.append(`
+                        <tr>
+                            <td data-label="Product">${installment.product_name}</td>
+                            <td data-label="Customer">${installment.customer_name}</td>
+                            <td data-label="Amount"><span class="outstanding-debt-value">฿${parseFloat(installment.outstanding_debt).toLocaleString()}</span></td>
+                            <td data-label="Status"><span class="badge ${statusClass}">${installment.status}</span></td>
+                        </tr>
+                    `);
+                });
+            }
+
+            openModal("card-details-modal");
+        } catch (error) {
+            console.error('Error fetching card details:', error);
+            showNotification(error.message, 'error');
         }
     }
 }

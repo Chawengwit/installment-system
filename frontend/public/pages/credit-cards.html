@@ -104,96 +104,41 @@
     <div class="modal_overlay"></div>
     <div class="modal_content">
         <div class="modal_header">
-            <h3 class="modal_title">Card Transaction History</h3>
+            <h3 class="modal_title">Credit Card Details</h3>
             <button class="modal_close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <div class="card-details-content">
-            <div class="card-summary">
-                <div class="card-summary_info">
-                    <h4 class="card-summary_name" id="modal-card-name">KBank Visa</h4>
+        <div class="customer-detail">
+            <div class="customer-detail_info">
+                <div class="customer-detail_avatar">
+                    <i class="fas fa-credit-card"></i>
                 </div>
-                <div class="card-summary_stats">
-                    <div class="card-summary_stat">
-                        <span class="card-summary_stat-label">Available</span>
-                        <span class="card-summary_stat-value" id="modal-card-available">฿15,000</span>
-                    </div>
-                    <div class="card-summary_stat">
-                        <span class="card-summary_stat-label">Used</span>
-                        <span class="card-summary_stat-value" id="modal-card-used">฿10,000</span>
-                    </div>
+                <div class="customer-detail_data">
+                    <h4 class="customer-detail_name" id="detail-card-name"></h4>
+                    <p class="customer-detail_contact">Credit Limit: <span id="detail-card-limit"></span></p>
+                    <p class="customer-detail_contact">Used Amount: <span id="detail-card-used"></span></p>
+                    <p class="customer-detail_contact">Available Amount: <span id="detail-card-available"></span></p>
                 </div>
-            </div>
-
-            <div class="transaction-filters">
-                <div class="filter-group">
-                    <label class="filter-label">Date Range</label>
-                    <select class="filter-select">
-                        <option value="30">Last 30 days</option>
-                        <option value="90">Last 3 months</option>
-                        <option value="180">Last 6 months</option>
-                        <option value="365">Last year</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Transaction Type</label>
-                    <select class="filter-select">
-                        <option value="all">All Transactions</option>
-                        <option value="purchase">Purchases</option>
-                        <option value="payment">Payments</option>
-                        <option value="refund">Refunds</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="transactions-table">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Customer</th>
-                            <th>Product</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="transactions-body">
-                        <tr>
-                            <td>Dec 15, 2023</td>
-                            <td>John Smith</td>
-                            <td>iPhone 14 Pro</td>
-                            <td class="amount amount-debit">-฿1,200.00</td>
-                            <td><span class="badge badge-success">Completed</span></td>
-                            <td>
-                                <button class="btn btn-small btn-outline">View</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Dec 10, 2023</td>
-                            <td>Sarah Johnson</td>
-                            <td>MacBook Air</td>
-                            <td class="amount amount-debit">-฿1,250.00</td>
-                            <td><span class="badge badge-success">Completed</span></td>
-                            <td>
-                                <button class="btn btn-small btn-outline">View</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Dec 5, 2023</td>
-                            <td>Payment</td>
-                            <td>Monthly Payment</td>
-                            <td class="amount amount-credit">+฿2,500.00</td>
-                            <td><span class="badge badge-info">Payment</span></td>
-                            <td>
-                                <button class="btn btn-small btn-outline">View</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
             
+            <div class="installment-history">
+                <h5 class="installment-history_title">Installment History</h5>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Customer</th>
+                                <th>Outstanding Debt</th>
+                                <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="installment-history-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
