@@ -242,7 +242,10 @@ class PageCreditCards {
         showConfirmationModal('Are you sure you want to delete this credit card?', async () => {
             try {
                 const response = await fetch(`/api/credit-cards/${cardId}`, { method: 'DELETE' });
-                if (!response.ok) throw new Error((await response.json()).error || 'Failed to delete credit card');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to delete credit card');
+                }
                 showNotification('Credit card deleted successfully!', 'success');
                 // Remove the card element from the DOM
                 $(e.currentTarget).closest("[data-card-id]").remove();

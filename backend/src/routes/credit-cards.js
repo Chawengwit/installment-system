@@ -118,6 +118,16 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     try {
+        const { rows } = await query('SELECT installment_status FROM credit_cards WHERE id = $1', [id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Credit card not found' });
+        }
+
+        if (rows[0].installment_status) {
+            return res.status(409).json({ error: 'Cannot delete a credit card that is currently in use.' });
+        }
+
         const result = await query('DELETE FROM credit_cards WHERE id = $1 RETURNING *', [id]);
         if (result.rowCount === 0) {
             return res.status(404).json({ error: 'Credit card not found' });
