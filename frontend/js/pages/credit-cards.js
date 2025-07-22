@@ -139,11 +139,11 @@ class PageCreditCards {
                     
                     <div class="credit-card_detail-item">
                         <span class="credit-card_detail-label">Used:</span>
-                        <span class="credit-card_detail-value used">${card.used_amount}</span>
+                        <span class="credit-card_detail-value used">฿${parseFloat(card.used_amount).toLocaleString()}</span>
                     </div>
                     <div class="credit-card_detail-item">
                         <span class="credit-card_detail-label">Available:</span>
-                        <span class="credit-card_detail-value available">${card.credit_limit - card.used_amount}</span>
+                        <span class="credit-card_detail-value available">฿${parseFloat(card.credit_limit - card.used_amount).toLocaleString()}</span>
                     </div>
                 </div>
             </div>
@@ -282,9 +282,9 @@ class PageCreditCards {
             const card = await response.json();
 
             $('#detail-card-name').text(card.card_name);
-            $('#detail-card-limit').text(`฿${card.credit_limit.toLocaleString()}`);
-            $('#detail-card-used').text(`฿${card.used_amount.toLocaleString()}`);
-            $('#detail-card-available').text(`฿${(card.credit_limit - card.used_amount).toLocaleString()}`);
+            $('#detail-card-limit').text(`฿${parseFloat(card.credit_limit).toLocaleString()}`);
+            $('#detail-card-used').text(`฿${parseFloat(card.used_amount).toLocaleString()}`);
+            $('#detail-card-available').text(`฿${parseFloat(card.credit_limit - card.used_amount).toLocaleString()}`);
 
             const installmentHistoryBody = $('#installment-history-body');
             installmentHistoryBody.empty();
