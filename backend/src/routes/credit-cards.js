@@ -73,15 +73,15 @@ router.get('/:id', async (req, res) => {
 
 // POST a new credit card
 router.post('/', async (req, res) => {
-    const { card_name, credit_limit } = req.body;
+    const { card_name, credit_limit, color } = req.body;
     if (!card_name || !credit_limit) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
     try {
         const { rows } = await query(
-            'INSERT INTO credit_cards (card_name, credit_limit) VALUES ($1, $2) RETURNING *',
-            [card_name, credit_limit]
+            'INSERT INTO credit_cards (card_name, credit_limit, color) VALUES ($1, $2, $3) RETURNING *',
+            [card_name, credit_limit, color]
         );
         res.status(201).json(rows[0]);
     } catch (error) {
@@ -93,7 +93,7 @@ router.post('/', async (req, res) => {
 // PUT (update) a credit card by ID
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { card_name, credit_limit } = req.body;
+    const { card_name, credit_limit, color } = req.body;
 
     if (!card_name || !credit_limit) {
         return res.status(400).json({ error: 'Missing required fields' });
@@ -101,8 +101,8 @@ router.put('/:id', async (req, res) => {
 
     try {
         const { rows } = await query(
-            'UPDATE credit_cards SET card_name = $1, credit_limit = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING *',
-            [card_name, credit_limit, id]
+            'UPDATE credit_cards SET card_name = $1, credit_limit = $2, color = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $4 RETURNING *',
+            [card_name, credit_limit, color, id]
         );
         if (rows.length === 0) {
             return res.status(404).json({ error: 'Credit card not found' });

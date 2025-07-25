@@ -36,6 +36,8 @@ const createTables = async () => {
                 installment_status BOOLEAN NOT NULL DEFAULT FALSE
             );
 
+            ALTER TABLE credit_cards ADD COLUMN IF NOT EXISTS color VARCHAR(255);
+
             CREATE INDEX IF NOT EXISTS idx_credit_card_name ON credit_cards(card_name);
 
             CREATE TABLE IF NOT EXISTS products (

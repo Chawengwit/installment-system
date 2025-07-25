@@ -63,6 +63,15 @@
                 <label class="form_label">Credit Limit (฿) *</label>
                 <input type="number" class="form_input" name="creditLimit" placeholder="25000.00" min="0" required>
             </div>
+            <div class="form_group">
+                <label class="form_label">Card Theme</label>
+                <div class="color-selector" id="add-card-color-selector">
+                    <div class="color-option" data-color="theme-1" style="background: radial-gradient(circle at 30% 30%, #3b3bb2, transparent), radial-gradient(circle at 70% 70%, #9e2a75, transparent), radial-gradient(circle at 50% 50%, #ff5f6d, #ffc371);"></div>
+                    <div class="color-option" data-color="theme-2" style="background: radial-gradient(circle at 30% 30%, #4CAF50, transparent), radial-gradient(circle at 70% 70%, #2196F3, transparent), radial-gradient(circle at 50% 50%, #FFEB3B, #FF9800);"></div>
+                    <div class="color-option" data-color="theme-3" style="background: radial-gradient(circle at 30% 30%, #FF5722, transparent), radial-gradient(circle at 70% 70%, #607D8B, transparent), radial-gradient(circle at 50% 50%, #9C27B0, #E91E63);"></div>
+                </div>
+                <input type="hidden" name="color" value="theme-1">
+            </div>
             <div class="form_actions">
                 <button type="button" class="btn btn-secondary" id="cancel-add-card">Cancel</button>
                 <button type="submit" class="btn btn-primary">Add Card</button>
@@ -90,6 +99,15 @@
             <div class="form_group">
                 <label class="form_label">Credit Limit (฿) *</label>
                 <input type="number" class="form_input" name="credit_limit" min="0" required>
+            </div>
+            <div class="form_group">
+                <label class="form_label">Card Theme</label>
+                <div class="color-selector" id="edit-card-color-selector">
+                    <div class="color-option" data-color="theme-1" style="background: radial-gradient(circle at 30% 30%, #3b3bb2, transparent), radial-gradient(circle at 70% 70%, #9e2a75, transparent), radial-gradient(circle at 50% 50%, #ff5f6d, #ffc371);"></div>
+                    <div class="color-option" data-color="theme-2" style="background: radial-gradient(circle at 30% 30%, #4CAF50, transparent), radial-gradient(circle at 70% 70%, #2196F3, transparent), radial-gradient(circle at 50% 50%, #FFEB3B, #FF9800);"></div>
+                    <div class="color-option" data-color="theme-3" style="background: radial-gradient(circle at 30% 30%, #FF5722, transparent), radial-gradient(circle at 70% 70%, #607D8B, transparent), radial-gradient(circle at 50% 50%, #9C27B0, #E91E63);"></div>
+                </div>
+                <input type="hidden" name="color" value="theme-1">
             </div>
             <div class="form_actions">
                 <button type="button" class="btn btn-secondary" id="cancel-edit-card">Cancel</button>
