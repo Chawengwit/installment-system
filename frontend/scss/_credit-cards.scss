@@ -13,6 +13,21 @@
     }
 }
 
+/*
+    width: 350px;
+    height: 200px;
+    border-radius: 16px;
+    padding: 20px;
+    background: linear-gradient(135deg, #3b3bb2, #9e2a75);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+*/
 
 
 // Credit cards
@@ -23,12 +38,31 @@
 }
 
 .credit-card {
-    background: linear-gradient(135deg, var(--color-gray-900) 0%, var(--color-gray-700) 100%);
+    // background: linear-gradient(135deg, var(--color-gray-900) 0%, var(--color-gray-700) 100%);
+    // box-shadow: var(--shadow-lg);
     color: var(--color-white);
     border-radius: var(--border-radius-xl);
     padding: var(--spacing-lg);
-    box-shadow: var(--shadow-lg);
     transition: var(--transition-fast);
+
+    // background: linear-gradient(135deg, #3b3bb2, #9e2a75);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -30%;
+        left: -30%;
+        width: 160%;
+        height: 160%;
+        background: radial-gradient(circle at 30% 30%, #3b3bb2, transparent),
+                    radial-gradient(circle at 70% 70%, #9e2a75, transparent),
+                    radial-gradient(circle at 50% 50%, #ff5f6d, #ffc371);
+        filter: blur(50px);
+        z-index: 0;
+    }
 
     &:hover {
         transform: translateY(-4px);
@@ -37,6 +71,7 @@
 
     .credit-card_header {
         display: flex;
+        position: relative;
         align-items: center;
         justify-content: space-between;
         margin-bottom: var(--spacing-lg);
@@ -54,6 +89,7 @@
     }
 
     .credit-card_action {
+        position: relative;
         width: 32px;
         height: 32px;
         border: none;
@@ -73,32 +109,6 @@
         }
     }
 
-    .btn-view-card {
-        background-color: transparent;
-        color: var(--color-primary);
-        &:hover {
-            background-color: var(--color-primary-light);
-            color: var(--color-primary-dark);
-        }
-    }
-
-    .btn-edit-card {
-        background-color: transparent;
-        color: var(--color-secondary);
-        &:hover {
-            background-color: var(--color-secondary-light);
-            color: var(--color-secondary-dark);
-        }
-    }
-
-    .btn-delete-card {
-        background-color: transparent;
-        color: var(--color-danger);
-        &:hover {
-            background-color: var(--color-danger-light);
-            color: var(--color-danger-dark);
-        }
-    }
 
     .credit-card_actions {
         display: flex;
@@ -107,6 +117,7 @@
     }
 
     .credit-card_details {
+        position: relative;
         display: flex;
         justify-content: space-between;
         margin-top: var(--spacing-md);
