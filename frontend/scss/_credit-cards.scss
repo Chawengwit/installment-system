@@ -40,7 +40,7 @@
 .credit-card {
     // background: linear-gradient(135deg, var(--color-gray-900) 0%, var(--color-gray-700) 100%);
     // box-shadow: var(--shadow-lg);
-    color: var(--color-white);
+    color: var(--color-gray-800);
     border-radius: var(--border-radius-xl);
     padding: var(--spacing-lg);
     transition: var(--transition-fast);
@@ -93,8 +93,8 @@
         width: 32px;
         height: 32px;
         border: none;
-        background-color: rgba(255, 255, 255, 0.2);
-        color: var(--color-white);
+        background-color: rgba(0, 0, 0, 0.1);
+        color: var(--color-gray-800);
         border-radius: var(--border-radius-md);
         display: flex;
         align-items: center;
@@ -103,7 +103,7 @@
         transition: var(--transition-fast);
         
         &:hover {
-            background-color: rgba(255, 255, 255, 0.3);
+            background-color: rgba(0, 0, 0, 0.2);
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
@@ -122,14 +122,14 @@
         justify-content: space-between;
         margin-top: var(--spacing-md);
         padding-top: var(--spacing-md);
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
 
         .credit-card_detail-item {
             text-align: left;
 
             .credit-card_detail-label {
                 opacity: 0.8;
-                color: var(--color-white);
+                color: var(--color-gray-800);
             }
 
             .credit-card_detail-value {
