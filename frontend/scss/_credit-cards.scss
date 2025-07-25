@@ -200,3 +200,52 @@
 .color-option.selected {
     border-color: var(--color-primary);
 }
+
+.credit-card-theme-4::before {
+    background: radial-gradient(circle at 30% 30%, #ff9a8b, transparent),
+        radial-gradient(circle at 70% 70%, #ff6a88, transparent),
+        radial-gradient(circle at 50% 50%, #ff99ac, #ff6a88);
+    filter: blur(50px);
+}
+
+.credit-card-theme-5::before {
+    background: radial-gradient(circle at 30% 30%, #a18cd1, transparent),
+        radial-gradient(circle at 70% 70%, #fbc2eb, transparent),
+        radial-gradient(circle at 50% 50%, #a18cd1, #fbc2eb);
+    filter: blur(50px);
+}
+
+.credit-card-theme-6::before {
+    background: radial-gradient(circle at 30% 30%, #fad0c4, transparent),
+        radial-gradient(circle at 70% 70%, #ffd1ff, transparent),
+        radial-gradient(circle at 50% 50%, #fad0c4, #ffd1ff);
+    filter: blur(50px);
+}
+
+.credit-card-theme-7::before {
+    background: radial-gradient(circle at 30% 30%, #ffecd2, transparent),
+        radial-gradient(circle at 70% 70%, #fcb69f, transparent),
+        radial-gradient(circle at 50% 50%, #ffecd2, #fcb69f);
+    filter: blur(50px);
+}
+
+.credit-card-theme-8::before {
+    background: radial-gradient(circle at 30% 30%, #f6d365, transparent),
+        radial-gradient(circle at 70% 70%, #fda085, transparent),
+        radial-gradient(circle at 50% 50%, #f6d365, #fda085);
+    filter: blur(50px);
+}
+
+.credit-card-theme-9::before {
+    background: radial-gradient(circle at 30% 30%, #c2e9fb, transparent),
+        radial-gradient(circle at 70% 70%, #a1c4fd, transparent),
+        radial-gradient(circle at 50% 50%, #c2e9fb, #a1c4fd);
+    filter: blur(50px);
+}
+
+.credit-card-theme-10::before {
+    background: radial-gradient(circle at 30% 30%, #d4fc79, transparent),
+        radial-gradient(circle at 70% 70%, #96e6a1, transparent),
+        radial-gradient(circle at 50% 50%, #d4fc79, #96e6a1);
+    filter: blur(50px);
+}
