@@ -34,6 +34,7 @@ class PageCreditCards {
         this.$mainContent.on("click", ".btn-view-card", this.handleViewCard.bind(this));
         this.$mainContent.on("change", "#filter-card-select", this.handleFilterChange.bind(this));
         this.$mainContent.on("input", "#card-search-input", debounce(this.handleSearchInput.bind(this), 300));
+        this.$mainContent.on("click", ".color-option", this.handleColorSelection.bind(this));
     }
 
     async fetchCreditCards(clearExisting = false, filter = 'all', searchTerm = '') {
@@ -116,8 +117,10 @@ class PageCreditCards {
     }
 
     createCreditCard(card) {
+        console.log("card: ",card)
+
         return `
-            <div class="credit-card" data-card-id="${card.id}">
+            <div class="credit-card ${card.color ? 'credit-card-'+card.color : 'credit-card-theme-1'}" data-card-id="${card.id}">
                 <div class="credit-card_header">
                     <div class="credit-card_brand">
                         <i class="fas fa-credit-card"></i>
@@ -139,11 +142,11 @@ class PageCreditCards {
                     
                     <div class="credit-card_detail-item">
                         <span class="credit-card_detail-label">Used:</span>
-                        <span class="credit-card_detail-value used">${card.used_amount}</span>
+                        <span class="credit-card_detail-value used">฿${parseFloat(card.used_amount).toLocaleString()}</span>
                     </div>
                     <div class="credit-card_detail-item">
                         <span class="credit-card_detail-label">Available:</span>
-                        <span class="credit-card_detail-value available">${card.credit_limit - card.used_amount}</span>
+                        <span class="credit-card_detail-value available">฿${parseFloat(card.credit_limit - card.used_amount).toLocaleString()}</span>
                     </div>
                 </div>
             </div>
@@ -156,7 +159,8 @@ class PageCreditCards {
         const formData = new FormData(form);
         const data = {
             card_name: formData.get('cardName'),
-            credit_limit: formData.get('creditLimit')
+            credit_limit: formData.get('creditLimit'),
+            color: formData.get('color')
         };
 
         try {
@@ -195,6 +199,12 @@ class PageCreditCards {
             form.find('[name="id"]').val(card.id);
             form.find('[name="card_name"]').val(card.card_name);
             form.find('[name="credit_limit"]').val(card.credit_limit);
+            form.find('[name="color"]').val(card.color || 'theme-1');
+
+            // Update color selector UI
+            const colorSelector = form.find('.color-selector');
+            colorSelector.find('.color-option').removeClass('selected');
+            colorSelector.find(`[data-color="${card.color || 'theme-1'}"]`).addClass('selected');
 
             openModal('edit-card-modal');
         } catch (error) {
@@ -210,7 +220,8 @@ class PageCreditCards {
         const data = {
             id: formData.get('id'),
             card_name: formData.get('card_name'),
-            credit_limit: formData.get('credit_limit')
+            credit_limit: formData.get('credit_limit'),
+            color: formData.get('color')
         };
         const cardId = data.id;
 
@@ -282,9 +293,9 @@ class PageCreditCards {
             const card = await response.json();
 
             $('#detail-card-name').text(card.card_name);
-            $('#detail-card-limit').text(`฿${card.credit_limit.toLocaleString()}`);
-            $('#detail-card-used').text(`฿${card.used_amount.toLocaleString()}`);
-            $('#detail-card-available').text(`฿${(card.credit_limit - card.used_amount).toLocaleString()}`);
+            $('#detail-card-limit').text(`฿${parseFloat(card.credit_limit).toLocaleString()}`);
+            $('#detail-card-used').text(`฿${parseFloat(card.used_amount).toLocaleString()}`);
+            $('#detail-card-available').text(`฿${parseFloat(card.credit_limit - card.used_amount).toLocaleString()}`);
 
             const installmentHistoryBody = $('#installment-history-body');
             installmentHistoryBody.empty();
@@ -328,6 +339,14 @@ class PageCreditCards {
             console.error('Error fetching card details:', error);
             showNotification(error.message, 'error');
         }
+    }
+
+    handleColorSelection(e) {
+        const selectedColor = $(e.currentTarget).data('color');
+        const colorSelector = $(e.currentTarget).closest('.color-selector');
+        colorSelector.find('.color-option').removeClass('selected');
+        $(e.currentTarget).addClass('selected');
+        colorSelector.siblings('input[name="color"]').val(selectedColor);
     }
 }
 

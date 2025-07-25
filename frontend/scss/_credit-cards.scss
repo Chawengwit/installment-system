@@ -13,6 +13,21 @@
     }
 }
 
+/*
+    width: 350px;
+    height: 200px;
+    border-radius: 16px;
+    padding: 20px;
+    background: linear-gradient(135deg, #3b3bb2, #9e2a75);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+*/
 
 
 // Credit cards
@@ -23,12 +38,31 @@
 }
 
 .credit-card {
-    background: linear-gradient(135deg, var(--color-gray-900) 0%, var(--color-gray-700) 100%);
-    color: var(--color-white);
+    // background: linear-gradient(135deg, var(--color-gray-900) 0%, var(--color-gray-700) 100%);
+    // box-shadow: var(--shadow-lg);
+    color: var(--color-gray-800);
     border-radius: var(--border-radius-xl);
     padding: var(--spacing-lg);
-    box-shadow: var(--shadow-lg);
     transition: var(--transition-fast);
+
+    // background: linear-gradient(135deg, #3b3bb2, #9e2a75);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -30%;
+        left: -30%;
+        width: 160%;
+        height: 160%;
+        // background: radial-gradient(circle at 30% 30%, #3b3bb2, transparent),
+        //             radial-gradient(circle at 70% 70%, #9e2a75, transparent),
+        //             radial-gradient(circle at 50% 50%, #ff5f6d, #ffc371);
+        // filter: blur(50px);
+        z-index: 0;
+    }
 
     &:hover {
         transform: translateY(-4px);
@@ -37,6 +71,7 @@
 
     .credit-card_header {
         display: flex;
+        position: relative;
         align-items: center;
         justify-content: space-between;
         margin-bottom: var(--spacing-lg);
@@ -54,11 +89,12 @@
     }
 
     .credit-card_action {
+        position: relative;
         width: 32px;
         height: 32px;
         border: none;
-        background-color: rgba(255, 255, 255, 0.2);
-        color: var(--color-white);
+        background-color: rgba(0, 0, 0, 0.1);
+        color: var(--color-gray-800);
         border-radius: var(--border-radius-md);
         display: flex;
         align-items: center;
@@ -67,38 +103,12 @@
         transition: var(--transition-fast);
         
         &:hover {
-            background-color: rgba(255, 255, 255, 0.3);
+            background-color: rgba(0, 0, 0, 0.2);
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
     }
 
-    .btn-view-card {
-        background-color: transparent;
-        color: var(--color-primary);
-        &:hover {
-            background-color: var(--color-primary-light);
-            color: var(--color-primary-dark);
-        }
-    }
-
-    .btn-edit-card {
-        background-color: transparent;
-        color: var(--color-secondary);
-        &:hover {
-            background-color: var(--color-secondary-light);
-            color: var(--color-secondary-dark);
-        }
-    }
-
-    .btn-delete-card {
-        background-color: transparent;
-        color: var(--color-danger);
-        &:hover {
-            background-color: var(--color-danger-light);
-            color: var(--color-danger-dark);
-        }
-    }
 
     .credit-card_actions {
         display: flex;
@@ -107,31 +117,24 @@
     }
 
     .credit-card_details {
+        position: relative;
         display: flex;
         justify-content: space-between;
         margin-top: var(--spacing-md);
         padding-top: var(--spacing-md);
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
 
         .credit-card_detail-item {
             text-align: left;
 
             .credit-card_detail-label {
                 opacity: 0.8;
-                color: var(--color-white);
+                color: var(--color-gray-800);
             }
 
             .credit-card_detail-value {
                 font-size: var(--font-size-md);
                 font-weight: 600;
-            }
-
-            .credit-card_detail-value.used {
-                color: var(--color-danger);
-            }
-
-            .credit-card_detail-value.available {
-                color: var(--color-success);
             }
         }
     }
@@ -156,4 +159,93 @@
 
 #detail-card-available {
     color: var(--color-success);
+}
+
+.credit-card-theme-1::before {
+    background: radial-gradient(circle at 30% 30%, #3b3bb2, transparent),
+        radial-gradient(circle at 70% 70%, #9e2a75, transparent),
+        radial-gradient(circle at 50% 50%, #ff5f6d, #ffc371);
+    filter: blur(50px);
+}
+
+.credit-card-theme-2::before {
+    background: radial-gradient(circle at 30% 30%, #4CAF50, transparent),
+        radial-gradient(circle at 70% 70%, #2196F3, transparent),
+        radial-gradient(circle at 50% 50%, #FFEB3B, #FF9800);
+    filter: blur(50px);
+}
+
+.credit-card-theme-3::before {
+    background: radial-gradient(circle at 30% 30%, #FF5722, transparent),
+        radial-gradient(circle at 70% 70%, #607D8B, transparent),
+        radial-gradient(circle at 50% 50%, #9C27B0, #E91E63);
+    filter: blur(50px);
+}
+
+.color-selector {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.3s;
+}
+
+.color-option.selected {
+    border-color: var(--color-primary);
+}
+
+.credit-card-theme-4::before {
+    background: radial-gradient(circle at 30% 30%, #ff9a8b, transparent),
+        radial-gradient(circle at 70% 70%, #ff6a88, transparent),
+        radial-gradient(circle at 50% 50%, #ff99ac, #ff6a88);
+    filter: blur(50px);
+}
+
+.credit-card-theme-5::before {
+    background: radial-gradient(circle at 30% 30%, #a18cd1, transparent),
+        radial-gradient(circle at 70% 70%, #fbc2eb, transparent),
+        radial-gradient(circle at 50% 50%, #a18cd1, #fbc2eb);
+    filter: blur(50px);
+}
+
+.credit-card-theme-6::before {
+    background: radial-gradient(circle at 30% 30%, #fad0c4, transparent),
+        radial-gradient(circle at 70% 70%, #ffd1ff, transparent),
+        radial-gradient(circle at 50% 50%, #fad0c4, #ffd1ff);
+    filter: blur(50px);
+}
+
+.credit-card-theme-7::before {
+    background: radial-gradient(circle at 30% 30%, #ffecd2, transparent),
+        radial-gradient(circle at 70% 70%, #fcb69f, transparent),
+        radial-gradient(circle at 50% 50%, #ffecd2, #fcb69f);
+    filter: blur(50px);
+}
+
+.credit-card-theme-8::before {
+    background: radial-gradient(circle at 30% 30%, #f6d365, transparent),
+        radial-gradient(circle at 70% 70%, #fda085, transparent),
+        radial-gradient(circle at 50% 50%, #f6d365, #fda085);
+    filter: blur(50px);
+}
+
+.credit-card-theme-9::before {
+    background: radial-gradient(circle at 30% 30%, #c2e9fb, transparent),
+        radial-gradient(circle at 70% 70%, #a1c4fd, transparent),
+        radial-gradient(circle at 50% 50%, #c2e9fb, #a1c4fd);
+    filter: blur(50px);
+}
+
+.credit-card-theme-10::before {
+    background: radial-gradient(circle at 30% 30%, #d4fc79, transparent),
+        radial-gradient(circle at 70% 70%, #96e6a1, transparent),
+        radial-gradient(circle at 50% 50%, #d4fc79, #96e6a1);
+    filter: blur(50px);
 }
