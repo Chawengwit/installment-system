@@ -829,8 +829,6 @@ class PageDashboard {
     async handleViewInstallment(event) {
         const installmentId = $(event.currentTarget).data('installment-id');
 
-        console.log("BBBBB", installmentId)
-
         if (!installmentId) {
             showNotification('Installment ID not found.', 'error');
             return;
@@ -884,8 +882,20 @@ class PageDashboard {
             const paymentScheduleBody = $('#view-payment-schedule-body');
             paymentScheduleBody.empty();
             if (installment.payment_schedule && installment.payment_schedule.length > 0) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Set to midnight to compare dates only
+
                 installment.payment_schedule.forEach(payment => {
-                    const actionsHtml = payment.is_paid ? '' : `<button class="btn btn-sm btn-success mark-paid-btn" data-payment-id="${payment.id}" data-installment-id="${installment.id}" data-payment-amount="${payment.amount}"><i class="fas fa-check"></i> Mark Paid</button>`;
+                    let actionsHtml;
+                    if (payment.is_paid) {
+                        actionsHtml = `<span style="color: green; font-weight: bold;">Paid</span>`;
+                    } else {
+                        const dueDate = new Date(payment.due_date);
+                        const isOverdue = dueDate < today;
+                        const buttonClass = isOverdue ? 'btn-danger' : 'btn-primary';
+                        actionsHtml = `<button class="btn btn-sm ${buttonClass} mark-paid-btn" data-payment-id="${payment.id}" data-installment-id="${installment.id}" data-payment-amount="${payment.amount}"><i class="fas fa-check"></i> Mark Paid</button>`;
+                    }
+
                     paymentScheduleBody.append(`
                         <tr>
                             <td>${payment.term_number}</td>
