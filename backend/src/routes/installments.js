@@ -106,7 +106,6 @@ router.get('/:id', async (req, res) => {
                 p.description as product_description,
                 p.images as product_images,
                 cc.card_name,
-                cc.card_number,
                 cc.credit_limit
             FROM installments i
             JOIN customers c ON i.customer_id = c.id
@@ -176,25 +175,10 @@ router.post('/', upload.array('productImages'), async (req, res) => {
         const monthlyPayment = (totalAmount * (1 + interestRate / 100)) / installmentMonths;
 
         const installmentResult = await client.query(
-            'INSERT INTO installments (customer_id, product_id, credit_card_id, due_date, monthly_payment, total_amount, interest_rate, term_months, status, late_fee, start_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW()) RETURNING id, start_date',
-            [customerId, productId, creditCardId, paymentDueDate, monthlyPayment, totalAmount, interestRate, installmentMonths, 'active', lateFee]
+            'INSERT INTO installments (customer_id, product_id, credit_card_id, due_date, monthly_payment, total_amount, interest_rate, term_months, status, late_fee, start_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW()) RETURNING id',
+            [customerId, productId, creditCardId, paymentDueDate, monthlyPayment, totalAmount, interestRate, installmentMonths, 'non-active', lateFee]
         );
         const installmentId = installmentResult.rows[0].id;
-        const startDate = new Date(installmentResult.rows[0].start_date);
-
-        // 3. Create installment payments
-        const paymentDay = parseInt(paymentDueDate, 10);
-
-        for (let i = 1; i <= installmentMonths; i++) {
-            const actualDueDate = new Date(startDate);
-            actualDueDate.setMonth(actualDueDate.getMonth() + i);
-            actualDueDate.setDate(paymentDay);
-
-            await client.query(
-                'INSERT INTO installment_payments (installment_id, term_number, due_date, amount, is_paid, notification_sent) VALUES ($1, $2, $3, $4, $5, $6)',
-                [installmentId, i, actualDueDate, monthlyPayment, false, false]
-            );
-        }
 
         // Update credit card used_amount and installment_status
         await client.query(

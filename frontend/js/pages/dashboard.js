@@ -16,10 +16,32 @@ class PageDashboard {
 
     init() {
         this.bindEvents();
+        this.fetchDashboardStats();
         this.fetchInstallments(true);
         this.setupCustomerModals();
         this.setupCreditCardModals();
         this.toggleView(false); // Show table view by default
+    }
+
+    async fetchDashboardStats() {
+        try {
+            const response = await fetch('/api/dashboard/stats');
+            if (!response.ok) {
+                throw new Error('Failed to fetch dashboard stats');
+            }
+            const stats = await response.json();
+
+            $('#total-customers').text(stats.totalCustomers);
+            $('#active-installments').text(stats.activeInstallmentsCount);
+            $('#today-due-date').text(stats.todayDueDateCount);
+            $('#overdue-installments').text(stats.overdueCount);
+            $('#available-credit').text(`฿${stats.availableCredit.toLocaleString()}`);
+            $('#cash-flow').text(`฿${stats.cashFlow.toLocaleString()}`);
+
+        } catch (error) {
+            console.error('Error fetching dashboard stats:', error);
+            showNotification(error.message, 'error');
+        }
     }
 
     setupCreditCardModals() {
@@ -262,7 +284,7 @@ class PageDashboard {
         });
 
         this.$mainContent.on("click", "#customize-term-btn", () => this.showStep(2));
-        this.$mainContent.on("click", ".view-installment-btn", this.handleViewInstallment.bind(this));
+        this.$mainContent.on("click", "#installment-table-body tr", this.handleViewInstallment.bind(this));
         this.$mainContent.on("click", ".mark-paid-btn", this.handleMarkPaymentAsPaid.bind(this));
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
@@ -759,7 +781,7 @@ class PageDashboard {
 
         if (installments.length === 0 && clearExisting) {
             installmentGrid.html('<p>No installment plans found.</p>');
-            installmentTableBody.html('<tr><td colspan="5">No installment plans found.</td></tr>');
+            installmentTableBody.html('<tr><td colspan="3">No installment plans found.</td></tr>');
             return;
         } else if (installments.length === 0 && !clearExisting) {
             return;
@@ -799,20 +821,12 @@ class PageDashboard {
                         <a href="tel:${installment.customer_phone}" class="customer-phone">${installment.customer_phone}</a>
                     </div>
                 </td>
-                <td>
-                    <div class="amount-info">
-                        <span class="paid-amount">฿${parseFloat(installment.total_paid_amount || 0).toLocaleString()}</span>
-                        <span class="total-amount">/ ฿${parseFloat(installment.total_amount).toLocaleString()}</span>
-                    </div>
-                </td>
-                <td>${installment.next_due_date_term_number || 'N/A'} / ${installment.term_months}</td>
                 <td class="text-center">
                     <div class="due-date-info">
                         <span class="monthly-payment">฿${parseFloat(installment.monthly_payment).toLocaleString()}</span><br>
                         <span class="due-date">${nextDueDate}</span>
                     </div>
                 </td>
-                <td><span class="status-badge status-${statusClass}">${installment.status}</span></td>
             </tr>
         `;
     }
@@ -835,7 +849,8 @@ class PageDashboard {
     }
 
     async handleViewInstallment(event) {
-        const installmentId = $(event.currentTarget).data('id');
+        const installmentId = $(event.currentTarget).data('installment-id');
+
         if (!installmentId) {
             showNotification('Installment ID not found.', 'error');
             return;
@@ -889,22 +904,31 @@ class PageDashboard {
             const paymentScheduleBody = $('#view-payment-schedule-body');
             paymentScheduleBody.empty();
             if (installment.payment_schedule && installment.payment_schedule.length > 0) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Set to midnight to compare dates only
+
                 installment.payment_schedule.forEach(payment => {
-                    const paymentStatusClass = payment.is_paid ? 'status-completed' : (new Date(payment.due_date) < new Date() ? 'status-overdue' : 'status-pending');
-                    const actionsHtml = payment.is_paid ? '' : `<button class="btn btn-sm btn-success mark-paid-btn" data-payment-id="${payment.id}" data-installment-id="${installment.id}" data-payment-amount="${payment.amount}"><i class="fas fa-check"></i> Mark Paid</button>`;
+                    let actionsHtml;
+                    if (payment.is_paid) {
+                        actionsHtml = `<span style="color: green; font-weight: bold;">Paid</span>`;
+                    } else {
+                        const dueDate = new Date(payment.due_date);
+                        const isOverdue = dueDate < today;
+                        const buttonClass = isOverdue ? 'btn-danger' : 'btn-primary';
+                        actionsHtml = `<button class="btn btn-sm ${buttonClass} mark-paid-btn" data-payment-id="${payment.id}" data-installment-id="${installment.id}" data-payment-amount="${payment.amount}"><i class="fas fa-check"></i> Mark Paid</button>`;
+                    }
+
                     paymentScheduleBody.append(`
                         <tr>
                             <td>${payment.term_number}</td>
                             <td>${new Date(payment.due_date).toLocaleDateString()}</td>
                             <td>฿${parseFloat(payment.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                            <td>฿${parseFloat(payment.paid_amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                            <td><span class="status-badge ${paymentStatusClass}">${payment.is_paid ? 'Paid' : 'Pending'}</span></td>
                             <td class="text-right">${actionsHtml}</td>
                         </tr>
                     `);
                 });
             } else {
-                paymentScheduleBody.append('<tr><td colspan="5">No payment schedule available.</td></tr>');
+                paymentScheduleBody.append('<tr><td colspan="4">No payment schedule available.</td></tr>');
             }
 
             openModal('view-installment-modal');

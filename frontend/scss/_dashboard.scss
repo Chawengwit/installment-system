@@ -73,6 +73,14 @@
     &.stat-card-info .stat-card_icon {
         background-color: var(--color-info);
     }
+
+    &.stat-card-danger .stat-card_icon {
+        background-color: var(--color-danger);
+    }
+
+    &.stat-card-violet .stat-card_icon {
+        background-color: var(--color-violet);
+    }
 }
 
 // Progress Indicator

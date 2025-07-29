@@ -19,10 +19,17 @@ router.get('/', async (req, res) => {
         paramIndex++;
     }
 
-    if (search) {
-        filters.push(`card_name ILIKE $${paramIndex}`);
-        queryParams.push(`%${search}%`);
-        paramIndex++;
+    if (search && search.trim()) {
+        const numericValue = parseFloat(search);
+        if (!isNaN(numericValue) && isFinite(numericValue)) {
+            filters.push(`(credit_limit - used_amount) >= $${paramIndex}`);
+            queryParams.push(numericValue);
+            paramIndex++;
+        } else {
+            filters.push(`card_name ILIKE $${paramIndex}`);
+            queryParams.push(`%${search}%`);
+            paramIndex++;
+        }
     }
 
     if (filters.length > 0) {

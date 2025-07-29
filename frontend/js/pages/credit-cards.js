@@ -117,8 +117,6 @@ class PageCreditCards {
     }
 
     createCreditCard(card) {
-        console.log("card: ",card)
-
         return `
             <div class="credit-card ${card.color ? 'credit-card-'+card.color : 'credit-card-theme-1'}" data-card-id="${card.id}">
                 <div class="credit-card_header">
