@@ -8,6 +8,7 @@
     --color-warning: #f59e0b;
     --color-danger: #ef4444;
     --color-info: #06b6d4;
+    --color-violet: #8b5cf6;
 
     // Neutral colors
     --color-white: #ffffff;
@@ -764,6 +765,14 @@ a{
 
     &.overview-stat-info .overview-stat_icon {
         background-color: var(--color-info);
+    }
+
+    &.stat-card-warning .stat-card_icon {
+        background-color: var(--color-danger);
+    }
+
+    &.stat-card-violet .stat-card_icon {
+        background-color: var(--color-danger);
     }
 }
 
