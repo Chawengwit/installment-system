@@ -32,6 +32,8 @@ class PageDashboard {
             const stats = await response.json();
 
             $('#total-customers').text(stats.totalCustomers);
+            $('#active-installments').text(stats.activeInstallmentsCount);
+            $('#today-due-date').text(stats.todayDueDateCount);
             $('#overdue-installments').text(stats.overdueCount);
             $('#available-credit').text(`฿${stats.availableCredit.toLocaleString()}`);
             $('#cash-flow').text(`฿${stats.cashFlow.toLocaleString()}`);

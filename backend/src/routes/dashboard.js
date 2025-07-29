@@ -10,6 +10,19 @@ router.get('/stats', async (req, res) => {
         const customerResult = await pool.query('SELECT COUNT(*) FROM customers');
         const totalCustomers = parseInt(customerResult.rows[0].count, 10);
 
+        // Active Installments
+        const activeInstallmentsResult = await pool.query('SELECT COUNT(*) FROM installments WHERE status = \'active\'');
+        const activeInstallmentsCount = parseInt(activeInstallmentsResult.rows[0].count, 10);
+
+        // Today Due Date Installments
+        const todayDueDateResult = await pool.query(`
+            SELECT COUNT(DISTINCT i.id)
+            FROM installments i
+            JOIN installment_payments ip ON i.id = ip.installment_id
+            WHERE ip.is_paid = false AND ip.due_date = CURRENT_DATE;
+        `);
+        const todayDueDateCount = parseInt(todayDueDateResult.rows[0].count, 10);
+
         // Overdue Installments
         const overdueResult = await pool.query(`
             SELECT COUNT(DISTINCT i.id)
@@ -33,6 +46,8 @@ router.get('/stats', async (req, res) => {
 
         res.json({
             totalCustomers,
+            activeInstallmentsCount,
+            todayDueDateCount,
             overdueCount,
             availableCredit,
             cashFlow
