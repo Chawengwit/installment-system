@@ -68,7 +68,7 @@ const createTables = async () => {
                 total_amount NUMERIC(12, 2) NOT NULL,
                 interest_rate NUMERIC(5, 2) NOT NULL,
                 term_months INTEGER NOT NULL,
-                status installment_status_enum DEFAULT 'active',
+                status installment_status_enum DEFAULT 'non-active',
                 late_fee NUMERIC(12, 2) DEFAULT 0,
                 start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
