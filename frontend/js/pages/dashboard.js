@@ -262,7 +262,7 @@ class PageDashboard {
         });
 
         this.$mainContent.on("click", "#customize-term-btn", () => this.showStep(2));
-        this.$mainContent.on("click", ".view-installment-btn", this.handleViewInstallment.bind(this));
+        this.$mainContent.on("click", "#installment-table-body tr", this.handleViewInstallment.bind(this));
         this.$mainContent.on("click", ".mark-paid-btn", this.handleMarkPaymentAsPaid.bind(this));
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
@@ -827,7 +827,10 @@ class PageDashboard {
     }
 
     async handleViewInstallment(event) {
-        const installmentId = $(event.currentTarget).data('id');
+        const installmentId = $(event.currentTarget).data('installment-id');
+
+        console.log("BBBBB", installmentId)
+
         if (!installmentId) {
             showNotification('Installment ID not found.', 'error');
             return;

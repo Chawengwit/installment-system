@@ -106,7 +106,6 @@ router.get('/:id', async (req, res) => {
                 p.description as product_description,
                 p.images as product_images,
                 cc.card_name,
-                cc.card_number,
                 cc.credit_limit
             FROM installments i
             JOIN customers c ON i.customer_id = c.id
