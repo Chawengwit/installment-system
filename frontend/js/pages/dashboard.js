@@ -16,10 +16,30 @@ class PageDashboard {
 
     init() {
         this.bindEvents();
+        this.fetchDashboardStats();
         this.fetchInstallments(true);
         this.setupCustomerModals();
         this.setupCreditCardModals();
         this.toggleView(false); // Show table view by default
+    }
+
+    async fetchDashboardStats() {
+        try {
+            const response = await fetch('/api/dashboard/stats');
+            if (!response.ok) {
+                throw new Error('Failed to fetch dashboard stats');
+            }
+            const stats = await response.json();
+
+            $('#total-customers').text(stats.totalCustomers);
+            $('#overdue-installments').text(stats.overdueCount);
+            $('#available-credit').text(`฿${stats.availableCredit.toLocaleString()}`);
+            $('#cash-flow').text(`฿${stats.cashFlow.toLocaleString()}`);
+
+        } catch (error) {
+            console.error('Error fetching dashboard stats:', error);
+            showNotification(error.message, 'error');
+        }
     }
 
     setupCreditCardModals() {
