@@ -759,7 +759,7 @@ class PageDashboard {
 
         if (installments.length === 0 && clearExisting) {
             installmentGrid.html('<p>No installment plans found.</p>');
-            installmentTableBody.html('<tr><td colspan="5">No installment plans found.</td></tr>');
+            installmentTableBody.html('<tr><td colspan="3">No installment plans found.</td></tr>');
             return;
         } else if (installments.length === 0 && !clearExisting) {
             return;
@@ -799,20 +799,12 @@ class PageDashboard {
                         <a href="tel:${installment.customer_phone}" class="customer-phone">${installment.customer_phone}</a>
                     </div>
                 </td>
-                <td>
-                    <div class="amount-info">
-                        <span class="paid-amount">฿${parseFloat(installment.total_paid_amount || 0).toLocaleString()}</span>
-                        <span class="total-amount">/ ฿${parseFloat(installment.total_amount).toLocaleString()}</span>
-                    </div>
-                </td>
-                <td>${installment.next_due_date_term_number || 'N/A'} / ${installment.term_months}</td>
                 <td class="text-center">
                     <div class="due-date-info">
                         <span class="monthly-payment">฿${parseFloat(installment.monthly_payment).toLocaleString()}</span><br>
                         <span class="due-date">${nextDueDate}</span>
                     </div>
                 </td>
-                <td><span class="status-badge status-${statusClass}">${installment.status}</span></td>
             </tr>
         `;
     }
