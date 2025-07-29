@@ -885,21 +885,18 @@ class PageDashboard {
             paymentScheduleBody.empty();
             if (installment.payment_schedule && installment.payment_schedule.length > 0) {
                 installment.payment_schedule.forEach(payment => {
-                    const paymentStatusClass = payment.is_paid ? 'status-completed' : (new Date(payment.due_date) < new Date() ? 'status-overdue' : 'status-pending');
                     const actionsHtml = payment.is_paid ? '' : `<button class="btn btn-sm btn-success mark-paid-btn" data-payment-id="${payment.id}" data-installment-id="${installment.id}" data-payment-amount="${payment.amount}"><i class="fas fa-check"></i> Mark Paid</button>`;
                     paymentScheduleBody.append(`
                         <tr>
                             <td>${payment.term_number}</td>
                             <td>${new Date(payment.due_date).toLocaleDateString()}</td>
                             <td>฿${parseFloat(payment.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                            <td>฿${parseFloat(payment.paid_amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                            <td><span class="status-badge ${paymentStatusClass}">${payment.is_paid ? 'Paid' : 'Pending'}</span></td>
                             <td class="text-right">${actionsHtml}</td>
                         </tr>
                     `);
                 });
             } else {
-                paymentScheduleBody.append('<tr><td colspan="5">No payment schedule available.</td></tr>');
+                paymentScheduleBody.append('<tr><td colspan="4">No payment schedule available.</td></tr>');
             }
 
             openModal('view-installment-modal');
