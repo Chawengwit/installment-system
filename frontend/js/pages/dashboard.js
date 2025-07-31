@@ -157,21 +157,18 @@ class PageDashboard {
         event.preventDefault();
         const form = $(event.currentTarget);
         const nameInput = form.find('[name="name"]');
-        const phoneInput = form.find('[name="phone"]');
         const idCardNumberInput = form.find('[name="id_card_number"]');
 
         // Clear previous errors
         form.find('.form_input').removeClass('form_input-error');
 
         const name = nameInput.val();
-        const phone = phoneInput.val();
         const idCardNumber = idCardNumberInput.val();
 
-        if (!name || !phone || !idCardNumber) {
+        if (!name || !idCardNumber) {
             if (!name) nameInput.addClass('form_input-error');
-            if (!phone) phoneInput.addClass('form_input-error');
             if (!idCardNumber) idCardNumberInput.addClass('form_input-error');
-            showNotification('Name, phone, and ID card number are required.', 'error');
+            showNotification('Name and ID card number are required.', 'error');
             return;
         }
 
@@ -188,11 +185,9 @@ class PageDashboard {
                 const errorMessage = errorData.error || 'An unexpected error occurred. Please try again.';
 
                 if (response.status === 409) { // Duplicate customer
-                    phoneInput.addClass('form_input-error');
                     idCardNumberInput.addClass('form_input-error');
                 } else if (response.status === 400) { // Validation error from backend
                     nameInput.addClass('form_input-error');
-                    phoneInput.addClass('form_input-error');
                     idCardNumberInput.addClass('form_input-error');
                 }
 
