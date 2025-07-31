@@ -477,15 +477,10 @@ class PageDashboard {
         switch (stepNumber) {
             case 1: // Product Details
                 const productName = currentStepElement.find('#product-name').val();
-                const productSerialNumber = currentStepElement.find('#product-serial-number').val();
                 const productPrice = currentStepElement.find('#product-price').val();
 
                 if (!productName) {
                     currentStepElement.find('#product-name').addClass('form_input-error');
-                    isValid = false;
-                }
-                if (!productSerialNumber) {
-                    currentStepElement.find('#product-serial-number').addClass('form_input-error');
                     isValid = false;
                 }
                 if (!productPrice || parseFloat(productPrice) <= 0) {
