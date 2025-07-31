@@ -427,10 +427,10 @@ class PageDashboard {
         const summaryText = [
             `Product Price: ${$('#summary-price').text()}`,
             `Down Payment: ${$('#summary-down-payment').text()}`,
-            `Financed Amount: ${$('#summary-financed').text()}`,
-            `Interest Rate: ${$('#summary-interest-rate').text()}`,
-            `Interest Amount: ${$('#summary-interest-amount').text()}`,
-            `Total Amount: ${$('#summary-total').text()}`,
+            // `Financed Amount: ${$('#summary-financed').text()}`,
+            // `Interest Rate: ${$('#summary-interest-rate').text()}`,
+            // `Interest Amount: ${$('#summary-interest-amount').text()}`,
+            // `Total Amount: ${$('#summary-total').text()}`,
             `Monthly Payment: ${$('#summary-monthly').text()}`,
             `Number of Payments: ${$('#summary-payments').text()}`,
         ].join('\n');
