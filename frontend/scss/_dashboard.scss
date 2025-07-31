@@ -467,21 +467,9 @@
             border-bottom: none;
         }
 
-        &.calculation-summary_item-total {
-            grid-column: 1 / -1;
-            font-weight: 600;
-            font-size: var(--font-size-lg);
-            color: var(--color-gray-900);
-            border-top: 2px solid var(--color-gray-300);
-            padding-top: var(--spacing-md);
-            margin-top: var(--spacing-sm);
-        }
-
-        &.calculation-summary_item-monthly, &.calculation-summary_item-number-payments {
+        &.calculation-summary_item-total, &.calculation-summary_item-monthly, &.calculation-summary_item-number-payments {
             grid-column: 1 / -1;
             color: var(--color-white);
-            margin: var(--spacing-md) calc(-1 * var(--spacing-xl));
-            padding: 0 var(--spacing-xl);
             border-radius: var(--border-radius-lg);
             font-weight: 600;
             font-size: var(--font-size-xl);

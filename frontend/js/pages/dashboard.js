@@ -157,21 +157,18 @@ class PageDashboard {
         event.preventDefault();
         const form = $(event.currentTarget);
         const nameInput = form.find('[name="name"]');
-        const phoneInput = form.find('[name="phone"]');
         const idCardNumberInput = form.find('[name="id_card_number"]');
 
         // Clear previous errors
         form.find('.form_input').removeClass('form_input-error');
 
         const name = nameInput.val();
-        const phone = phoneInput.val();
         const idCardNumber = idCardNumberInput.val();
 
-        if (!name || !phone || !idCardNumber) {
+        if (!name || !idCardNumber) {
             if (!name) nameInput.addClass('form_input-error');
-            if (!phone) phoneInput.addClass('form_input-error');
             if (!idCardNumber) idCardNumberInput.addClass('form_input-error');
-            showNotification('Name, phone, and ID card number are required.', 'error');
+            showNotification('Name and ID card number are required.', 'error');
             return;
         }
 
@@ -188,11 +185,9 @@ class PageDashboard {
                 const errorMessage = errorData.error || 'An unexpected error occurred. Please try again.';
 
                 if (response.status === 409) { // Duplicate customer
-                    phoneInput.addClass('form_input-error');
                     idCardNumberInput.addClass('form_input-error');
                 } else if (response.status === 400) { // Validation error from backend
                     nameInput.addClass('form_input-error');
-                    phoneInput.addClass('form_input-error');
                     idCardNumberInput.addClass('form_input-error');
                 }
 
@@ -427,10 +422,10 @@ class PageDashboard {
         const summaryText = [
             `Product Price: ${$('#summary-price').text()}`,
             `Down Payment: ${$('#summary-down-payment').text()}`,
-            `Financed Amount: ${$('#summary-financed').text()}`,
-            `Interest Rate: ${$('#summary-interest-rate').text()}`,
-            `Interest Amount: ${$('#summary-interest-amount').text()}`,
-            `Total Amount: ${$('#summary-total').text()}`,
+            // `Financed Amount: ${$('#summary-financed').text()}`,
+            // `Interest Rate: ${$('#summary-interest-rate').text()}`,
+            // `Interest Amount: ${$('#summary-interest-amount').text()}`,
+            // `Total Amount: ${$('#summary-total').text()}`,
             `Monthly Payment: ${$('#summary-monthly').text()}`,
             `Number of Payments: ${$('#summary-payments').text()}`,
         ].join('\n');
@@ -477,15 +472,10 @@ class PageDashboard {
         switch (stepNumber) {
             case 1: // Product Details
                 const productName = currentStepElement.find('#product-name').val();
-                const productSerialNumber = currentStepElement.find('#product-serial-number').val();
                 const productPrice = currentStepElement.find('#product-price').val();
 
                 if (!productName) {
                     currentStepElement.find('#product-name').addClass('form_input-error');
-                    isValid = false;
-                }
-                if (!productSerialNumber) {
-                    currentStepElement.find('#product-serial-number').addClass('form_input-error');
                     isValid = false;
                 }
                 if (!productPrice || parseFloat(productPrice) <= 0) {
