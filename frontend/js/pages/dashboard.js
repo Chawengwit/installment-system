@@ -636,7 +636,7 @@ class PageDashboard {
     }
 
     async fetchCreditCardsForModal(event) {
-        const search = event ? $(event.target).val().toLowerCase() : '';
+        const search = event ? $(event.target).val() : '';
         const cardOptionsContainer = $('#add-new-plan-modal .card-selection');
         cardOptionsContainer.html('<p>Loading credit cards...</p>');
 
