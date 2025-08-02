@@ -106,7 +106,6 @@ class PageDashboard {
                 },
                 body: JSON.stringify({
                     card_name: cardName,
-                    card_number: cardNumber,
                     credit_limit: creditLimit
                 })
             });
@@ -622,14 +621,15 @@ class PageDashboard {
 
     createCustomerOption(customer, isSelected) {
         const selectedClass = isSelected ? 'customer-option-selected' : '';
+        const nickname = customer.nickname ? `(${customer.nickname})` : '';
         return `
             <div class="customer-option ${selectedClass}" data-customer-id="${customer.id}">
                 <div class="customer-option_avatar">
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="customer-option_info">
-                    <h4 class="customer-option_name">${customer.name}</h4>
-                    <p class="customer-option_details">${customer.phone} • ${customer.activePlans || 0} active plans</p>
+                    <h4 class="customer-option_name">${customer.name} ${nickname}</h4>
+                    <p class="customer-option_details">${customer.phone}</p>
                 </div>
             </div>
         `;
@@ -715,7 +715,6 @@ class PageDashboard {
                 </div>
                 <div class="card-option_info">
                     <span class="card-option_name">${card.card_name}</span>
-                    <span class="card-option_number">**** **** **** ${String(card.card_number).slice(-4)}</span>
                 </div>
                 <div class="card-option_limit">
                     <span class="card-option_available"><span class="card-available-amount">${(card.credit_limit - card.used_amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span> <span class="card-available-text">available</span></span>
@@ -887,7 +886,6 @@ class PageDashboard {
 
             // Populate Payment Method
             $('#view-card-name').text(installment.card_name);
-            $('#view-card-number').text(`**** **** **** ${String(installment.card_number).slice(-4)}`);
             $('#view-credit-limit').text(`฿${parseFloat(installment.credit_limit).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
 
             // Populate Payment Schedule
