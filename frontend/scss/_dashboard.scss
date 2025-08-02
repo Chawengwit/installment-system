@@ -490,14 +490,12 @@
 .review-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: var(--spacing-lg);
     margin-bottom: var(--spacing-xl);
 }
 
 .review-section {
     background-color: var(--color-gray-50);
-    border-radius: var(--border-radius-lg);
-    padding: var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-lg) 0 var(--spacing-lg);
 
     .review-section_title {
         display: flex;
