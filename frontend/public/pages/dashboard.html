@@ -85,8 +85,10 @@
         <div class="section-filters">
             <select class="filter-select" id="dashboard-status-filter">
                 <option value="all">All Status</option>
+                <option value="active">Active</option>
                 <option value="today_duedate">Today Due Date</option>
                 <option value="over_due">Overdue</option>
+                <option value="non-active">Not Active</option>
             </select>
         </div>
     </section>
@@ -106,6 +108,7 @@
                             <th>Product</th>
                             <th>Customer</th>
                             <th>Due Date</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody id="installment-table-body">

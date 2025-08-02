@@ -816,6 +816,9 @@ class PageDashboard {
                         <span class="due-date">${nextDueDate}</span>
                     </div>
                 </td>
+                <td class="text-center">
+                    <span class="status-badge status-${statusClass}">${installment.status}</span>
+                </td>
             </tr>
         `;
     }

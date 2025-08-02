@@ -34,8 +34,14 @@ router.get('/', async (req, res) => {
                 whereClause += ` AND (SELECT ip.due_date FROM installment_payments ip WHERE ip.installment_id = i.id AND ip.is_paid = false ORDER BY ip.due_date ASC LIMIT 1) = CURRENT_DATE`;
             } else if (status === 'over_due') {
                 whereClause += ` AND (SELECT ip.due_date FROM installment_payments ip WHERE ip.installment_id = i.id AND ip.is_paid = false ORDER BY ip.due_date ASC LIMIT 1) < CURRENT_DATE AND i.status = 'active'`;
+            } else if (status === 'active') {
+                whereClause += ` AND i.status = 'active'`;
+            } else if (status === 'non-active') {
+                whereClause += ` AND i.status = 'non-active'`;
             } 
         }
+
+        console.log("STATUS >>> ",  status);
 
         const countResult = await pool.query(`
             SELECT COUNT(i.id) 
