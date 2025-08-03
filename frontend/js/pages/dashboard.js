@@ -422,6 +422,7 @@ class PageDashboard {
         $('#product-image-list').empty();
         $('#add-new-plan-modal .customer-option').removeClass('customer-option-selected');
         this.selectedCustomerId = null;
+        this.currentInstallmentId = null; // Reset currentInstallmentId
         this.showStep(1);
     }
 
@@ -493,6 +494,17 @@ class PageDashboard {
         $('#add-new-plan-modal #step-' + stepNumber).addClass('form-step-active');
 
         if (stepNumber === 3) {
+            if (this.currentInstallmentId) { // Edit mode
+                $('#step-3 .search-section').hide();
+                const title = $('#step-3 .form-step_title');
+                title.html('<span class="form-step_number">3</span> Customer Selected');
+                $('#step-3 .form-step_description').text('Customer that you selected on this installment');
+            } else { // Add mode
+                $('#step-3 .search-section').show();
+                const title = $('#step-3 .form-step_title');
+                title.html('<span class="form-step_number">3</span> Select Customer');
+                $('#step-3 .form-step_description').text('Choose an existing customer or add a new one');
+            }
             this.fetchCustomersForModal();
         } else if (stepNumber === 4) {
             this.fetchCreditCardsForModal();
@@ -666,23 +678,33 @@ class PageDashboard {
 
         try {
             let customers = [];
-            // If a customer is already selected, fetch their details and add them to the top
-            if (this.selectedCustomerId) {
+
+            if (this.currentInstallmentId && this.selectedCustomerId) {
+                // Edit mode: Only fetch and show the selected customer
                 const selectedCustomerResponse = await fetch(`/api/customers/${this.selectedCustomerId}`);
                 if (!selectedCustomerResponse.ok) throw new Error('Failed to fetch selected customer details');
                 const selectedCustomer = await selectedCustomerResponse.json();
                 if (selectedCustomer) {
                     customers.push(selectedCustomer);
                 }
+            } else {
+                // Add mode: Fetch selected customer (if any) and a list of others
+                if (this.selectedCustomerId) {
+                    const selectedCustomerResponse = await fetch(`/api/customers/${this.selectedCustomerId}`);
+                    if (!selectedCustomerResponse.ok) throw new Error('Failed to fetch selected customer details');
+                    const selectedCustomer = await selectedCustomerResponse.json();
+                    if (selectedCustomer) {
+                        customers.push(selectedCustomer);
+                    }
+                }
+
+                const response = await fetch(`/api/customers?search=${search}&limit=5&sortBy=created_at&sortOrder=DESC`);
+                if (!response.ok) throw new Error('Failed to fetch customers for modal');
+                const data = await response.json();
+
+                const filteredCustomers = data.customers.filter(customer => customer.id !== this.selectedCustomerId);
+                customers = customers.concat(filteredCustomers);
             }
-
-            const response = await fetch(`/api/customers?search=${search}&limit=5&sortBy=created_at&sortOrder=DESC`); // Limit to 5 customers
-            if (!response.ok) throw new Error('Failed to fetch customers for modal');
-            const data = await response.json();
-
-            // Filter out the already selected customer from the search results to avoid duplication
-            const filteredCustomers = data.customers.filter(customer => customer.id !== this.selectedCustomerId);
-            customers = customers.concat(filteredCustomers);
 
             customerOptionsContainer.html(''); // Clear loading message
             if (customers && customers.length > 0) {
@@ -701,6 +723,10 @@ class PageDashboard {
     }
 
     handleCustomerSelection(event) {
+        if (this.currentInstallmentId) {
+            return; // Do not allow customer change in edit mode
+        }
+
         const $selectedOption = $(event.currentTarget);
         const customerId = $selectedOption.data('customer-id');
 
