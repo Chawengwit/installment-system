@@ -231,6 +231,7 @@ class PageDashboard {
 
     bindEvents() {
         this.$mainContent.on("click", "#add-plan-btn", () => {
+            this.currentInstallmentId = null; // Ensure we are in 'add' mode
             this.clearAddPlanForm();
             $('#add-new-plan-modal .modal_title').text('Add New Plan');
             $('#add-new-plan-modal #step-5-submit').text('Create Installment Plan');
