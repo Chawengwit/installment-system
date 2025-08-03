@@ -405,9 +405,18 @@ class PageDashboard {
                 }
             }
 
+            // Directly display the selected customer in edit mode
+            const customerOptionsContainer = $('#add-new-plan-modal .customer-options');
+            customerOptionsContainer.empty(); // Clear any loading messages or previous content
+            if (data.customer) {
+                customerOptionsContainer.append(this.createCustomerOption(data.customer, true));
+            } else {
+                console.error('Customer data not found in installment details for editing.');
+                customerOptionsContainer.html('<p class="text-danger">Error: Customer data missing.</p>');
+            }
+
             this.updateCalculationSummary();
             this.showStep(1);
-            this.fetchCustomersForModal(); // Fetch and display the selected customer
         } catch (error) {
             console.error('Error pre-filling installment form:', error);
             showNotification(error.message, 'error');
@@ -681,23 +690,11 @@ class PageDashboard {
         try {
             let customers = [];
 
-            if (this.currentInstallmentId) { // Edit mode: Only fetch and show the selected customer
-                if (this.selectedCustomerId) { // Ensure selectedCustomerId is set
-                    const selectedCustomerResponse = await fetch(`/api/customers/${this.selectedCustomerId}`);
-                    if (!selectedCustomerResponse.ok) throw new Error('Failed to fetch selected customer details');
-                    const selectedCustomer = await selectedCustomerResponse.json();
-                    if (selectedCustomer) {
-                        customers.push(selectedCustomer);
-                    }
-                } else {
-                    console.warn("selectedCustomerId not set in edit mode for customer step.");
-                }
-            } else { // Add mode: Fetch all customers (with search/limit)
-                const response = await fetch(`/api/customers?search=${search}&limit=5&sortBy=created_at&sortOrder=DESC`);
-                if (!response.ok) throw new Error('Failed to fetch customers for modal');
-                const data = await response.json();
-                customers = data.customers; 
-            }
+            // This function is now only called in 'Add mode' for customer selection
+            const response = await fetch(`/api/customers?search=${search}&limit=5&sortBy=created_at&sortOrder=DESC`);
+            if (!response.ok) throw new Error('Failed to fetch customers for modal');
+            const data = await response.json();
+            customers = data.customers; 
 
             customerOptionsContainer.html(''); // Clear loading message
             if (customers && customers.length > 0) {

@@ -105,9 +105,11 @@ router.get('/:id', async (req, res) => {
                 i.start_date,
                 i.due_date,
                 i.late_fee,
+                c.id as customer_id,
                 c.name as customer_name,
                 c.phone as customer_phone,
                 c.id_card_number as customer_id_card_number,
+                c.nickname as customer_nickname,
                 p.name as product_name,
                 p.serial_number as product_serial_number,
                 p.price as product_price,
@@ -139,7 +141,11 @@ router.get('/:id', async (req, res) => {
         const paymentsResult = await pool.query(paymentsQuery, [id]);
         installment.payment_schedule = paymentsResult.rows;
 
-        res.json({ installment });
+        // Fetch customer details
+        const customerResult = await pool.query('SELECT * FROM customers WHERE id = $1', [installment.customer_id]);
+        const customer = customerResult.rows.length > 0 ? customerResult.rows[0] : null;
+
+        res.json({ installment, customer });
 
     } catch (err) {
         console.error(err);
