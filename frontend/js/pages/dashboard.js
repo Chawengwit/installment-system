@@ -407,6 +407,7 @@ class PageDashboard {
 
             this.updateCalculationSummary();
             this.showStep(1);
+            this.fetchCustomersForModal(); // Fetch and display the selected customer
         } catch (error) {
             console.error('Error pre-filling installment form:', error);
             showNotification(error.message, 'error');
@@ -505,8 +506,8 @@ class PageDashboard {
                 const title = $('#step-3 .form-step_title');
                 title.html('<span class="form-step_number">3</span> Select Customer');
                 $('#step-3 .form-step_description').text('Choose an existing customer or add a new one');
+                this.fetchCustomersForModal(); // Call only in add mode
             }
-            this.fetchCustomersForModal();
         } else if (stepNumber === 4) {
             this.fetchCreditCardsForModal();
         } else if (stepNumber === 5) {
@@ -680,31 +681,22 @@ class PageDashboard {
         try {
             let customers = [];
 
-            if (this.currentInstallmentId && this.selectedCustomerId) {
-                // Edit mode: Only fetch and show the selected customer
-                const selectedCustomerResponse = await fetch(`/api/customers/${this.selectedCustomerId}`);
-                if (!selectedCustomerResponse.ok) throw new Error('Failed to fetch selected customer details');
-                const selectedCustomer = await selectedCustomerResponse.json();
-                if (selectedCustomer) {
-                    customers.push(selectedCustomer);
-                }
-            } else {
-                // Add mode: Fetch selected customer (if any) and a list of others
-                if (this.selectedCustomerId) {
+            if (this.currentInstallmentId) { // Edit mode: Only fetch and show the selected customer
+                if (this.selectedCustomerId) { // Ensure selectedCustomerId is set
                     const selectedCustomerResponse = await fetch(`/api/customers/${this.selectedCustomerId}`);
                     if (!selectedCustomerResponse.ok) throw new Error('Failed to fetch selected customer details');
                     const selectedCustomer = await selectedCustomerResponse.json();
                     if (selectedCustomer) {
                         customers.push(selectedCustomer);
                     }
+                } else {
+                    console.warn("selectedCustomerId not set in edit mode for customer step.");
                 }
-
+            } else { // Add mode: Fetch all customers (with search/limit)
                 const response = await fetch(`/api/customers?search=${search}&limit=5&sortBy=created_at&sortOrder=DESC`);
                 if (!response.ok) throw new Error('Failed to fetch customers for modal');
                 const data = await response.json();
-
-                const filteredCustomers = data.customers.filter(customer => customer.id !== this.selectedCustomerId);
-                customers = customers.concat(filteredCustomers);
+                customers = data.customers; 
             }
 
             customerOptionsContainer.html(''); // Clear loading message
