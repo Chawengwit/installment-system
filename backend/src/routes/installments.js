@@ -146,6 +146,60 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+router.put('/:id', upload.array('productImages', 5), async (req, res) => {
+    const { id } = req.params;
+    const {
+        productName,
+        productSerialNumber,
+        productPrice,
+        productDescription,
+        installmentMonths,
+        paymentDueDate,
+        customerId,
+        creditCardId
+    } = req.body;
+
+    const downPayment = parseFloat(req.body.downPayment) || 0;
+    const interestRate = parseFloat(req.body.interestRate) || 0;
+    const lateFee = req.body.lateFee ? parseFloat(req.body.lateFee) : null;
+
+    const productImages = req.files ? req.files.map(file => file.filename) : [];
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        const installment = await client.query('SELECT * FROM installments WHERE id = $1', [id]);
+
+        // 1. Update Product
+        const productResult = await client.query(
+            'UPDATE products SET name = $1, serial_number = $2, price = $3, description = $4, images = $5, updated_at = NOW() WHERE id = $6 RETURNING id',
+            [productName, productSerialNumber, productPrice, productDescription, JSON.stringify(productImages), installment.rows[0].product_id]
+        );
+        const productId = productResult.rows[0].id;
+
+        // 2. Update Installment plan
+        const totalAmount = parseFloat(productPrice) - downPayment;
+        const monthlyPayment = (totalAmount * (1 + interestRate / 100)) / installmentMonths;
+
+        await client.query(
+            'UPDATE installments SET customer_id = $1, product_id = $2, credit_card_id = $3, due_date = $4, monthly_payment = $5, total_amount = $6, interest_rate = $7, term_months = $8, status = $9, late_fee = $10, updated_at = NOW() WHERE id = $11',
+            [customerId, productId, creditCardId, paymentDueDate, monthlyPayment, totalAmount, interestRate, installmentMonths, 'non-active', lateFee, id]
+        );
+
+        await client.query('COMMIT');
+        res.status(200).json({ message: 'Installment plan updated successfully', installmentId: id });
+
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error(err);
+        res.status(500).json({ error: 'Failed to update installment plan' });
+    } finally {
+        client.release();
+    }
+});
+
+
 
 // POST /api/installments
 router.post('/', upload.array('productImages'), async (req, res) => {

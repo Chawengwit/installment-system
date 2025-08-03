@@ -12,6 +12,7 @@ class PageDashboard {
         this.currentStep = 1; // Added for multi-step form
         this.selectedCustomerId = null;
         this.selectedCreditCardId = null;
+        this.currentInstallmentId = null;
     }
 
     init() {
@@ -218,8 +219,10 @@ class PageDashboard {
 
     bindEvents() {
         this.$mainContent.on("click", "#add-plan-btn", () => {
+            this.clearAddPlanForm();
+            $('#add-new-plan-modal .modal_title').text('Add New Plan');
+            $('#add-new-plan-modal #step-5-submit').text('Create Installment Plan');
             openModal('add-new-plan-modal');
-            this.showStep(1); // Show first step when modal opens
         });
         this.$mainContent.on("click", ".modal_close", (event) => {
             const modalId = $(event.currentTarget).closest('.modal').attr('id');
@@ -280,6 +283,7 @@ class PageDashboard {
         this.$mainContent.on("click", "#customize-term-btn", () => this.showStep(2));
         this.$mainContent.on("click", "#installment-table-body tr", this.handleViewInstallment.bind(this));
         this.$mainContent.on("click", ".mark-paid-btn", this.handleMarkPaymentAsPaid.bind(this));
+        this.$mainContent.on("click", "#edit-installment-btn", this.handleEditInstallment.bind(this));
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
     }
@@ -327,6 +331,65 @@ class PageDashboard {
         event.target.value = '';
     }
 
+    async handleEditInstallment() {
+        if (!this.currentInstallmentId) {
+            showNotification('No installment selected for editing.', 'error');
+            return;
+        }
+
+        closeModal('view-installment-modal');
+        openModal('add-new-plan-modal');
+        $('#add-new-plan-modal .modal_title').text('Edit Installment Plan');
+        $('#add-new-plan-modal #step-5-submit').text('Update Installment Plan');
+
+
+        try {
+            const response = await fetch(`/api/installments/${this.currentInstallmentId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch installment data for editing.');
+            }
+            const data = await response.json();
+            const installment = data.installment;
+
+            // Pre-fill the form with the fetched data
+            $('#product-name').val(installment.product_name);
+            $('#product-serial-number').val(installment.product_serial_number);
+            $('#product-price').val(installment.product_price);
+            $('#down-payment').val(installment.down_payment);
+            $('#product-description').val(installment.product_description);
+            $('#installment-months').val(installment.term_months);
+            $('#interest-rate').val(installment.interest_rate);
+            $('#payment-due-date').val(installment.due_date);
+            $('#late-fee').val(installment.late_fee);
+
+            this.selectedCustomerId = installment.customer_id;
+            this.selectedCreditCardId = installment.credit_card_id;
+
+            // Handle image previews
+            const imagePreviewContainer = $('#product-image-list');
+            imagePreviewContainer.empty();
+            if (installment.product_images && installment.product_images.length > 0) {
+                installment.product_images.forEach(imageUrl => {
+                    const imageItem = $(
+                        `<div class="image-list-item">
+                            <img src="/uploads/${imageUrl}" class="uploaded-image-preview">
+                            <button type="button" class="remove-image-btn"><i class="fas fa-times-circle"></i></button>
+                        </div>`
+                    );
+                    imagePreviewContainer.append(imageItem);
+                });
+            }
+
+            this.showStep(1);
+        } catch (error) {
+            console.error('Error pre-filling installment form:', error);
+            showNotification(error.message, 'error');
+            closeModal('add-new-plan-modal');
+        }
+    }
+
+    ""
+
     
 
     clearAddPlanForm() {
@@ -362,27 +425,30 @@ class PageDashboard {
             }
         }
 
+        const url = this.currentInstallmentId ? `/api/installments/${this.currentInstallmentId}` : '/api/installments';
+        const method = this.currentInstallmentId ? 'PUT' : 'POST';
+
         try {
-            const response = await fetch('/api/installments', {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 body: formData
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to create installment plan');
+                throw new Error(errorData.error || `Failed to ${this.currentInstallmentId ? 'update' : 'create'} installment plan`);
             }
 
             const result = await response.json();
             this.newInstallmentId = result.installmentId;
 
-            showNotification('Installment plan created successfully!', 'success');
+            showNotification(`Installment plan ${this.currentInstallmentId ? 'updated' : 'created'} successfully!`, 'success');
             this.fetchInstallments(true); // Refresh the installment list
             this.clearAddPlanForm(); // Clear the form for next use
             this.showStep(6);
 
         } catch (error) {
-            console.error('Error creating installment plan:', error);
+            console.error(`Error ${this.currentInstallmentId ? 'updating' : 'creating'} installment plan:`, error);
             showNotification(error.message, 'error');
         }
     }
@@ -881,6 +947,15 @@ class PageDashboard {
             }
             const data = await response.json();
             const installment = data.installment;
+
+            this.currentInstallmentId = installment.id;
+
+            // Show/hide edit button based on status
+            if (installment.status === 'non-active') {
+                $('#edit-installment-btn').show();
+            } else {
+                $('#edit-installment-btn').hide();
+            }
 
             // Populate Customer Information
             $('#view-customer-name').text(installment.customer_name);
