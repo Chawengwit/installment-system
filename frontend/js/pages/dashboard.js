@@ -231,6 +231,7 @@ class PageDashboard {
 
     bindEvents() {
         this.$mainContent.on("click", "#add-plan-btn", () => {
+            this.currentInstallmentId = null; // Ensure we are in 'add' mode
             this.clearAddPlanForm();
             $('#add-new-plan-modal .modal_title').text('Add New Plan');
             $('#add-new-plan-modal #step-5-submit').text('Create Installment Plan');
@@ -404,6 +405,16 @@ class PageDashboard {
                 }
             }
 
+            // Directly display the selected customer in edit mode
+            const customerOptionsContainer = $('#add-new-plan-modal .customer-options');
+            customerOptionsContainer.empty(); // Clear any loading messages or previous content
+            if (data.customer) {
+                customerOptionsContainer.append(this.createCustomerOption(data.customer, true));
+            } else {
+                console.error('Customer data not found in installment details for editing.');
+                customerOptionsContainer.html('<p class="text-danger">Error: Customer data missing.</p>');
+            }
+
             this.updateCalculationSummary();
             this.showStep(1);
         } catch (error) {
@@ -422,6 +433,7 @@ class PageDashboard {
         $('#product-image-list').empty();
         $('#add-new-plan-modal .customer-option').removeClass('customer-option-selected');
         this.selectedCustomerId = null;
+        this.currentInstallmentId = null; // Reset currentInstallmentId
         this.showStep(1);
     }
 
@@ -493,7 +505,18 @@ class PageDashboard {
         $('#add-new-plan-modal #step-' + stepNumber).addClass('form-step-active');
 
         if (stepNumber === 3) {
-            this.fetchCustomersForModal();
+            if (this.currentInstallmentId) { // Edit mode
+                $('#step-3 .search-section').hide();
+                const title = $('#step-3 .form-step_title');
+                title.html('<span class="form-step_number">3</span> Customer Selected');
+                $('#step-3 .form-step_description').text('Customer that you selected on this installment');
+            } else { // Add mode
+                $('#step-3 .search-section').show();
+                const title = $('#step-3 .form-step_title');
+                title.html('<span class="form-step_number">3</span> Select Customer');
+                $('#step-3 .form-step_description').text('Choose an existing customer or add a new one');
+                this.fetchCustomersForModal(); // Call only in add mode
+            }
         } else if (stepNumber === 4) {
             this.fetchCreditCardsForModal();
         } else if (stepNumber === 5) {
@@ -666,23 +689,12 @@ class PageDashboard {
 
         try {
             let customers = [];
-            // If a customer is already selected, fetch their details and add them to the top
-            if (this.selectedCustomerId) {
-                const selectedCustomerResponse = await fetch(`/api/customers/${this.selectedCustomerId}`);
-                if (!selectedCustomerResponse.ok) throw new Error('Failed to fetch selected customer details');
-                const selectedCustomer = await selectedCustomerResponse.json();
-                if (selectedCustomer) {
-                    customers.push(selectedCustomer);
-                }
-            }
 
-            const response = await fetch(`/api/customers?search=${search}&limit=5&sortBy=created_at&sortOrder=DESC`); // Limit to 5 customers
+            // This function is now only called in 'Add mode' for customer selection
+            const response = await fetch(`/api/customers?search=${search}&limit=5&sortBy=created_at&sortOrder=DESC`);
             if (!response.ok) throw new Error('Failed to fetch customers for modal');
             const data = await response.json();
-
-            // Filter out the already selected customer from the search results to avoid duplication
-            const filteredCustomers = data.customers.filter(customer => customer.id !== this.selectedCustomerId);
-            customers = customers.concat(filteredCustomers);
+            customers = data.customers; 
 
             customerOptionsContainer.html(''); // Clear loading message
             if (customers && customers.length > 0) {
@@ -701,6 +713,10 @@ class PageDashboard {
     }
 
     handleCustomerSelection(event) {
+        if (this.currentInstallmentId) {
+            return; // Do not allow customer change in edit mode
+        }
+
         const $selectedOption = $(event.currentTarget);
         const customerId = $selectedOption.data('customer-id');
 
