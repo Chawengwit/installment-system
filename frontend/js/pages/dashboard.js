@@ -226,7 +226,7 @@ class PageDashboard {
             closeModal(modalId);
         });
         this.$mainContent.on("input", "#dashboard-search", debounce(this.handleSearch.bind(this), 300));
-        this.$mainContent.on("change", "#dashboard-status-filter", this.handleSearch.bind(this));
+        this.$mainContent.on("change", "#dashboard-status-filter", this.handleStatusFilterChange.bind(this));
         this.$mainContent.on("click", "#toggle-view-btn", this.toggleView.bind(this));
 
         // Multi-step form navigation
@@ -723,6 +723,20 @@ class PageDashboard {
         `;
     }
 
+    handleStatusFilterChange(event) {
+        const $select = $(event.currentTarget);
+        const status = $select.val();
+        $select.removeClass('badge-primary badge-danger badge-success');
+        if (status === 'active') {
+            $select.addClass('badge-primary');
+        } else if (status === 'non-active') {
+            $select.addClass('badge-danger');
+        } else if (status === 'completed') {
+            $select.addClass('badge-success');
+        }
+        this.handleSearch();
+    }
+
     handleSearch() {
         this.currentPage = 1;
         this.hasMore = true;
@@ -796,6 +810,18 @@ class PageDashboard {
     createInstallmentTableRow(installment) {
         const statusClass = installment.status.replace(' ', '-').toLowerCase();
         const nextDueDate = installment.next_due_date ? new Intl.DateTimeFormat('en-GB').format(new Date(installment.next_due_date)) : 'N/A';
+        
+        let statusBadge;
+        if (installment.status === 'active') {
+            statusBadge = `<span class="badge badge-primary">${installment.status}</span>`;
+        } else if (installment.status === 'non-active') {
+            statusBadge = `<span class="badge badge-danger">${installment.status}</span>`;
+        } else if (installment.status === 'completed') {
+            statusBadge = `<span class="badge badge-success">${installment.status}</span>`;
+        } else {
+            statusBadge = `<span class="badge">${installment.status}</span>`;
+        }
+
         return `
             <tr data-installment-id="${installment.id}">
                 <td>
@@ -817,7 +843,7 @@ class PageDashboard {
                     </div>
                 </td>
                 <td class="text-center">
-                    <span class="status-badge status-${statusClass}">${installment.status}</span>
+                    ${statusBadge}
                 </td>
             </tr>
         `;

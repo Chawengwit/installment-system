@@ -38,6 +38,8 @@ router.get('/', async (req, res) => {
                 whereClause += ` AND i.status = 'active'`;
             } else if (status === 'non-active') {
                 whereClause += ` AND i.status = 'non-active'`;
+            } else if (status === 'completed') {
+                whereClause += ` AND i.status = 'completed'`;
             } 
         }
 

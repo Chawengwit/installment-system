@@ -338,6 +338,12 @@ a{
     letter-spacing: 0.025em;
 }
 
+.badge-primary {
+    background-color: rgba(37, 99, 235, 0.1);
+    color: var(--color-primary);
+}
+
+
 .badge-success {
     background-color: rgba(16, 185, 129, 0.1);
     color: var(--color-success);
