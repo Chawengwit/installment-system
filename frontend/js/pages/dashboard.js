@@ -1,5 +1,17 @@
 import { debounce, openModal, closeModal, showNotification } from '../utils/AppUtils.js';
 
+function dataURLtoFile(dataurl, filename) {
+    let arr = dataurl.split(','),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]),
+        n = bstr.length,
+        u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+}
+
 class PageDashboard {
     constructor() {
         this.$mainContent = $("#main-content");
@@ -12,6 +24,7 @@ class PageDashboard {
         this.currentStep = 1; // Added for multi-step form
         this.selectedCustomerId = null;
         this.selectedCreditCardId = null;
+        this.currentInstallmentId = null;
     }
 
     init() {
@@ -106,7 +119,6 @@ class PageDashboard {
                 },
                 body: JSON.stringify({
                     card_name: cardName,
-                    card_number: cardNumber,
                     credit_limit: creditLimit
                 })
             });
@@ -219,15 +231,17 @@ class PageDashboard {
 
     bindEvents() {
         this.$mainContent.on("click", "#add-plan-btn", () => {
+            this.clearAddPlanForm();
+            $('#add-new-plan-modal .modal_title').text('Add New Plan');
+            $('#add-new-plan-modal #step-5-submit').text('Create Installment Plan');
             openModal('add-new-plan-modal');
-            this.showStep(1); // Show first step when modal opens
         });
         this.$mainContent.on("click", ".modal_close", (event) => {
             const modalId = $(event.currentTarget).closest('.modal').attr('id');
             closeModal(modalId);
         });
         this.$mainContent.on("input", "#dashboard-search", debounce(this.handleSearch.bind(this), 300));
-        this.$mainContent.on("change", "#dashboard-status-filter", this.handleSearch.bind(this));
+        this.$mainContent.on("change", "#dashboard-status-filter", this.handleStatusFilterChange.bind(this));
         this.$mainContent.on("click", "#toggle-view-btn", this.toggleView.bind(this));
 
         // Multi-step form navigation
@@ -281,6 +295,7 @@ class PageDashboard {
         this.$mainContent.on("click", "#customize-term-btn", () => this.showStep(2));
         this.$mainContent.on("click", "#installment-table-body tr", this.handleViewInstallment.bind(this));
         this.$mainContent.on("click", ".mark-paid-btn", this.handleMarkPaymentAsPaid.bind(this));
+        this.$mainContent.on("click", "#edit-installment-btn", this.handleEditInstallment.bind(this));
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
     }
@@ -328,6 +343,77 @@ class PageDashboard {
         event.target.value = '';
     }
 
+    async handleEditInstallment() {
+        if (!this.currentInstallmentId) {
+            showNotification('No installment selected for editing.', 'error');
+            return;
+        }
+
+        closeModal('view-installment-modal');
+        openModal('add-new-plan-modal');
+        $('#add-new-plan-modal .modal_title').text('Edit Installment Plan');
+        $('#add-new-plan-modal #step-5-submit').text('Update Installment Plan');
+
+
+        try {
+            const response = await fetch(`/api/installments/${this.currentInstallmentId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch installment data for editing.');
+            }
+            const data = await response.json();
+            const installment = data.installment;
+
+            // Pre-fill the form with the fetched data
+            $('#product-name').val(installment.product_name);
+            $('#product-serial-number').val(installment.product_serial_number);
+            $('#product-price').val(installment.product_price);
+            $('#down-payment').val(installment.down_payment);
+            $('#product-description').val(installment.product_description);
+            $('#installment-months').val(installment.term_months);
+            $('#interest-rate').val(installment.interest_rate);
+            $('#payment-due-date').val(installment.due_date);
+            $('#late-fee').val(installment.late_fee);
+
+            this.selectedCustomerId = installment.customer_id;
+            this.selectedCreditCardId = installment.credit_card_id;
+
+            // Handle image previews
+            const imagePreviewContainer = $('#product-image-list');
+            imagePreviewContainer.empty();
+            if (installment.product_images) {
+                let productImages = installment.product_images;
+                if (typeof productImages === 'string') {
+                    try {
+                        productImages = JSON.parse(productImages);
+                    } catch (e) {
+                        console.error('Error parsing product_images JSON:', e);
+                        productImages = [];
+                    }
+                }
+
+                if (Array.isArray(productImages) && productImages.length > 0) {
+                    productImages.forEach(imageUrl => {
+                        const imageItem = $(
+                            `<div class="image-list-item">
+                                <img src="/uploads/${imageUrl}" class="uploaded-image-preview">
+                                <button type="button" class="remove-image-btn"><i class="fas fa-times-circle"></i></button>
+                            </div>`
+                        );
+                        imagePreviewContainer.append(imageItem);
+                    });
+                }
+            }
+
+            this.showStep(1);
+        } catch (error) {
+            console.error('Error pre-filling installment form:', error);
+            showNotification(error.message, 'error');
+            closeModal('add-new-plan-modal');
+        }
+    }
+
+    ""
+
     
 
     clearAddPlanForm() {
@@ -356,34 +442,46 @@ class PageDashboard {
         formData.append('creditCardId', this.selectedCreditCardId);
 
         const imageInput = form.find('#product-images')[0];
-        const imageFiles = imageInput.files;
+        const dataTransfer = new DataTransfer();
+        $('#product-image-list .image-list-item').each(function () {
+            const src = $(this).find('img').attr('src');
+            if (src.startsWith('data:image')) { // New image
+                const file = dataURLtoFile(src, `image-${Date.now()}.png`);
+                dataTransfer.items.add(file);
+            }
+        });
+        const imageFiles = dataTransfer.files;
+
         if (imageFiles) {
             for (let i = 0; i < imageFiles.length; i++) {
                 formData.append('productImages', imageFiles[i]);
             }
         }
 
+        const url = this.currentInstallmentId ? `/api/installments/${this.currentInstallmentId}` : '/api/installments';
+        const method = this.currentInstallmentId ? 'PUT' : 'POST';
+
         try {
-            const response = await fetch('/api/installments', {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 body: formData
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to create installment plan');
+                throw new Error(errorData.error || `Failed to ${this.currentInstallmentId ? 'update' : 'create'} installment plan`);
             }
 
             const result = await response.json();
             this.newInstallmentId = result.installmentId;
 
-            showNotification('Installment plan created successfully!', 'success');
+            showNotification(`Installment plan ${this.currentInstallmentId ? 'updated' : 'created'} successfully!`, 'success');
             this.fetchInstallments(true); // Refresh the installment list
             this.clearAddPlanForm(); // Clear the form for next use
             this.showStep(6);
 
         } catch (error) {
-            console.error('Error creating installment plan:', error);
+            console.error(`Error ${this.currentInstallmentId ? 'updating' : 'creating'} installment plan:`, error);
             showNotification(error.message, 'error');
         }
     }
@@ -622,21 +720,22 @@ class PageDashboard {
 
     createCustomerOption(customer, isSelected) {
         const selectedClass = isSelected ? 'customer-option-selected' : '';
+        const nickname = customer.nickname ? `(${customer.nickname})` : '';
         return `
             <div class="customer-option ${selectedClass}" data-customer-id="${customer.id}">
                 <div class="customer-option_avatar">
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="customer-option_info">
-                    <h4 class="customer-option_name">${customer.name}</h4>
-                    <p class="customer-option_details">${customer.phone} • ${customer.activePlans || 0} active plans</p>
+                    <h4 class="customer-option_name">${customer.name} ${nickname}</h4>
+                    <p class="customer-option_details">${customer.phone}</p>
                 </div>
             </div>
         `;
     }
 
     async fetchCreditCardsForModal(event) {
-        const search = event ? $(event.target).val().toLowerCase() : '';
+        const search = event ? $(event.target).val() : '';
         const cardOptionsContainer = $('#add-new-plan-modal .card-selection');
         cardOptionsContainer.html('<p>Loading credit cards...</p>');
 
@@ -715,13 +814,26 @@ class PageDashboard {
                 </div>
                 <div class="card-option_info">
                     <span class="card-option_name">${card.card_name}</span>
-                    <span class="card-option_number">**** **** **** ${String(card.card_number).slice(-4)}</span>
                 </div>
                 <div class="card-option_limit">
                     <span class="card-option_available"><span class="card-available-amount">${(card.credit_limit - card.used_amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span> <span class="card-available-text">available</span></span>
                 </div>
             </div>
         `;
+    }
+
+    handleStatusFilterChange(event) {
+        const $select = $(event.currentTarget);
+        const status = $select.val();
+        $select.removeClass('badge-primary badge-danger badge-success');
+        if (status === 'active') {
+            $select.addClass('badge-primary');
+        } else if (status === 'non-active') {
+            $select.addClass('badge-danger');
+        } else if (status === 'completed') {
+            $select.addClass('badge-success');
+        }
+        this.handleSearch();
     }
 
     handleSearch() {
@@ -797,6 +909,18 @@ class PageDashboard {
     createInstallmentTableRow(installment) {
         const statusClass = installment.status.replace(' ', '-').toLowerCase();
         const nextDueDate = installment.next_due_date ? new Intl.DateTimeFormat('en-GB').format(new Date(installment.next_due_date)) : 'N/A';
+        
+        let statusBadge;
+        if (installment.status === 'active') {
+            statusBadge = `<span class="badge badge-primary">${installment.status}</span>`;
+        } else if (installment.status === 'non-active') {
+            statusBadge = `<span class="badge badge-danger">${installment.status}</span>`;
+        } else if (installment.status === 'completed') {
+            statusBadge = `<span class="badge badge-success">${installment.status}</span>`;
+        } else {
+            statusBadge = `<span class="badge">${installment.status}</span>`;
+        }
+
         return `
             <tr data-installment-id="${installment.id}">
                 <td>
@@ -816,6 +940,9 @@ class PageDashboard {
                         <span class="monthly-payment">฿${parseFloat(installment.monthly_payment).toLocaleString()}</span><br>
                         <span class="due-date">${nextDueDate}</span>
                     </div>
+                </td>
+                <td class="text-center">
+                    ${statusBadge}
                 </td>
             </tr>
         `;
@@ -854,6 +981,15 @@ class PageDashboard {
             const data = await response.json();
             const installment = data.installment;
 
+            this.currentInstallmentId = installment.id;
+
+            // Show/hide edit button based on status
+            if (installment.status === 'non-active') {
+                $('#edit-installment-btn').show();
+            } else {
+                $('#edit-installment-btn').hide();
+            }
+
             // Populate Customer Information
             $('#view-customer-name').text(installment.customer_name);
             $('#view-customer-phone').text(installment.customer_phone);
@@ -887,7 +1023,6 @@ class PageDashboard {
 
             // Populate Payment Method
             $('#view-card-name').text(installment.card_name);
-            $('#view-card-number').text(`**** **** **** ${String(installment.card_number).slice(-4)}`);
             $('#view-credit-limit').text(`฿${parseFloat(installment.credit_limit).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
 
             // Populate Payment Schedule

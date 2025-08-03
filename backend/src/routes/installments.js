@@ -34,8 +34,16 @@ router.get('/', async (req, res) => {
                 whereClause += ` AND (SELECT ip.due_date FROM installment_payments ip WHERE ip.installment_id = i.id AND ip.is_paid = false ORDER BY ip.due_date ASC LIMIT 1) = CURRENT_DATE`;
             } else if (status === 'over_due') {
                 whereClause += ` AND (SELECT ip.due_date FROM installment_payments ip WHERE ip.installment_id = i.id AND ip.is_paid = false ORDER BY ip.due_date ASC LIMIT 1) < CURRENT_DATE AND i.status = 'active'`;
+            } else if (status === 'active') {
+                whereClause += ` AND i.status = 'active'`;
+            } else if (status === 'non-active') {
+                whereClause += ` AND i.status = 'non-active'`;
+            } else if (status === 'completed') {
+                whereClause += ` AND i.status = 'completed'`;
             } 
         }
+
+        console.log("STATUS >>> ",  status);
 
         const countResult = await pool.query(`
             SELECT COUNT(i.id) 
@@ -95,14 +103,15 @@ router.get('/:id', async (req, res) => {
                 i.term_months,
                 i.status,
                 i.start_date,
-                i.due_date as payment_due_day,
+                i.due_date,
                 i.late_fee,
                 c.name as customer_name,
                 c.phone as customer_phone,
                 c.id_card_number as customer_id_card_number,
                 p.name as product_name,
-                p.serial_number,
+                p.serial_number as product_serial_number,
                 p.price as product_price,
+                (p.price - i.total_amount) as down_payment,
                 p.description as product_description,
                 p.images as product_images,
                 cc.card_name,
@@ -138,6 +147,60 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+router.put('/:id', upload.array('productImages', 5), async (req, res) => {
+    const { id } = req.params;
+    const {
+        productName,
+        productSerialNumber,
+        productPrice,
+        productDescription,
+        installmentMonths,
+        paymentDueDate,
+        customerId,
+        creditCardId
+    } = req.body;
+
+    const downPayment = parseFloat(req.body.downPayment) || 0;
+    const interestRate = parseFloat(req.body.interestRate) || 0;
+    const lateFee = req.body.lateFee ? parseFloat(req.body.lateFee) : null;
+
+    const productImages = req.files ? req.files.map(file => file.filename) : [];
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        const installment = await client.query('SELECT * FROM installments WHERE id = $1', [id]);
+
+        // 1. Update Product
+        const productResult = await client.query(
+            'UPDATE products SET name = $1, serial_number = $2, price = $3, description = $4, images = $5, updated_at = NOW() WHERE id = $6 RETURNING id',
+            [productName, productSerialNumber, productPrice, productDescription, JSON.stringify(productImages), installment.rows[0].product_id]
+        );
+        const productId = productResult.rows[0].id;
+
+        // 2. Update Installment plan
+        const totalAmount = parseFloat(productPrice) - downPayment;
+        const monthlyPayment = (totalAmount * (1 + interestRate / 100)) / installmentMonths;
+
+        await client.query(
+            'UPDATE installments SET customer_id = $1, product_id = $2, credit_card_id = $3, due_date = $4, monthly_payment = $5, total_amount = $6, interest_rate = $7, term_months = $8, status = $9, late_fee = $10, updated_at = NOW() WHERE id = $11',
+            [customerId, productId, creditCardId, paymentDueDate, monthlyPayment, totalAmount, interestRate, installmentMonths, 'non-active', lateFee, id]
+        );
+
+        await client.query('COMMIT');
+        res.status(200).json({ message: 'Installment plan updated successfully', installmentId: id });
+
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error(err);
+        res.status(500).json({ error: 'Failed to update installment plan' });
+    } finally {
+        client.release();
+    }
+});
+
+
 
 // POST /api/installments
 router.post('/', upload.array('productImages'), async (req, res) => {
@@ -158,6 +221,8 @@ router.post('/', upload.array('productImages'), async (req, res) => {
     const lateFee = req.body.lateFee ? parseFloat(req.body.lateFee) : null; // Use null for empty string to allow DB default
 
     const productImages = req.files ? req.files.map(file => file.filename) : [];
+
+    console.log("productImages: ", productImages);
 
     const client = await pool.connect();
     try {

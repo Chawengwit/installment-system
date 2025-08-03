@@ -31,7 +31,7 @@
         box-shadow: var(--box-shadow);
         position: relative;
         width: 90%;
-        max-width: 500px;
+        // max-width: 500px;
         transform: translateY(20px);
         opacity: 0;
         animation: modal-fade-in 0.3s forwards;
