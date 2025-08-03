@@ -404,6 +404,7 @@ class PageDashboard {
                 }
             }
 
+            this.updateCalculationSummary();
             this.showStep(1);
         } catch (error) {
             console.error('Error pre-filling installment form:', error);
