@@ -222,6 +222,8 @@ router.post('/', upload.array('productImages'), async (req, res) => {
 
     const productImages = req.files ? req.files.map(file => file.filename) : [];
 
+    console.log("productImages: ", productImages);
+
     const client = await pool.connect();
     try {
         await client.query('BEGIN');

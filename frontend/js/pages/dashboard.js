@@ -1,5 +1,17 @@
 import { debounce, openModal, closeModal, showNotification } from '../utils/AppUtils.js';
 
+function dataURLtoFile(dataurl, filename) {
+    let arr = dataurl.split(','),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]),
+        n = bstr.length,
+        u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+}
+
 class PageDashboard {
     constructor() {
         this.$mainContent = $("#main-content");
@@ -368,16 +380,28 @@ class PageDashboard {
             // Handle image previews
             const imagePreviewContainer = $('#product-image-list');
             imagePreviewContainer.empty();
-            if (installment.product_images && installment.product_images.length > 0) {
-                installment.product_images.forEach(imageUrl => {
-                    const imageItem = $(
-                        `<div class="image-list-item">
-                            <img src="/uploads/${imageUrl}" class="uploaded-image-preview">
-                            <button type="button" class="remove-image-btn"><i class="fas fa-times-circle"></i></button>
-                        </div>`
-                    );
-                    imagePreviewContainer.append(imageItem);
-                });
+            if (installment.product_images) {
+                let productImages = installment.product_images;
+                if (typeof productImages === 'string') {
+                    try {
+                        productImages = JSON.parse(productImages);
+                    } catch (e) {
+                        console.error('Error parsing product_images JSON:', e);
+                        productImages = [];
+                    }
+                }
+
+                if (Array.isArray(productImages) && productImages.length > 0) {
+                    productImages.forEach(imageUrl => {
+                        const imageItem = $(
+                            `<div class="image-list-item">
+                                <img src="/uploads/${imageUrl}" class="uploaded-image-preview">
+                                <button type="button" class="remove-image-btn"><i class="fas fa-times-circle"></i></button>
+                            </div>`
+                        );
+                        imagePreviewContainer.append(imageItem);
+                    });
+                }
             }
 
             this.showStep(1);
@@ -418,7 +442,16 @@ class PageDashboard {
         formData.append('creditCardId', this.selectedCreditCardId);
 
         const imageInput = form.find('#product-images')[0];
-        const imageFiles = imageInput.files;
+        const dataTransfer = new DataTransfer();
+        $('#product-image-list .image-list-item').each(function () {
+            const src = $(this).find('img').attr('src');
+            if (src.startsWith('data:image')) { // New image
+                const file = dataURLtoFile(src, `image-${Date.now()}.png`);
+                dataTransfer.items.add(file);
+            }
+        });
+        const imageFiles = dataTransfer.files;
+
         if (imageFiles) {
             for (let i = 0; i < imageFiles.length; i++) {
                 formData.append('productImages', imageFiles[i]);
