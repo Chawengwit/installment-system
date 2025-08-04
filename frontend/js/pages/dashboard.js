@@ -968,19 +968,8 @@ class PageDashboard {
     }
 
     createInstallmentTableRow(installment) {
-        const statusClass = installment.status.replace(' ', '-').toLowerCase();
         const nextDueDate = installment.next_due_date ? new Intl.DateTimeFormat('en-GB').format(new Date(installment.next_due_date)) : 'N/A';
-        
-        let statusBadge;
-        if (installment.status === 'active') {
-            statusBadge = `<span class="badge badge-primary">${installment.status}</span>`;
-        } else if (installment.status === 'non-active') {
-            statusBadge = `<span class="badge badge-danger">${installment.status}</span>`;
-        } else if (installment.status === 'completed') {
-            statusBadge = `<span class="badge badge-success">${installment.status}</span>`;
-        } else {
-            statusBadge = `<span class="badge">${installment.status}</span>`;
-        }
+        const statusBadge = this.createStatusBadge(installment.status);
 
         return `
             <tr data-installment-id="${installment.id}">
@@ -1007,6 +996,17 @@ class PageDashboard {
                 </td>
             </tr>
         `;
+    }
+
+    createStatusBadge(status) {
+        const statusMap = {
+            'active': 'badge-primary',
+            'non-active': 'badge-danger',
+            'completed': 'badge-success',
+            'overdue': 'badge-warning'
+        };
+        const badgeClass = statusMap[status] || 'badge-secondary';
+        return `<span class="badge ${badgeClass}">${status}</span>`;
     }
 
     toggleView(isCard = this.isCardView) {
@@ -1039,8 +1039,7 @@ class PageDashboard {
             if (!response.ok) {
                 throw new Error('Failed to fetch installment details.');
             }
-            const data = await response.json();
-            const installment = data.installment;
+            const { installment, customer, creditCard } = await response.json();
 
             this.currentInstallmentId = installment.id;
 
@@ -1052,20 +1051,31 @@ class PageDashboard {
             }
 
             // Populate Customer Information
-            $('#view-customer-name').text(installment.customer_name);
-            $('#view-customer-phone').text(installment.customer_phone);
-            $('#view-customer-id-card').text(installment.customer_id_card_number || 'N/A');
+            $('#view-customer-name').text(customer ? customer.name : 'N/A');
+            $('#view-customer-phone').text(customer ? customer.phone : 'N/A');
+            $('#view-customer-id-card').text(customer ? customer.id_card_number : 'N/A');
 
             // Populate Product Details
             $('#view-product-name').text(installment.product_name);
             $('#view-product-serial').text(installment.product_serial_number);
             $('#view-product-price').text(`฿${parseFloat(installment.product_price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+            $('#view-down-payment').text(`฿${parseFloat(installment.down_payment).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
             $('#view-product-description').text(installment.product_description || 'N/A');
             
             const productImagesContainer = $('#view-product-images');
             productImagesContainer.empty();
-            if (installment.product_images && installment.product_images.length > 0) {
-                installment.product_images.forEach(image => {
+            let images = installment.product_images;
+            if (typeof images === 'string') {
+                try {
+                    images = JSON.parse(images);
+                } catch (e) {
+                    console.error("Error parsing product images JSON", e);
+                    images = [];
+                }
+            }
+
+            if (Array.isArray(images) && images.length > 0) {
+                images.forEach(image => {
                     productImagesContainer.append(`<img src="/uploads/${image}" alt="Product Image" class="img-thumbnail">`);
                 });
             } else {
@@ -1076,27 +1086,30 @@ class PageDashboard {
             $('#view-total-amount').text(`฿${parseFloat(installment.total_amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
             $('#view-monthly-payment').text(`฿${parseFloat(installment.monthly_payment).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
             $('#view-interest-rate').text(`${parseFloat(installment.interest_rate).toFixed(1)}%`);
-            $('#view-term-months').text(installment.term_months);
-            $('#view-status').text(installment.status);
+            $('#view-term-months').text(`${installment.term_months} months`);
+            
+            const statusBadge = this.createStatusBadge(installment.status);
+            $('#view-status').html(statusBadge);
+
             $('#view-start-date').text(new Date(installment.start_date).toLocaleDateString());
-            $('#view-payment-due-day').text(installment.due_date); // This is the day of the month
+            $('#view-payment-due-day').text(installment.due_date);
             $('#view-late-fee').text(`฿${parseFloat(installment.late_fee || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
 
             // Populate Payment Method
-            $('#view-card-name').text(installment.card_name);
-            $('#view-credit-limit').text(`฿${parseFloat(installment.credit_limit).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+            $('#view-card-name').text(creditCard ? creditCard.card_name : 'N/A');
+            $('#view-credit-limit').text(creditCard ? `฿${parseFloat(creditCard.credit_limit).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`: 'N/A');
 
             // Populate Payment Schedule
             const paymentScheduleBody = $('#view-payment-schedule-body');
             paymentScheduleBody.empty();
             if (installment.payment_schedule && installment.payment_schedule.length > 0) {
                 const today = new Date();
-                today.setHours(0, 0, 0, 0); // Set to midnight to compare dates only
+                today.setHours(0, 0, 0, 0);
 
                 installment.payment_schedule.forEach(payment => {
                     let actionsHtml;
                     if (payment.is_paid) {
-                        actionsHtml = `<span style="color: green; font-weight: bold;">Paid</span>`;
+                        actionsHtml = `<span class="badge badge-success">Paid</span>`;
                     } else {
                         const dueDate = new Date(payment.due_date);
                         const isOverdue = dueDate < today;
