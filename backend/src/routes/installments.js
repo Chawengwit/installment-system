@@ -173,31 +173,51 @@ router.put('/:id', upload.array('productImages', 5), async (req, res) => {
     try {
         await client.query('BEGIN');
 
-        const installment = await client.query('SELECT * FROM installments WHERE id = $1', [id]);
+        // Get original installment data to access start_date
+        const installmentResult = await client.query('SELECT * FROM installments WHERE id = $1', [id]);
+        if (installmentResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Installment plan not found' });
+        }
+        const originalInstallment = installmentResult.rows[0];
 
         // 1. Update Product
         const productResult = await client.query(
             'UPDATE products SET name = $1, serial_number = $2, price = $3, description = $4, images = $5, updated_at = NOW() WHERE id = $6 RETURNING id',
-            [productName, productSerialNumber, productPrice, productDescription, JSON.stringify(productImages), installment.rows[0].product_id]
+            [productName, productSerialNumber, productPrice, productDescription, JSON.stringify(productImages), originalInstallment.product_id]
         );
         const productId = productResult.rows[0].id;
 
-        // 2. Update Installment plan
+        // 2. Update Installment plan and set status to active
         const totalAmount = parseFloat(productPrice) - downPayment;
         const monthlyPayment = (totalAmount * (1 + interestRate / 100)) / installmentMonths;
 
         await client.query(
             'UPDATE installments SET customer_id = $1, product_id = $2, credit_card_id = $3, due_date = $4, monthly_payment = $5, total_amount = $6, interest_rate = $7, term_months = $8, status = $9, late_fee = $10, updated_at = NOW() WHERE id = $11',
-            [customerId, productId, creditCardId, paymentDueDate, monthlyPayment, totalAmount, interestRate, installmentMonths, 'non-active', lateFee, id]
+            [customerId, productId, creditCardId, paymentDueDate, monthlyPayment, totalAmount, interestRate, installmentMonths, 'active', lateFee, id]
         );
 
+        // 3. Delete old payment schedule
+        await client.query('DELETE FROM installment_payments WHERE installment_id = $1', [id]);
+
+        // 4. Create new payment schedule
+        const startDate = new Date(originalInstallment.start_date);
+        const paymentDay = parseInt(paymentDueDate, 10);
+
+        for (let i = 1; i <= installmentMonths; i++) {
+            const dueDate = new Date(startDate.getFullYear(), startDate.getMonth() + i, paymentDay);
+            await client.query(
+                'INSERT INTO installment_payments (installment_id, term_number, due_date, amount) VALUES ($1, $2, $3, $4)',
+                [id, i, dueDate.toISOString().split('T')[0], monthlyPayment]
+            );
+        }
+
         await client.query('COMMIT');
-        res.status(200).json({ message: 'Installment plan updated successfully', installmentId: id });
+        res.status(200).json({ message: 'Installment plan updated and activated successfully', installmentId: id });
 
     } catch (err) {
         await client.query('ROLLBACK');
         console.error(err);
-        res.status(500).json({ error: 'Failed to update installment plan' });
+        res.status(500).json({ error: 'Failed to update and activate installment plan' });
     } finally {
         client.release();
     }

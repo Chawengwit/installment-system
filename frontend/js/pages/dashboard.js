@@ -353,7 +353,7 @@ class PageDashboard {
         closeModal('view-installment-modal');
         openModal('add-new-plan-modal');
         $('#add-new-plan-modal .modal_title').text('Edit Installment Plan');
-        $('#add-new-plan-modal #step-5-submit').text('Update Installment Plan');
+        $('#add-new-plan-modal #step-5-submit').text('Active Installment Plan');
 
 
         try {
@@ -444,6 +444,12 @@ class PageDashboard {
         $('#add-new-plan-modal .customer-option').removeClass('customer-option-selected');
         this.selectedCustomerId = null;
         this.currentInstallmentId = null; // Reset currentInstallmentId
+
+        // Reset completion step text to default (for "create" mode)
+        $('#step-6 .form-step_title').html('<span class="form-step_number">6</span> Plan Created Successfully');
+        $('#step-6 .form-step_description').text('The installment plan is now active.');
+        $('#step-6 .complated-desc').text('The installment plan has been successfully created and is now active. You can view the details of the plan in the main dashboard.');
+
         this.showStep(1);
     }
 
@@ -498,7 +504,19 @@ class PageDashboard {
             const result = await response.json();
             this.newInstallmentId = result.installmentId;
 
-            showNotification(`Installment plan ${this.currentInstallmentId ? 'updated' : 'created'} successfully!`, 'success');
+            if (this.currentInstallmentId) {
+                // It was an update
+                $('#step-6 .form-step_title').html('<span class="form-step_number">6</span> Plan Updated & Activated');
+                $('#step-6 .form-step_description').text('The installment plan has been successfully updated and activated.');
+                $('#step-6 .complated-desc').text('The installment plan has been successfully updated and is now active. The payment schedule has been regenerated. You can view the updated details in the main dashboard.');
+            } else {
+                // It was a creation
+                $('#step-6 .form-step_title').html('<span class="form-step_number">6</span> Plan Created Successfully');
+                $('#step-6 .form-step_description').text('The installment plan is now active.');
+                $('#step-6 .complated-desc').text('The installment plan has been successfully created and is now active. You can view the details of the plan in the main dashboard.');
+            }
+
+            showNotification(`Installment plan ${this.currentInstallmentId ? 'updated and activated' : 'created'} successfully!`, 'success');
             this.fetchInstallments(true); // Refresh the installment list
             this.clearAddPlanForm(); // Clear the form for next use
             this.showStep(6);
