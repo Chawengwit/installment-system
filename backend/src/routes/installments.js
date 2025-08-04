@@ -97,6 +97,8 @@ router.get('/:id', async (req, res) => {
         const installmentQuery = `
             SELECT
                 i.id,
+                i.customer_id,
+                i.credit_card_id,
                 i.total_amount,
                 i.monthly_payment,
                 i.interest_rate,
@@ -105,23 +107,14 @@ router.get('/:id', async (req, res) => {
                 i.start_date,
                 i.due_date,
                 i.late_fee,
-                c.id as customer_id,
-                c.name as customer_name,
-                c.phone as customer_phone,
-                c.id_card_number as customer_id_card_number,
-                c.nickname as customer_nickname,
                 p.name as product_name,
                 p.serial_number as product_serial_number,
                 p.price as product_price,
                 (p.price - i.total_amount) as down_payment,
                 p.description as product_description,
-                p.images as product_images,
-                cc.card_name,
-                cc.credit_limit
+                p.images as product_images
             FROM installments i
-            JOIN customers c ON i.customer_id = c.id
             JOIN products p ON i.product_id = p.id
-            JOIN credit_cards cc ON i.credit_card_id = cc.id
             WHERE i.id = $1
         `;
         const installmentResult = await pool.query(installmentQuery, [id]);
@@ -133,7 +126,7 @@ router.get('/:id', async (req, res) => {
         const installment = installmentResult.rows[0];
 
         const paymentsQuery = `
-            SELECT term_number, due_date, amount, paid_amount, is_paid
+            SELECT id, term_number, due_date, amount, paid_amount, is_paid
             FROM installment_payments
             WHERE installment_id = $1
             ORDER BY term_number ASC
@@ -145,7 +138,11 @@ router.get('/:id', async (req, res) => {
         const customerResult = await pool.query('SELECT * FROM customers WHERE id = $1', [installment.customer_id]);
         const customer = customerResult.rows.length > 0 ? customerResult.rows[0] : null;
 
-        res.json({ installment, customer });
+        // Fetch credit card details
+        const creditCardResult = await pool.query('SELECT * FROM credit_cards WHERE id = $1', [installment.credit_card_id]);
+        const creditCard = creditCardResult.rows.length > 0 ? creditCardResult.rows[0] : null;
+
+        res.json({ installment, customer, creditCard });
 
     } catch (err) {
         console.error(err);

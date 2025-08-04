@@ -362,7 +362,7 @@ class PageDashboard {
                 throw new Error('Failed to fetch installment data for editing.');
             }
             const data = await response.json();
-            const installment = data.installment;
+            const { installment, customer, creditCard } = data;
 
             // Pre-fill the form with the fetched data
             $('#product-name').val(installment.product_name);
@@ -408,11 +408,21 @@ class PageDashboard {
             // Directly display the selected customer in edit mode
             const customerOptionsContainer = $('#add-new-plan-modal .customer-options');
             customerOptionsContainer.empty(); // Clear any loading messages or previous content
-            if (data.customer) {
-                customerOptionsContainer.append(this.createCustomerOption(data.customer, true));
+            if (customer) {
+                customerOptionsContainer.append(this.createCustomerOption(customer, true));
             } else {
-                console.error('Customer data not found in installment details for editing.');
+                console.error('Customer data not found for this installment.');
                 customerOptionsContainer.html('<p class="text-danger">Error: Customer data missing.</p>');
+            }
+
+            // Directly display the selected credit card in edit mode
+            const cardOptionsContainer = $('#add-new-plan-modal .card-selection');
+            cardOptionsContainer.empty();
+            if (creditCard) {
+                cardOptionsContainer.append(this.createCreditCardOption(creditCard, true));
+            } else {
+                console.error('Credit card data not found for this installment.');
+                cardOptionsContainer.html('<p class="text-danger">Error: Credit Card data missing.</p>');
             }
 
             this.updateCalculationSummary();
@@ -509,7 +519,7 @@ class PageDashboard {
                 $('#step-3 .search-section').hide();
                 const title = $('#step-3 .form-step_title');
                 title.html('<span class="form-step_number">3</span> Customer Selected');
-                $('#step-3 .form-step_description').text('Customer that you selected on this installment');
+                $('#step-3 .form-step_description').text('The customer for this installment is fixed and cannot be changed during an edit.');
             } else { // Add mode
                 $('#step-3 .search-section').show();
                 const title = $('#step-3 .form-step_title');
@@ -518,6 +528,17 @@ class PageDashboard {
                 this.fetchCustomersForModal(); // Call only in add mode
             }
         } else if (stepNumber === 4) {
+            if (this.currentInstallmentId) { // Edit mode
+                $('#step-4 .search-section').hide();
+                const title = $('#step-4 .form-step_title');
+                title.html('<span class="form-step_number">4</span> Payment Method');
+                $('#step-4 .form-step_description').text('The credit card for this installment is fixed and cannot be changed during an edit.');
+            } else { // Add mode
+                $('#step-4 .search-section').show();
+                const title = $('#step-4 .form-step_title');
+                title.html('<span class="form-step_number">4</span> Payment Method');
+                $('#step-4 .form-step_description').text('Choose how the customer will make payments');
+            }
             this.fetchCreditCardsForModal();
         } else if (stepNumber === 5) {
             this.updateReviewStep();
@@ -758,21 +779,21 @@ class PageDashboard {
 
         try {
             let cards = [];
-            if (this.selectedCreditCardId) {
+            if (this.currentInstallmentId && this.selectedCreditCardId) {
+                // Edit mode: Fetch only the selected credit card
                 const selectedCardResponse = await fetch(`/api/credit-cards/${this.selectedCreditCardId}`);
                 if (!selectedCardResponse.ok) throw new Error('Failed to fetch selected credit card details');
                 const selectedCard = await selectedCardResponse.json();
                 if (selectedCard) {
                     cards.push(selectedCard);
                 }
+            } else {
+                // Add mode: Fetch all available credit cards
+                const response = await fetch(`/api/credit-cards?search=${search}&limit=5`);
+                if (!response.ok) throw new Error('Failed to fetch credit cards for modal');
+                const data = await response.json();
+                cards = data.credit_cards;
             }
-
-            const response = await fetch(`/api/credit-cards?search=${search}&limit=5`);
-            if (!response.ok) throw new Error('Failed to fetch credit cards for modal');
-            const data = await response.json();
-
-            const filteredCards = data.credit_cards.filter(card => card.id !== this.selectedCreditCardId);
-            cards = cards.concat(filteredCards);
 
             cardOptionsContainer.html('');
             if (cards && cards.length > 0) {
@@ -791,6 +812,11 @@ class PageDashboard {
     }
 
     handleCreditCardSelection(event) {
+        if (this.currentInstallmentId) {
+            showNotification('The credit card cannot be changed when editing an installment plan.', 'warning');
+            return; // Prevent changing the card in edit mode
+        }
+
         const $selectedOption = $(event.currentTarget);
         const cardId = $selectedOption.data('card-id');
 
