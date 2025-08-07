@@ -35,4 +35,12 @@ app.use('/', frontendRoutes);
 // API routes
 app.use('/api', apiRoutes);
 
+// Centralized error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack); // Log the error stack for debugging
+    res.status(err.statusCode || 500).json({
+        error: err.message || 'An unexpected error occurred.'
+    });
+});
+
 export default app;

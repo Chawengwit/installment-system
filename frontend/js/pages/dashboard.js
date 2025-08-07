@@ -296,6 +296,9 @@ class PageDashboard {
         this.$mainContent.on("click", "#customize-term-btn", () => this.showStep(2));
         this.$mainContent.on("click", "#installment-table-body tr", this.handleViewInstallment.bind(this));
         this.$mainContent.on("click", ".mark-paid-btn", this.handleMarkPaymentAsPaid.bind(this));
+        this.$mainContent.on("click", "#confirm-payment-btn", this.confirmMarkPaymentAsPaid.bind(this));
+        this.$mainContent.on("click", "#cancel-confirm-payment", () => closeModal('confirmation-modal'));
+        this.$mainContent.on("change", "#slip-image-upload", this.handleSlipImageUpload.bind(this));
         this.$mainContent.on("click", "#edit-installment-btn", this.handleEditInstallment.bind(this));
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
@@ -685,10 +688,7 @@ class PageDashboard {
                 cardSelectionContainer.find('.error-message').remove();
 
                 if (!this.selectedCreditCardId) {
-                    console.log(">> Show Error <<");
-
                     showNotification('Please select a credit card.', 'error');
-                    
                     isValid = false;
                 }
                 break;
@@ -1167,27 +1167,42 @@ class PageDashboard {
         }
     }
 
-    async handleMarkPaymentAsPaid(event) {
+    handleMarkPaymentAsPaid(event) {
         const paymentId = $(event.currentTarget).data('payment-id');
         const installmentId = $(event.currentTarget).data('installment-id');
         const paymentAmount = $(event.currentTarget).data('payment-amount');
 
+        // Store these values temporarily for the confirmation modal
+        this.currentPaymentToMarkPaid = { paymentId, installmentId, paymentAmount };
+
+        // Clear any previous image preview
+        $('#slip-image-preview').empty();
+        $('#slip-image-upload').val('');
+
+        openModal('confirmation-modal');
+    }
+
+    async confirmMarkPaymentAsPaid() {
+        const { paymentId, installmentId, paymentAmount } = this.currentPaymentToMarkPaid;
+
         if (!paymentId || !installmentId || !paymentAmount) {
-            showNotification('Missing payment details.', 'error');
+            showNotification('Missing payment details for confirmation.', 'error');
             return;
         }
 
-        if (!confirm('Are you sure you want to mark this payment as paid?')) {
-            return;
+        const formData = new FormData();
+        formData.append('paid_amount', paymentAmount);
+        formData.append('installment_id', installmentId);
+
+        const slipImageInput = $('#slip-image-upload')[0];
+        if (slipImageInput.files.length > 0) {
+            formData.append('slip_image', slipImageInput.files[0]);
         }
 
         try {
-            const response = await fetch(`/api/installment-payments/${paymentId}/mark-paid`, {
+            const response = await fetch(`/api/installment-payment/${paymentId}/mark-paid`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ paid_amount: paymentAmount, installment_id: installmentId })
+                body: formData // FormData handles Content-Type automatically for file uploads
             });
 
             if (!response.ok) {
@@ -1196,13 +1211,45 @@ class PageDashboard {
             }
 
             showNotification('Payment marked as paid successfully!', 'success');
+            closeModal('confirmation-modal');
             // Re-fetch installment details to update the modal and table
-            this.handleViewInstallment({ currentTarget: $(`button[data-id="${installmentId}"]`) });
+            this.handleViewInstallment({ currentTarget: $(`#installment-table-body tr[data-installment-id="${installmentId}"]`) });
             this.fetchInstallments(true); // Refresh main table
 
         } catch (error) {
             console.error('Error marking payment as paid:', error);
             showNotification(error.message, 'error');
+        }
+    }
+
+    handleSlipImageUpload(event) {
+        const files = event.target.files;
+        const previewContainer = $('#slip-image-preview');
+        previewContainer.empty(); // Clear previous preview
+
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageItem = $(
+                        `<div class="image-list-item">
+                            <img src="${e.target.result}" class="uploaded-image-preview">
+                            <button type="button" class="remove-image-btn"><i class="fas fa-times-circle"></i></button>
+                        </div>`
+                    );
+                    previewContainer.append(imageItem);
+
+                    imageItem.find('.remove-image-btn').on('click', function() {
+                        $(this).closest('.image-list-item').remove();
+                        $('#slip-image-upload').val(''); // Clear the input
+                    });
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showNotification('Only image files are allowed for slip upload.', 'warning');
+                $('#slip-image-upload').val(''); // Clear the input
+            }
         }
     }
 

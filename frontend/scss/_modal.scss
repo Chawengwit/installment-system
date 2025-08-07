@@ -184,7 +184,56 @@
         }
     }
 
-    .file-upload {
+    .customer-selection,
+    .payment-methods,
+    .credit-card-details,
+    .review-summary {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .customer-options,
+    .card-selection {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .customer-option,
+    .card-option {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+        border: 1px solid var(--color-gray-200);
+        border-radius: var(--border-radius-lg);
+        cursor: pointer;
+        transition: var(--transition-fast);
+
+        &:hover {
+            border-color: var(--color-primary);
+            background-color: rgba(37, 99, 235, 0.02);
+        }
+    }
+
+    .payment-method_label {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-lg);
+        padding: var(--spacing-lg);
+        border: 2px solid var(--color-gray-200);
+        border-radius: var(--border-radius-lg);
+        cursor: pointer;
+        transition: var(--transition-fast);
+
+        &:hover {
+            border-color: var(--color-primary);
+            background-color: rgba(37, 99, 235, 0.02);
+        }
+    }
+}
+
+   .file-upload {
         .file-upload_input {
             display: none;
         }
@@ -266,55 +315,6 @@
         &:hover {
             background-color: var(--color-white);
             transform: scale(1.1);
-        }
-    }
-    }
-
-    .customer-selection,
-    .payment-methods,
-    .credit-card-details,
-    .review-summary {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-
-    .customer-options,
-    .card-selection {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-md);
-    }
-
-    .customer-option,
-    .card-option {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
-        padding: var(--spacing-md);
-        border: 1px solid var(--color-gray-200);
-        border-radius: var(--border-radius-lg);
-        cursor: pointer;
-        transition: var(--transition-fast);
-
-        &:hover {
-            border-color: var(--color-primary);
-            background-color: rgba(37, 99, 235, 0.02);
-        }
-    }
-
-    .payment-method_label {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-lg);
-        padding: var(--spacing-lg);
-        border: 2px solid var(--color-gray-200);
-        border-radius: var(--border-radius-lg);
-        cursor: pointer;
-        transition: var(--transition-fast);
-
-        &:hover {
-            border-color: var(--color-primary);
-            background-color: rgba(37, 99, 235, 0.02);
         }
     }
 }

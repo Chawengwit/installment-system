@@ -698,6 +698,38 @@
     </div>
 </div>
 
+<!-- Confirmation Modal -->
+<div class="modal" id="confirmation-modal">
+    <div class="modal_overlay"></div>
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3 class="modal_title">Confirm Payment</h3>
+            <button class="modal_close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal_body">
+            <p>Are you sure you want to mark this payment as paid?</p>
+            <div class="form_group">
+                <label class="form_label">Upload Slip Image (Optional)</label>
+                <div class="file-upload">
+                    <input type="file" class="file-upload_input" id="slip-image-upload" accept="image/*">
+                    <label for="slip-image-upload" class="file-upload_area">
+                        <i class="fas fa-cloud-upload-alt file-upload_icon"></i>
+                        <p class="file-upload_text">Drag & drop image here or click to browse</p>
+                        <p class="file-upload_hint">Support: JPG, PNG, GIF (Max 5MB)</p>
+                    </label>
+                    <div class="image-list-container" id="slip-image-preview"></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal_footer">
+            <button type="button" class="btn btn-secondary" id="cancel-confirm-payment">Cancel</button>
+            <button type="button" class="btn btn-primary" id="confirm-payment-btn">Confirm</button>
+        </div>
+    </div>
+</div>
+
 <!-- Loading Overlay -->
 <!-- <div class="loading-overlay" id="loading-overlay">
     <div class="spinner"></div>
