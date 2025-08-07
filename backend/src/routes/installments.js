@@ -242,23 +242,31 @@ router.post('/', upload.array('productImages'), async (req, res) => {
     const downPayment = parseFloat(req.body.downPayment) || 0;
     const interestRate = parseFloat(req.body.interestRate) || 0;
     const lateFee = req.body.lateFee ? parseFloat(req.body.lateFee) : null; // Use null for empty string to allow DB default
-
     const productImages = req.files ? req.files.map(file => file.filename) : [];
-
-    console.log("productImages: ", productImages);
 
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
 
-        // 1. Create new Product
+        // 1. Calculate total used amount for the credit card
+        const totalUsedAmountResult = await client.query(
+            `SELECT COALESCE(SUM(p.price), 0) AS total_used_amount
+                FROM installments i
+                JOIN products p ON i.product_id = p.id
+                WHERE i.credit_card_id = $1`,
+            [creditCardId]
+        );
+        const existingUsedAmount = parseFloat(totalUsedAmountResult.rows[0].total_used_amount);
+        const newUsedAmount = existingUsedAmount + parseFloat(productPrice);
+
+        // 2. Create new Product
         const productResult = await client.query(
             'INSERT INTO products (name, serial_number, price, description, images) VALUES ($1, $2, $3, $4, $5) RETURNING id',
             [productName, productSerialNumber, productPrice, productDescription, JSON.stringify(productImages)]
         );
         const productId = productResult.rows[0].id;
 
-        // 2. Create new Installment plan
+        // 3. Create new Installment plan
         const totalAmount = parseFloat(productPrice) - downPayment;
         const usedAmount = parseFloat(productPrice);
         const monthlyPayment = (totalAmount * (1 + interestRate / 100)) / installmentMonths;
@@ -269,13 +277,13 @@ router.post('/', upload.array('productImages'), async (req, res) => {
         );
         const installmentId = installmentResult.rows[0].id;
 
-        // Update credit card used_amount and installment_status
+        // 4. Update credit card used_amount and installment_status
         await client.query(
-            'UPDATE credit_cards SET used_amount = used_amount + $1, installment_status = TRUE, updated_at = NOW() WHERE id = $2',
-            [usedAmount, creditCardId]
+            'UPDATE credit_cards SET used_amount = $1, installment_status = TRUE, updated_at = NOW() WHERE id = $2',
+            [newUsedAmount, creditCardId]
         );
 
-        // Update customer installment_status
+        // 5. Update customer installment_status
         await client.query(
             'UPDATE customers SET installment_status = TRUE, updated_at = NOW() WHERE id = $1',
             [customerId]
