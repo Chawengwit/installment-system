@@ -43,8 +43,6 @@ router.get('/', async (req, res) => {
             } 
         }
 
-        console.log("STATUS >>> ",  status);
-
         const countResult = await pool.query(`
             SELECT COUNT(i.id) 
             FROM installments i
