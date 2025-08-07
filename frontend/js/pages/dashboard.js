@@ -699,7 +699,10 @@ class PageDashboard {
     updateReviewStep() {
         const form = $('#installment-plan-form');
         const productName = form.find('#product-name').val();
+        const productSerialNumber = form.find('#product-serial-number').val();
         const productPrice = form.find('#product-price').val();
+        const downPayment = form.find('#down-payment').val();
+        const productDescription = form.find('#product-description').val();
         const installmentMonths = form.find('#installment-months').val();
         const interestRate = form.find('#interest-rate').val();
         const paymentDueDate = form.find('#payment-due-date').val();
@@ -707,16 +710,38 @@ class PageDashboard {
         const customerPhone = $('#add-new-plan-modal .customer-option-selected .customer-option_details').text().split('•')[0].trim();
         const cardName = $('#add-new-plan-modal .card-option-selected .card-option_name').text();
 
-        console.log("productPrice: ", productPrice)
-        console.log("installmentMonths: ", installmentMonths)
-        console.log("interestRate: ", interestRate)
+        // Update Review Product section
+        $('#review-product').html(`
+            <p><strong>Name:</strong> ${productName}</p>
+            <p><strong>Serial Number:</strong> ${productSerialNumber || 'N/A'}</p>
+            <p><strong>Price:</strong> ฿${parseFloat(productPrice).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+            <p><strong>Down Payment:</strong> ฿${parseFloat(downPayment).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+            <p><strong>Description:</strong> ${productDescription || 'N/A'}</p>
+        `);
 
-        const monthlyPayment = ((parseFloat(productPrice) * (1 + parseFloat(interestRate) / 100)) / parseInt(installmentMonths, 10)).toFixed(2);
+        // Update Review Terms section
+        const summaryPrice = $('#summary-price').text();
+        const summaryDownPayment = $('#summary-down-payment').text();
+        const summaryFinanced = $('#summary-financed').text();
+        const summaryInterestRate = $('#summary-interest-rate').text();
+        const summaryInterestAmount = $('#summary-interest-amount').text();
+        const summaryTotal = $('#summary-total').text();
+        const summaryMonthly = $('#summary-monthly').text();
+        const summaryPayments = $('#summary-payments').text();
+
+        $('#review-terms').html(`
+            <p><strong>Product Price:</strong> ${summaryPrice}</p>
+            <p><strong>Down Payment:</strong> ${summaryDownPayment}</p>
+            <p><strong>Financed Amount:</strong> ${summaryFinanced}</p>
+            <p><strong>Interest Rate:</strong> ${summaryInterestRate}</p>
+            <p><strong>Interest Amount:</strong> ${summaryInterestAmount}</p>
+            <p><strong>Total Amount:</strong> ${summaryTotal}</p>
+            <p><strong>Monthly Payment:</strong> ${summaryMonthly}</p>
+            <p><strong>Number of Payments:</strong> ${summaryPayments}</p>
+        `);
 
         $('#review-customer').text(`${customerName} - ${customerPhone}`);
-        $('#review-product').text(`${productName} - ฿${productPrice}`);
         $('#review-payment-method').text(`Credit Card - ${cardName}`);
-        $('#review-terms').text(`${installmentMonths} months - ฿${monthlyPayment}/month`);
     }
 
     prevStep() {
