@@ -260,6 +260,7 @@ router.post('/', upload.array('productImages'), async (req, res) => {
 
         // 2. Create new Installment plan
         const totalAmount = parseFloat(productPrice) - downPayment;
+        const usedAmount = parseFloat(productPrice);
         const monthlyPayment = (totalAmount * (1 + interestRate / 100)) / installmentMonths;
 
         const installmentResult = await client.query(
@@ -271,7 +272,7 @@ router.post('/', upload.array('productImages'), async (req, res) => {
         // Update credit card used_amount and installment_status
         await client.query(
             'UPDATE credit_cards SET used_amount = used_amount + $1, installment_status = TRUE, updated_at = NOW() WHERE id = $2',
-            [totalAmount, creditCardId]
+            [usedAmount, creditCardId]
         );
 
         // Update customer installment_status

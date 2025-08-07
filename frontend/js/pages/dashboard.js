@@ -707,6 +707,10 @@ class PageDashboard {
         const customerPhone = $('#add-new-plan-modal .customer-option-selected .customer-option_details').text().split('•')[0].trim();
         const cardName = $('#add-new-plan-modal .card-option-selected .card-option_name').text();
 
+        console.log("productPrice: ", productPrice)
+        console.log("installmentMonths: ", installmentMonths)
+        console.log("interestRate: ", interestRate)
+
         const monthlyPayment = ((parseFloat(productPrice) * (1 + parseFloat(interestRate) / 100)) / parseInt(installmentMonths, 10)).toFixed(2);
 
         $('#review-customer').text(`${customerName} - ${customerPhone}`);
