@@ -43,8 +43,6 @@ router.get('/', async (req, res) => {
             } 
         }
 
-        console.log("STATUS >>> ",  status);
-
         const countResult = await pool.query(`
             SELECT COUNT(i.id) 
             FROM installments i
@@ -97,6 +95,8 @@ router.get('/:id', async (req, res) => {
         const installmentQuery = `
             SELECT
                 i.id,
+                i.customer_id,
+                i.credit_card_id,
                 i.total_amount,
                 i.monthly_payment,
                 i.interest_rate,
@@ -105,23 +105,14 @@ router.get('/:id', async (req, res) => {
                 i.start_date,
                 i.due_date,
                 i.late_fee,
-                c.id as customer_id,
-                c.name as customer_name,
-                c.phone as customer_phone,
-                c.id_card_number as customer_id_card_number,
-                c.nickname as customer_nickname,
                 p.name as product_name,
                 p.serial_number as product_serial_number,
                 p.price as product_price,
                 (p.price - i.total_amount) as down_payment,
                 p.description as product_description,
-                p.images as product_images,
-                cc.card_name,
-                cc.credit_limit
+                p.images as product_images
             FROM installments i
-            JOIN customers c ON i.customer_id = c.id
             JOIN products p ON i.product_id = p.id
-            JOIN credit_cards cc ON i.credit_card_id = cc.id
             WHERE i.id = $1
         `;
         const installmentResult = await pool.query(installmentQuery, [id]);
@@ -133,7 +124,7 @@ router.get('/:id', async (req, res) => {
         const installment = installmentResult.rows[0];
 
         const paymentsQuery = `
-            SELECT term_number, due_date, amount, paid_amount, is_paid
+            SELECT id, term_number, due_date, amount, paid_amount, is_paid
             FROM installment_payments
             WHERE installment_id = $1
             ORDER BY term_number ASC
@@ -145,7 +136,11 @@ router.get('/:id', async (req, res) => {
         const customerResult = await pool.query('SELECT * FROM customers WHERE id = $1', [installment.customer_id]);
         const customer = customerResult.rows.length > 0 ? customerResult.rows[0] : null;
 
-        res.json({ installment, customer });
+        // Fetch credit card details
+        const creditCardResult = await pool.query('SELECT * FROM credit_cards WHERE id = $1', [installment.credit_card_id]);
+        const creditCard = creditCardResult.rows.length > 0 ? creditCardResult.rows[0] : null;
+
+        res.json({ installment, customer, creditCard });
 
     } catch (err) {
         console.error(err);
@@ -176,31 +171,51 @@ router.put('/:id', upload.array('productImages', 5), async (req, res) => {
     try {
         await client.query('BEGIN');
 
-        const installment = await client.query('SELECT * FROM installments WHERE id = $1', [id]);
+        // Get original installment data to access start_date
+        const installmentResult = await client.query('SELECT * FROM installments WHERE id = $1', [id]);
+        if (installmentResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Installment plan not found' });
+        }
+        const originalInstallment = installmentResult.rows[0];
 
         // 1. Update Product
         const productResult = await client.query(
             'UPDATE products SET name = $1, serial_number = $2, price = $3, description = $4, images = $5, updated_at = NOW() WHERE id = $6 RETURNING id',
-            [productName, productSerialNumber, productPrice, productDescription, JSON.stringify(productImages), installment.rows[0].product_id]
+            [productName, productSerialNumber, productPrice, productDescription, JSON.stringify(productImages), originalInstallment.product_id]
         );
         const productId = productResult.rows[0].id;
 
-        // 2. Update Installment plan
+        // 2. Update Installment plan and set status to active
         const totalAmount = parseFloat(productPrice) - downPayment;
         const monthlyPayment = (totalAmount * (1 + interestRate / 100)) / installmentMonths;
 
         await client.query(
             'UPDATE installments SET customer_id = $1, product_id = $2, credit_card_id = $3, due_date = $4, monthly_payment = $5, total_amount = $6, interest_rate = $7, term_months = $8, status = $9, late_fee = $10, updated_at = NOW() WHERE id = $11',
-            [customerId, productId, creditCardId, paymentDueDate, monthlyPayment, totalAmount, interestRate, installmentMonths, 'non-active', lateFee, id]
+            [customerId, productId, creditCardId, paymentDueDate, monthlyPayment, totalAmount, interestRate, installmentMonths, 'active', lateFee, id]
         );
 
+        // 3. Delete old payment schedule
+        await client.query('DELETE FROM installment_payments WHERE installment_id = $1', [id]);
+
+        // 4. Create new payment schedule
+        const startDate = new Date(originalInstallment.start_date);
+        const paymentDay = parseInt(paymentDueDate, 10);
+
+        for (let i = 1; i <= installmentMonths; i++) {
+            const dueDate = new Date(startDate.getFullYear(), startDate.getMonth() + i, paymentDay);
+            await client.query(
+                'INSERT INTO installment_payments (installment_id, term_number, due_date, amount) VALUES ($1, $2, $3, $4)',
+                [id, i, dueDate.toISOString().split('T')[0], monthlyPayment]
+            );
+        }
+
         await client.query('COMMIT');
-        res.status(200).json({ message: 'Installment plan updated successfully', installmentId: id });
+        res.status(200).json({ message: 'Installment plan updated and activated successfully', installmentId: id });
 
     } catch (err) {
         await client.query('ROLLBACK');
         console.error(err);
-        res.status(500).json({ error: 'Failed to update installment plan' });
+        res.status(500).json({ error: 'Failed to update and activate installment plan' });
     } finally {
         client.release();
     }
@@ -225,24 +240,33 @@ router.post('/', upload.array('productImages'), async (req, res) => {
     const downPayment = parseFloat(req.body.downPayment) || 0;
     const interestRate = parseFloat(req.body.interestRate) || 0;
     const lateFee = req.body.lateFee ? parseFloat(req.body.lateFee) : null; // Use null for empty string to allow DB default
-
     const productImages = req.files ? req.files.map(file => file.filename) : [];
-
-    console.log("productImages: ", productImages);
 
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
 
-        // 1. Create new Product
+        // 1. Calculate total used amount for the credit card
+        const totalUsedAmountResult = await client.query(
+            `SELECT COALESCE(SUM(p.price), 0) AS total_used_amount
+                FROM installments i
+                JOIN products p ON i.product_id = p.id
+                WHERE i.credit_card_id = $1`,
+            [creditCardId]
+        );
+        const existingUsedAmount = parseFloat(totalUsedAmountResult.rows[0].total_used_amount);
+        const newUsedAmount = existingUsedAmount + parseFloat(productPrice);
+
+        // 2. Create new Product
         const productResult = await client.query(
             'INSERT INTO products (name, serial_number, price, description, images) VALUES ($1, $2, $3, $4, $5) RETURNING id',
             [productName, productSerialNumber, productPrice, productDescription, JSON.stringify(productImages)]
         );
         const productId = productResult.rows[0].id;
 
-        // 2. Create new Installment plan
+        // 3. Create new Installment plan
         const totalAmount = parseFloat(productPrice) - downPayment;
+        const usedAmount = parseFloat(productPrice);
         const monthlyPayment = (totalAmount * (1 + interestRate / 100)) / installmentMonths;
 
         const installmentResult = await client.query(
@@ -251,13 +275,13 @@ router.post('/', upload.array('productImages'), async (req, res) => {
         );
         const installmentId = installmentResult.rows[0].id;
 
-        // Update credit card used_amount and installment_status
+        // 4. Update credit card used_amount and installment_status
         await client.query(
-            'UPDATE credit_cards SET used_amount = used_amount + $1, installment_status = TRUE, updated_at = NOW() WHERE id = $2',
-            [totalAmount, creditCardId]
+            'UPDATE credit_cards SET used_amount = $1, installment_status = TRUE, updated_at = NOW() WHERE id = $2',
+            [newUsedAmount, creditCardId]
         );
 
-        // Update customer installment_status
+        // 5. Update customer installment_status
         await client.query(
             'UPDATE customers SET installment_status = TRUE, updated_at = NOW() WHERE id = $1',
             [customerId]
@@ -275,44 +299,6 @@ router.post('/', upload.array('productImages'), async (req, res) => {
     }
 });
 
-router.put('/installment-payments/:id/mark-paid', async (req, res) => {
-    const { id } = req.params;
-    const { paid_amount, installment_id } = req.body;
 
-    const client = await pool.connect();
-    try {
-        await client.query('BEGIN');
-
-        // 1. Update the specific installment payment
-        const updatePaymentQuery = `
-            UPDATE installment_payments
-            SET is_paid = TRUE, paid_date = NOW(), paid_amount = $1, updated_at = NOW()
-            WHERE id = $2 RETURNING installment_id;
-        `;
-        const updatePaymentResult = await client.query(updatePaymentQuery, [paid_amount, id]);
-
-        if (updatePaymentResult.rows.length === 0) {
-            throw new Error('Installment payment not found.');
-        }
-
-        // 2. Update the used_amount on the associated credit card
-        const updateCreditCardQuery = `
-            UPDATE credit_cards
-            SET used_amount = used_amount + $1, updated_at = NOW()
-            WHERE id = (SELECT credit_card_id FROM installments WHERE id = $2);
-        `;
-        await client.query(updateCreditCardQuery, [paid_amount, installment_id]);
-
-        await client.query('COMMIT');
-        res.status(200).json({ message: 'Payment marked as paid successfully' });
-
-    } catch (err) {
-        await client.query('ROLLBACK');
-        console.error(err);
-        res.status(500).json({ error: 'Failed to mark payment as paid' });
-    } finally {
-        client.release();
-    }
-});
 
 export default router;
