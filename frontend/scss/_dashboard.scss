@@ -609,3 +609,7 @@
         gap: var(--spacing-md);
     }
 }
+
+.daterangepicker .ranges li.active {
+    background-color: var(--color-primary) !important;
+}
