@@ -567,6 +567,18 @@
     }
 }
 
+.daterange-picker-btn {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-300);
+    color: var(--color-gray-700);
+
+    &:hover, &.active {
+        background-color: var(--color-gray-50);
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+    }
+}
+
 // Responsive Design
 @media (max-width: 768px) {
     .form-step {

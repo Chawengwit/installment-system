@@ -18,7 +18,7 @@ const upload = multer({ storage: storage });
 
 // GET /api/installments
 router.get('/', async (req, res) => {
-    const { search = '', status = 'all', limit = 10, offset = 0, sortBy = 'created_at', sortOrder = 'DESC' } = req.query;
+    const { search = '', status = 'all', limit = 10, offset = 0, sortBy = 'created_at', sortOrder = 'DESC', startDate, endDate } = req.query;
 
     try {
         let whereClause = 'WHERE 1 = 1';
@@ -41,6 +41,11 @@ router.get('/', async (req, res) => {
             } else if (status === 'completed') {
                 whereClause += ` AND i.status = 'completed'`;
             } 
+        }
+
+        if (startDate && endDate) {
+            whereClause += ` AND i.created_at BETWEEN $${params.length + 1} AND $${params.length + 2}`;
+            params.push(startDate, endDate);
         }
 
         const countResult = await pool.query(`

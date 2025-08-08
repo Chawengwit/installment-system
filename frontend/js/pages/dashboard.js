@@ -25,6 +25,8 @@ class PageDashboard {
         this.selectedCustomerId = null;
         this.selectedCreditCardId = null;
         this.currentInstallmentId = null;
+        this.startDate = null;
+        this.endDate = null;
     }
 
     init() {
@@ -34,6 +36,7 @@ class PageDashboard {
         this.setupCustomerModals();
         this.setupCreditCardModals();
         this.toggleView(false); // Show table view by default
+        this.setupDateRangePicker();
     }
 
     async fetchDashboardStats() {
@@ -55,6 +58,37 @@ class PageDashboard {
             console.error('Error fetching dashboard stats:', error);
             showNotification(error.message, 'error');
         }
+    }
+
+    setupDateRangePicker() {
+        const self = this;
+
+        $('#daterange-btn').daterangepicker({
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                },
+                startDate: moment().subtract(29, 'days'),
+                endDate: moment()
+            },
+            function(start, end) {
+                self.startDate = start.format('YYYY-MM-DD');
+                self.endDate = end.format('YYYY-MM-DD');
+                $('#daterange-text').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                self.handleSearch();
+            }
+        );
+
+        $('#daterange-btn').on('cancel.daterangepicker', function(ev, picker) {
+            self.startDate = null;
+            self.endDate = null;
+            $('#daterange-text').html('Date Range');
+            self.handleSearch();
+        });
     }
 
     setupCreditCardModals() {
@@ -931,10 +965,10 @@ class PageDashboard {
         this.hasMore = true;
         const searchTerm = $('#dashboard-search').val().toLowerCase();
         const status = $('#dashboard-status-filter').val();
-        this.fetchInstallments(true, searchTerm, status);
+        this.fetchInstallments(true, searchTerm, status, this.startDate, this.endDate);
     }
 
-    async fetchInstallments(clearExisting = false, search = '', status = 'all') {
+    async fetchInstallments(clearExisting = false, search = '', status = 'all', startDate = null, endDate = null) {
         if (this.isLoading || !this.hasMore) {
             return;
         }
@@ -943,8 +977,12 @@ class PageDashboard {
         $('#infinite-scroll-loading').show();
 
         const offset = (this.currentPage - 1) * this.installmentsPerPage;
+        let url = `/api/installments?search=${search}&status=${status}&limit=${this.installmentsPerPage}&offset=${offset}`;
+        if (startDate && endDate) {
+            url += `&startDate=${startDate}&endDate=${endDate}`;
+        }
         try {
-            const response = await fetch(`/api/installments?search=${search}&status=${status}&limit=${this.installmentsPerPage}&offset=${offset}`);
+            const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch installment plans');
             const data = await response.json();
 
@@ -1257,7 +1295,7 @@ class PageDashboard {
         const scrollHeight = $(document).height();
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollHeight - scrollPos < 200 && !this.isLoading && this.hasMore) {
-            this.fetchInstallments(false, $('#dashboard-search').val().toLowerCase(), $('#dashboard-status-filter').val());
+            this.fetchInstallments(false, $('#dashboard-search').val().toLowerCase(), $('#dashboard-status-filter').val(), this.startDate, this.endDate);
         }
     }
 }
