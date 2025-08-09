@@ -1,7 +1,7 @@
 
 export async function generateContractPDF(installmentData) {
     const { jsPDF } = window.jspdf;
-    const { installment, customer, creditCard, payment_schedule } = installmentData;
+    const { installment, customer, creditCard } = installmentData;
 
     // Create a hidden element to build the contract HTML
     const contractElement = document.createElement('div');
@@ -112,15 +112,7 @@ export async function generateContractPDF(installmentData) {
                         <th>Amount</th>
                     </tr>
                 </thead>
-                <tbody>
-                    ${payment_schedule.map(p => `
-                        <tr>
-                            <td>${p.term_number}</td>
-                            <td>${new Date(p.due_date).toLocaleDateString()}</td>
-                            <td>฿${parseFloat(p.amount).toLocaleString()}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
 

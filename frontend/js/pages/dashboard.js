@@ -340,8 +340,6 @@ class PageDashboard {
     }
 
     async handleExportContract() {
-        console.log("this is handle Contract", this);
-
         if (!this.currentInstallmentId) {
             showNotification('No new installment plan to export.', 'error');
             return;
@@ -354,6 +352,7 @@ class PageDashboard {
                 throw new Error('Failed to fetch installment data for PDF export.');
             }
             const installmentData = await response.json();
+
             await generateContractPDF(installmentData);
             showNotification('Contract exported successfully!', 'success');
         } catch (error) {
