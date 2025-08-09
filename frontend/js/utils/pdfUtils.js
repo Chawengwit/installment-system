@@ -82,8 +82,6 @@ export async function generateContractPDF(installmentData, { asBlob = false } = 
     const { jsPDF } = window.jspdf;
     const { installment, customer } = installmentData;
 
-    console.log("installmentData: >>", installmentData)
-
     // Create a hidden element to build the contract HTML for canvas conversion
     const contractElement = document.createElement('div');
     contractElement.id = 'contract-container';

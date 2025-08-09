@@ -33,24 +33,32 @@ class PageDashboard {
 
     init() {
         this.bindEvents();
+        this.setupDateRangePicker();
         this.fetchDashboardStats();
         this.fetchInstallments(true);
         this.setupCustomerModals();
         this.setupCreditCardModals();
         this.toggleView(false); // Show table view by default
-        this.setupDateRangePicker();
     }
 
     async fetchDashboardStats() {
+        let url = '/api/dashboard/stats';
+        const params = new URLSearchParams();
+        if (this.startDate) params.append('startDate', this.startDate);
+        if (this.endDate) params.append('endDate', this.endDate);
+        
+        const queryString = params.toString();
+        if (queryString) {
+            url += `?${queryString}`;
+        }
+
         try {
-            const response = await fetch('/api/dashboard/stats');
+            const response = await fetch(url);
             if (!response.ok) {
                 throw new Error('Failed to fetch dashboard stats');
             }
             const stats = await response.json();
 
-            $('#total-customers').text(stats.totalCustomers);
-            $('#active-installments').text(stats.activeInstallmentsCount);
             $('#today-due-date').text(stats.todayDueDateCount);
             $('#overdue-installments').text(stats.overdueCount);
             $('#available-credit').text(`฿${stats.availableCredit.toLocaleString()}`);
@@ -65,30 +73,40 @@ class PageDashboard {
     setupDateRangePicker() {
         const self = this;
 
+        const start = moment().subtract(29, 'days');
+        const end = moment();
+
+        self.startDate = start.format('YYYY-MM-DD');
+        self.endDate = end.format('YYYY-MM-DD');
+
+        function cb(start, end) {
+            self.startDate = start.format('YYYY-MM-DD');
+            self.endDate = end.format('YYYY-MM-DD');
+            $('#daterange-text').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            self.fetchDashboardStats();
+            self.handleSearch();
+        }
+
         $('#daterange-btn').daterangepicker({
-                ranges: {
-                    'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-                },
-                startDate: moment().subtract(29, 'days'),
-                endDate: moment()
-            },
-            function(start, end) {
-                self.startDate = start.format('YYYY-MM-DD');
-                self.endDate = end.format('YYYY-MM-DD');
-                $('#daterange-text').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-                self.handleSearch();
+            startDate: start,
+            endDate: end,
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
             }
-        );
+        }, cb);
+
+        cb(start, end);
 
         $('#daterange-btn').on('cancel.daterangepicker', function(ev, picker) {
             self.startDate = null;
             self.endDate = null;
             $('#daterange-text').html('Date Range');
+            self.fetchDashboardStats();
             self.handleSearch();
         });
     }
