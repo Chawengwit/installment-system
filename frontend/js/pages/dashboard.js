@@ -195,10 +195,6 @@ class PageDashboard {
         this.$mainContent.on('input', '#add-customer-form .form_input', function() {
             $(this).removeClass('form_input-error');
         });
-
-        // Edit Customer Modal (if applicable, though not directly used in dashboard for editing)
-        // this.$mainContent.on("submit", "#edit-customer-form", this.handleEditCustomer.bind(this));
-        // this.$mainContent.on("click", "#cancel-edit-customer", () => closeModal('edit-customer-modal'));
     }
 
     async handleAddCustomer(event) {
@@ -337,7 +333,62 @@ class PageDashboard {
         this.$mainContent.on("change", "#slip-image-upload", this.handleSlipImageUpload.bind(this));
         this.$mainContent.on("click", "#edit-installment-btn", this.handleEditInstallment.bind(this));
 
+        // Contract buttons in view modal
+        this.$mainContent.on("click", "#download-contract-btn", this.handleDownloadContract.bind(this));
+        this.$mainContent.on("change", "#upload-contract-input", this.handleUploadContract.bind(this));
+
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
+    }
+
+    async handleDownloadContract(event) {
+        const contractPath = $(event.currentTarget).data('contract-path');
+        if (contractPath) {
+            const downloadUrl = contractPath.replace('public/', '/');
+            window.open(downloadUrl, '_blank');
+        } else {
+            showNotification('No contract available for download.', 'warning');
+        }
+    }
+
+    async handleUploadContract(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const installmentId = this.currentInstallmentId;
+        const customerId = $('#upload-contract-input').data('customer-id');
+
+        if (!installmentId || !customerId) {
+            showNotification('Cannot upload contract without installment and customer context.', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('contractPdf', file);
+        formData.append('customerId', customerId);
+
+        try {
+            showNotification('Uploading new contract...', 'info');
+            const response = await fetch(`/api/installments/${installmentId}/contract`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to upload new contract.');
+            }
+
+            const result = await response.json();
+            showNotification('Contract updated successfully!', 'success');
+
+            // Update the download button with the new path
+            const $downloadBtn = $('#download-contract-btn');
+            $downloadBtn.data('contract-path', result.path);
+            $downloadBtn.show();
+
+        } catch (error) {
+            console.error('Error uploading contract:', error);
+            showNotification(error.message, 'error');
+        }
     }
 
     async handleExportContract(event) {
@@ -405,7 +456,6 @@ class PageDashboard {
         } catch (error) {
             console.error('Error generating or uploading contract:', error);
             showNotification(error.message, 'error');
-            // Don't block the user flow if this fails. They can still generate it manually.
             this.currentContractPath = null;
         }
     }
@@ -415,15 +465,12 @@ class PageDashboard {
         const previewContainer = $('#product-image-list');
 
         Array.from(files).forEach(file => {
-            // Create a unique identifier for the file (e.g., filename + size)
             const fileIdentifier = `${file.name}-${file.size}`;
-
-            // Check if an image with this identifier already exists in the preview
             const existingImage = previewContainer.find(`.image-list-item[data-file-id="${fileIdentifier}"]`);
 
             if (existingImage.length > 0) {
                 showNotification(`Image "${file.name}" is already added.`, 'info');
-                return; // Skip this file
+                return;
             }
 
             if (file.type.startsWith('image/')) {
@@ -437,7 +484,6 @@ class PageDashboard {
                     );
                     previewContainer.append(imageItem);
 
-                    // Add event listener to remove button
                     imageItem.find('.remove-image-btn').on('click', function() {
                         $(this).closest('.image-list-item').remove();
                     });
@@ -448,8 +494,6 @@ class PageDashboard {
             }
         });
         showNotification(`${files.length} image(s) selected.`, 'info');
-
-        // Clear the file input value to allow re-uploading the same file or new files immediately
         event.target.value = '';
     }
 
@@ -464,7 +508,6 @@ class PageDashboard {
         $('#add-new-plan-modal .modal_title').text('Edit Installment Plan');
         $('#add-new-plan-modal #step-5-submit').text('Active Installment Plan');
 
-
         try {
             const response = await fetch(`/api/installments/${this.currentInstallmentId}`);
             if (!response.ok) {
@@ -473,7 +516,6 @@ class PageDashboard {
             const data = await response.json();
             const { installment, customer, creditCard } = data;
 
-            // Pre-fill the form with the fetched data
             $('#product-name').val(installment.product_name);
             $('#product-serial-number').val(installment.product_serial_number);
             $('#product-price').val(installment.product_price);
@@ -487,7 +529,6 @@ class PageDashboard {
             this.selectedCustomerId = installment.customer_id;
             this.selectedCreditCardId = installment.credit_card_id;
 
-            // Handle image previews
             const imagePreviewContainer = $('#product-image-list');
             imagePreviewContainer.empty();
             if (installment.product_images) {
@@ -514,9 +555,8 @@ class PageDashboard {
                 }
             }
 
-            // Directly display the selected customer in edit mode
             const customerOptionsContainer = $('#add-new-plan-modal .customer-options');
-            customerOptionsContainer.empty(); // Clear any loading messages or previous content
+            customerOptionsContainer.empty();
             if (customer) {
                 customerOptionsContainer.append(this.createCustomerOption(customer, true));
             } else {
@@ -524,7 +564,6 @@ class PageDashboard {
                 customerOptionsContainer.html('<p class="text-danger">Error: Customer data missing.</p>');
             }
 
-            // Directly display the selected credit card in edit mode
             const cardOptionsContainer = $('#add-new-plan-modal .card-selection');
             cardOptionsContainer.empty();
             if (creditCard) {
@@ -543,17 +582,14 @@ class PageDashboard {
         }
     }
 
-    
-
     clearAddPlanForm() {
         $('#installment-plan-form')[0].reset();
         $('#product-image-list').empty();
         $('#add-new-plan-modal .customer-option').removeClass('customer-option-selected');
         this.selectedCustomerId = null;
-        this.currentInstallmentId = null; // Reset currentInstallmentId
+        this.currentInstallmentId = null;
         this.currentContractPath = null;
 
-        // Reset completion step text to default (for "create" mode)
         $('#step-6 .form-step_title').html('<span class="form-step_number">6</span> Plan Created Successfully');
         $('#step-6 .form-step_description').text('The installment plan is now active.');
         $('#step-6 .complated-desc').text('The installment plan has been successfully created and is now active. You can view the details of the plan in the main dashboard.');
@@ -582,7 +618,7 @@ class PageDashboard {
         const dataTransfer = new DataTransfer();
         $('#product-image-list .image-list-item').each(function () {
             const src = $(this).find('img').attr('src');
-            if (src.startsWith('data:image')) { // New image
+            if (src.startsWith('data:image')) {
                 const file = dataURLtoFile(src, `image-${Date.now()}.png`);
                 dataTransfer.items.add(file);
             }
@@ -613,24 +649,22 @@ class PageDashboard {
             const result = await response.json();
             this.currentInstallmentId = result.installmentId;
 
-            if (!isUpdate) { // Only for new installments
+            if (!isUpdate) {
                 await this.generateAndUploadContract(result.installmentId, result.customerId);
             }
 
             if (isUpdate) {
-                // It was an update
                 $('#step-6 .form-step_title').html('<span class="form-step_number">6</span> Plan Updated & Activated');
                 $('#step-6 .form-step_description').text('The installment plan has been successfully updated and activated.');
                 $('#step-6 .complated-desc').text('The installment plan has been successfully updated and is now active. The payment schedule has been regenerated. You can view the updated details in the main dashboard.');
             } else {
-                // It was a creation
                 $('#step-6 .form-step_title').html('<span class="form-step_number">6</span> Plan Created Successfully');
                 $('#step-6 .form-step_description').text('The installment plan is now active.');
                 $('#step-6 .complated-desc').text('The installment plan has been successfully created and is now active. You can view the details of the plan in the main dashboard.');
             }
 
             showNotification(`Installment plan ${isUpdate ? 'updated and activated' : 'created'} successfully!`, 'success');
-            this.fetchInstallments(true); // Refresh the installment list
+            this.fetchInstallments(true);
             this.showStep(6);
 
         } catch (error) {
@@ -645,25 +679,25 @@ class PageDashboard {
         $('#add-new-plan-modal #step-' + stepNumber).addClass('form-step-active');
 
         if (stepNumber === 3) {
-            if (this.currentInstallmentId) { // Edit mode
+            if (this.currentInstallmentId) {
                 $('#step-3 .search-section').hide();
                 const title = $('#step-3 .form-step_title');
                 title.html('<span class="form-step_number">3</span> Customer Selected');
                 $('#step-3 .form-step_description').text('The customer for this installment is fixed and cannot be changed during an edit.');
-            } else { // Add mode
+            } else {
                 $('#step-3 .search-section').show();
                 const title = $('#step-3 .form-step_title');
                 title.html('<span class="form-step_number">3</span> Select Customer');
                 $('#step-3 .form-step_description').text('Choose an existing customer or add a new one');
-                this.fetchCustomersForModal(); // Call only in add mode
+                this.fetchCustomersForModal();
             }
         } else if (stepNumber === 4) {
-            if (this.currentInstallmentId) { // Edit mode
+            if (this.currentInstallmentId) {
                 $('#step-4 .search-section').hide();
                 const title = $('#step-4 .form-step_title');
                 title.html('<span class="form-step_number">4</span> Payment Method');
                 $('#step-4 .form-step_description').text('The credit card for this installment is fixed and cannot be changed during an edit.');
-            } else { // Add mode
+            } else {
                 $('#step-4 .search-section').show();
                 const title = $('#step-4 .form-step_title');
                 title.html('<span class="form-step_number">4</span> Payment Method');
@@ -689,7 +723,7 @@ class PageDashboard {
 
     nextStep() {
         if (this.validateStep(this.currentStep)) {
-            if (this.currentStep < 6) { // Assuming 6 steps
+            if (this.currentStep < 6) {
                 this.showStep(this.currentStep + 1);
             }
         }
@@ -699,10 +733,6 @@ class PageDashboard {
         const summaryText = [
             `Product Price: ${$('#summary-price').text()}`,
             `Down Payment: ${$('#summary-down-payment').text()}`,
-            // `Financed Amount: ${$('#summary-financed').text()}`,
-            // `Interest Rate: ${$('#summary-interest-rate').text()}`,
-            // `Interest Amount: ${$('#summary-interest-amount').text()}`,
-            // `Total Amount: ${$('#summary-total').text()}`,
             `Monthly Payment: ${$('#summary-monthly').text()}`,
             `Number of Payments: ${$('#summary-payments').text()}`,
         ].join('\n');
@@ -743,11 +773,10 @@ class PageDashboard {
         let isValid = true;
         const currentStepElement = $('#step-' + stepNumber);
 
-        // Clear previous errors
         currentStepElement.find('.form_input, .form_select').removeClass('form_input-error');
 
         switch (stepNumber) {
-            case 1: // Product Details
+            case 1:
                 const productName = currentStepElement.find('#product-name').val();
                 const productPrice = currentStepElement.find('#product-price').val();
 
@@ -761,7 +790,7 @@ class PageDashboard {
                 }
                 if (!isValid) showNotification('Please fill in all required product details.', 'error');
                 break;
-            case 2: // Installment Terms
+            case 2:
                 const installmentMonths = currentStepElement.find('#installment-months').val();
                 const interestRate = currentStepElement.find('#interest-rate').val();
                 const paymentDueDate = currentStepElement.find('#payment-due-date').val();
@@ -787,16 +816,14 @@ class PageDashboard {
                 }
                 if (!isValid) showNotification('Please fill in all required installment terms.', 'error');
                 break;
-            case 3: // Customer Selection
+            case 3:
                 if (!this.selectedCustomerId) {
                     showNotification('Please select a customer.', 'error');
                     isValid = false;
                 }
                 break;
-            case 4: // Payment Method
+            case 4:
                 const cardSelectionContainer = currentStepElement.find('.card-selection');
-
-                // Clear previous errors
                 cardSelectionContainer.removeClass('card-selection-error');
                 cardSelectionContainer.find('.error-message').remove();
 
@@ -816,14 +843,10 @@ class PageDashboard {
         const productPrice = form.find('#product-price').val();
         const downPayment = form.find('#down-payment').val();
         const productDescription = form.find('#product-description').val();
-        const installmentMonths = form.find('#installment-months').val();
-        const interestRate = form.find('#interest-rate').val();
-        const paymentDueDate = form.find('#payment-due-date').val();
         const customerName = $('#add-new-plan-modal .customer-option-selected .customer-option_name').text();
         const customerPhone = $('#add-new-plan-modal .customer-option-selected .customer-option_details').text().split('•')[0].trim();
         const cardName = $('#add-new-plan-modal .card-option-selected .card-option_name').text();
 
-        // Update Review Product section
         $('#review-product').html(`
             <p><strong>Name:</strong> ${productName}</p>
             <p><strong>Serial Number:</strong> ${productSerialNumber || 'N/A'}</p>
@@ -832,7 +855,6 @@ class PageDashboard {
             <p><strong>Description:</strong> ${productDescription || 'N/A'}</p>
         `);
 
-        // Update Review Terms section
         const summaryPrice = $('#summary-price').text();
         const summaryDownPayment = $('#summary-down-payment').text();
         const summaryFinanced = $('#summary-financed').text();
@@ -871,13 +893,12 @@ class PageDashboard {
         try {
             let customers = [];
 
-            // This function is now only called in 'Add mode' for customer selection
             const response = await fetch(`/api/customers?search=${search}&limit=5&sortBy=created_at&sortOrder=DESC`);
             if (!response.ok) throw new Error('Failed to fetch customers for modal');
             const data = await response.json();
             customers = data.customers; 
 
-            customerOptionsContainer.html(''); // Clear loading message
+            customerOptionsContainer.html('');
             if (customers && customers.length > 0) {
                 customers.forEach(customer => {
                     const isSelected = (this.selectedCustomerId && this.selectedCustomerId === customer.id);
@@ -895,24 +916,16 @@ class PageDashboard {
 
     handleCustomerSelection(event) {
         if (this.currentInstallmentId) {
-            return; // Do not allow customer change in edit mode
+            return;
         }
 
         const $selectedOption = $(event.currentTarget);
         const customerId = $selectedOption.data('customer-id');
 
-        // Remove selected class from all options
         $('#add-new-plan-modal .customer-option').removeClass('customer-option-selected');
-
-        // Add selected class to the clicked option
         $selectedOption.addClass('customer-option-selected');
-
-        // Store the selected customer ID
         this.selectedCustomerId = customerId;
 
-        // Optionally, update a hidden input or display area with the selected customer's name/ID
-        // For example, if you have an input field for the selected customer:
-        // $('#selected-customer-display').text($selectedOption.find('.customer-option_name').text());
         showNotification(`Customer selected: ${$selectedOption.find('.customer-option_name').text()}`, 'info');
     }
 
@@ -940,7 +953,6 @@ class PageDashboard {
         try {
             let cards = [];
             if (this.currentInstallmentId && this.selectedCreditCardId) {
-                // Edit mode: Fetch only the selected credit card
                 const selectedCardResponse = await fetch(`/api/credit-cards/${this.selectedCreditCardId}`);
                 if (!selectedCardResponse.ok) throw new Error('Failed to fetch selected credit card details');
                 const selectedCard = await selectedCardResponse.json();
@@ -948,7 +960,6 @@ class PageDashboard {
                     cards.push(selectedCard);
                 }
             } else {
-                // Add mode: Fetch all available credit cards
                 const response = await fetch(`/api/credit-cards?search=${search}&limit=5`);
                 if (!response.ok) throw new Error('Failed to fetch credit cards for modal');
                 const data = await response.json();
@@ -974,19 +985,16 @@ class PageDashboard {
     handleCreditCardSelection(event) {
         if (this.currentInstallmentId) {
             showNotification('The credit card cannot be changed when editing an installment plan.', 'warning');
-            return; // Prevent changing the card in edit mode
+            return;
         }
 
         const $selectedOption = $(event.currentTarget);
         const cardId = $selectedOption.data('card-id');
 
         $('#add-new-plan-modal .card-option').removeClass('card-option-selected');
-
         $selectedOption.addClass('card-option-selected');
-
         this.selectedCreditCardId = cardId;
 
-        // Remove error styling from the container
         const cardSelectionContainer = $('#add-new-plan-modal .card-selection');
         cardSelectionContainer.find('.error-message').remove();
 
@@ -1000,10 +1008,10 @@ class PageDashboard {
 
         if (selectedMethod === 'credit-card') {
             creditCardSelectContainer.show();
-            this.fetchCreditCardsForModal(); // Fetch cards when credit card option is selected
+            this.fetchCreditCardsForModal();
         } else {
             creditCardSelectContainer.hide();
-            this.selectedCreditCardId = null; // Clear selection if not credit card
+            this.selectedCreditCardId = null;
             cardSelectionContainer.find('.error-message').remove();
         }
     }
@@ -1105,7 +1113,6 @@ class PageDashboard {
     }
 
     createInstallmentCard(installment) {
-        // Card template to be filled
         return `
             <div class="installment-card" data-installment-id="${installment.id}">
                 
@@ -1189,19 +1196,25 @@ class PageDashboard {
 
             this.currentInstallmentId = installment.id;
 
-            // Show/hide edit button based on status
             if (installment.status === 'non-active') {
                 $('#edit-installment-btn').show();
             } else {
                 $('#edit-installment-btn').hide();
             }
 
-            // Populate Customer Information
+            const $downloadBtn = $('#download-contract-btn');
+            if (installment.contract_path) {
+                $downloadBtn.data('contract-path', installment.contract_path).show();
+            } else {
+                $downloadBtn.hide();
+            }
+
+            $('#upload-contract-input').data('customer-id', customer.id);
+
             $('#view-customer-name').text(customer ? customer.name : 'N/A');
             $('#view-customer-phone').text(customer ? customer.phone : 'N/A');
             $('#view-customer-id-card').text(customer ? customer.id_card_number : 'N/A');
 
-            // Populate Product Details
             $('#view-product-name').text(installment.product_name);
             $('#view-product-serial').text(installment.product_serial_number);
             $('#view-product-price').text(`฿${parseFloat(installment.product_price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
@@ -1228,7 +1241,6 @@ class PageDashboard {
                 productImagesContainer.append('<p>No images available.</p>');
             }
 
-            // Populate Plan Overview
             $('#view-total-amount').text(`฿${parseFloat(installment.total_amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
             $('#view-monthly-payment').text(`฿${parseFloat(installment.monthly_payment).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
             $('#view-interest-rate').text(`${parseFloat(installment.interest_rate).toFixed(1)}%`);
@@ -1241,11 +1253,9 @@ class PageDashboard {
             $('#view-payment-due-day').text(installment.due_date);
             $('#view-late-fee').text(`฿${parseFloat(installment.late_fee || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
 
-            // Populate Payment Method
             $('#view-card-name').text(creditCard ? creditCard.card_name : 'N/A');
             $('#view-credit-limit').text(creditCard ? `฿${parseFloat(creditCard.credit_limit).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`: 'N/A');
 
-            // Populate Payment Schedule
             const paymentScheduleBody = $('#view-payment-schedule-body');
             paymentScheduleBody.empty();
             if (installment.payment_schedule && installment.payment_schedule.length > 0) {
@@ -1289,10 +1299,8 @@ class PageDashboard {
         const installmentId = $(event.currentTarget).data('installment-id');
         const paymentAmount = $(event.currentTarget).data('payment-amount');
 
-        // Store these values temporarily for the confirmation modal
         this.currentPaymentToMarkPaid = { paymentId, installmentId, paymentAmount };
 
-        // Clear any previous image preview
         $('#slip-image-preview').empty();
         $('#slip-image-upload').val('');
 
@@ -1319,7 +1327,7 @@ class PageDashboard {
         try {
             const response = await fetch(`/api/installment-payment/${paymentId}/mark-paid`, {
                 method: 'PUT',
-                body: formData // FormData handles Content-Type automatically for file uploads
+                body: formData
             });
 
             if (!response.ok) {
@@ -1329,9 +1337,8 @@ class PageDashboard {
 
             showNotification('Payment marked as paid successfully!', 'success');
             closeModal('confirmation-modal');
-            // Re-fetch installment details to update the modal and table
             this.handleViewInstallment({ currentTarget: $(`#installment-table-body tr[data-installment-id="${installmentId}"]`) });
-            this.fetchInstallments(true); // Refresh main table
+            this.fetchInstallments(true);
 
         } catch (error) {
             console.error('Error marking payment as paid:', error);
@@ -1342,7 +1349,7 @@ class PageDashboard {
     handleSlipImageUpload(event) {
         const files = event.target.files;
         const previewContainer = $('#slip-image-preview');
-        previewContainer.empty(); // Clear previous preview
+        previewContainer.empty();
 
         if (files.length > 0) {
             const file = files[0];
@@ -1359,13 +1366,13 @@ class PageDashboard {
 
                     imageItem.find('.remove-image-btn').on('click', function() {
                         $(this).closest('.image-list-item').remove();
-                        $('#slip-image-upload').val(''); // Clear the input
+                        $('#slip-image-upload').val('');
                     });
                 };
                 reader.readAsDataURL(file);
             } else {
                 showNotification('Only image files are allowed for slip upload.', 'warning');
-                $('#slip-image-upload').val(''); // Clear the input
+                $('#slip-image-upload').val('');
             }
         }
     }

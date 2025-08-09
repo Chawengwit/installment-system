@@ -579,6 +579,12 @@
     }
 }
 
+.modal_header .button_actiion {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
 // Responsive Design
 @media (max-width: 768px) {
     .form-step {
