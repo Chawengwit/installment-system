@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { pool } from '../db/index.js';
 import multer from 'multer';
-import { extname } from 'path';
+import { extname, join } from 'path';
+import { promises as fs } from 'fs';
 
 const router = Router();
 
@@ -293,7 +294,7 @@ router.post('/', upload.array('productImages'), async (req, res) => {
         );
 
         await client.query('COMMIT');
-        res.status(201).json({ message: 'Installment plan created successfully', installmentId });
+        res.status(201).json({ message: 'Installment plan created successfully', installmentId, customerId });
 
     } catch (err) {
         await client.query('ROLLBACK');
@@ -304,6 +305,42 @@ router.post('/', upload.array('productImages'), async (req, res) => {
     }
 });
 
+const contractDestination = 'public/contracts/';
+const contractUpload = multer({ dest: contractDestination });
 
+router.post('/:id/contract', contractUpload.single('contractPdf'), async (req, res) => {
+    const { id: installmentId } = req.params;
+    const { customerId } = req.body;
+    
+    if (!req.file) {
+        return res.status(400).json({ error: 'Contract file is missing.' });
+    }
+    const tempPath = req.file.path;
+
+    if (!customerId) {
+        await fs.unlink(tempPath);
+        return res.status(400).json({ error: 'Missing customerId.' });
+    }
+
+    const newFilename = `contract-installment-${installmentId}-customer-${customerId}-${Date.now()}${extname(req.file.originalname)}`;
+    const newPath = join(contractDestination, newFilename);
+
+    try {
+        // Rename the file from the temporary name to the desired name.
+        await fs.rename(tempPath, newPath);
+
+        await pool.query(
+            'INSERT INTO contracts (customer_id, installment_id, contract_pdf) VALUES ($1, $2, $3)',
+            [customerId, installmentId, newPath]
+        );
+        res.status(201).json({ message: 'Contract uploaded successfully', path: newPath });
+    } catch (err) {
+        // If anything fails after the file is uploaded, try to delete it.
+        await fs.unlink(tempPath).catch(() => {}); // Clean up temp file if it still exists
+        await fs.unlink(newPath).catch(() => {}); // Clean up renamed file if it was created
+        console.error(err);
+        res.status(500).json({ error: 'Failed to save contract information.' });
+    }
+});
 
 export default router;
