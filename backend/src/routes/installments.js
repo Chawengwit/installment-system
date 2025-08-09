@@ -32,9 +32,9 @@ router.get('/', async (req, res) => {
 
         if (status !== 'all') {
             if (status === 'today_duedate') {
-                whereClause += ` AND (SELECT ip.due_date FROM installment_payments ip WHERE ip.installment_id = i.id AND ip.is_paid = false ORDER BY ip.due_date ASC LIMIT 1) = CURRENT_DATE`;
+                whereClause += ` AND i.id IN (SELECT ip.installment_id FROM installment_payments ip WHERE ip.is_paid = false AND ip.due_date = CURRENT_DATE)`;
             } else if (status === 'over_due') {
-                whereClause += ` AND (SELECT ip.due_date FROM installment_payments ip WHERE ip.installment_id = i.id AND ip.is_paid = false ORDER BY ip.due_date ASC LIMIT 1) < CURRENT_DATE AND i.status = 'active'`;
+                whereClause += ` AND i.status = 'active' AND i.id IN (SELECT ip.installment_id FROM installment_payments ip WHERE ip.is_paid = false AND ip.due_date < CURRENT_DATE)`;
             } else if (status === 'active') {
                 whereClause += ` AND i.status = 'active'`;
             } else if (status === 'non-active') {
@@ -72,8 +72,8 @@ router.get('/', async (req, res) => {
                 i.status,
                 i.created_at,
                 i.term_months,
-                (SELECT ip.due_date FROM installment_payments ip WHERE ip.installment_id = i.id AND ip.is_paid = false ORDER BY ip.due_date ASC LIMIT 1) as next_due_date,
-                (SELECT ip.term_number FROM installment_payments ip WHERE ip.installment_id = i.id AND ip.is_paid = false ORDER BY ip.due_date ASC LIMIT 1) as next_due_date_term_number
+                (SELECT ip.due_date FROM installment_payments ip WHERE ip.installment_id = i.id AND ip.is_paid = false ORDER BY CASE WHEN ip.due_date = CURRENT_DATE THEN 0 ELSE 1 END, ip.due_date ASC LIMIT 1) as next_due_date,
+                (SELECT ip.term_number FROM installment_payments ip WHERE ip.installment_id = i.id AND ip.is_paid = false ORDER BY CASE WHEN ip.due_date = CURRENT_DATE THEN 0 ELSE 1 END, ip.due_date ASC LIMIT 1) as next_due_date_term_number
             FROM installments i
             JOIN customers c ON i.customer_id = c.id
             JOIN products p ON i.product_id = p.id
