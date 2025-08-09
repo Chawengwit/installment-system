@@ -1,4 +1,5 @@
 import { debounce, openModal, closeModal, showNotification } from '../utils/AppUtils.js';
+import { generateContractPDF } from '../utils/pdfUtils.js';
 
 function dataURLtoFile(dataurl, filename) {
     let arr = dataurl.split(','),
@@ -273,6 +274,9 @@ class PageDashboard {
         });
         this.$mainContent.on("click", ".modal_close", (event) => {
             const modalId = $(event.currentTarget).closest('.modal').attr('id');
+            if (modalId === 'add-new-plan-modal') {
+                this.clearAddPlanForm();
+            }
             closeModal(modalId);
         });
         this.$mainContent.on("input", "#dashboard-search", debounce(this.handleSearch.bind(this), 300));
@@ -322,10 +326,7 @@ class PageDashboard {
         // Form submission for new plan
         this.$mainContent.on("submit", "#installment-plan-form", this.handleFormSubmission.bind(this));
 
-        this.$mainContent.on("click", "#export-contract-btn", () => {
-            // Add PDF export logic here
-            showNotification('Exporting PDF...', 'info');
-        });
+        this.$mainContent.on("click", "#export-contract-btn", this.handleExportContract.bind(this));
 
         this.$mainContent.on("click", "#customize-term-btn", () => this.showStep(2));
         this.$mainContent.on("click", "#installment-table-body tr", this.handleViewInstallment.bind(this));
@@ -336,6 +337,29 @@ class PageDashboard {
         this.$mainContent.on("click", "#edit-installment-btn", this.handleEditInstallment.bind(this));
 
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
+    }
+
+    async handleExportContract() {
+        console.log("this is handle Contract", this);
+
+        if (!this.currentInstallmentId) {
+            showNotification('No new installment plan to export.', 'error');
+            return;
+        }
+
+        try {
+            showNotification('Generating contract...', 'info');
+            const response = await fetch(`/api/installments/${this.currentInstallmentId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch installment data for PDF export.');
+            }
+            const installmentData = await response.json();
+            await generateContractPDF(installmentData);
+            showNotification('Contract exported successfully!', 'success');
+        } catch (error) {
+            console.error('Error exporting contract:', error);
+            showNotification(error.message, 'error');
+        }
     }
 
     handleImageUpload(event) {
@@ -539,7 +563,7 @@ class PageDashboard {
             }
 
             const result = await response.json();
-            this.newInstallmentId = result.installmentId;
+            this.currentInstallmentId = result.installmentId;
 
             if (this.currentInstallmentId) {
                 // It was an update
@@ -555,7 +579,6 @@ class PageDashboard {
 
             showNotification(`Installment plan ${this.currentInstallmentId ? 'updated and activated' : 'created'} successfully!`, 'success');
             this.fetchInstallments(true); // Refresh the installment list
-            this.clearAddPlanForm(); // Clear the form for next use
             this.showStep(6);
 
         } catch (error) {
