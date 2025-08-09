@@ -146,6 +146,10 @@ router.get('/:id', async (req, res) => {
         const creditCardResult = await pool.query('SELECT * FROM credit_cards WHERE id = $1', [installment.credit_card_id]);
         const creditCard = creditCardResult.rows.length > 0 ? creditCardResult.rows[0] : null;
 
+        // Fetch contract path
+        const contractResult = await pool.query('SELECT contract_pdf FROM contracts WHERE installment_id = $1 ORDER BY created_at DESC LIMIT 1', [id]);
+        installment.contract_path = contractResult.rows.length > 0 ? contractResult.rows[0].contract_pdf : null;
+
         res.json({ installment, customer, creditCard });
 
     } catch (err) {

@@ -574,8 +574,15 @@
         <div class="modal_content modal-large">
             <div class="modal_header">
                 <h3 class="modal_title">Installment Plan Details</h3>
-                <div>
-                    <button class="btn btn-primary" id="edit-installment-btn" style="display: none; margin-right: var(--spacing-md);">
+                <div class="button_actiion">
+                    <button class="btn btn-secondary" id="download-contract-btn" title="Download Contract" style="display: none;">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <label for="upload-contract-input" class="btn btn-outline" id="upload-contract-btn" title="Upload Contract">
+                        <i class="fas fa-upload"></i>
+                    </label>
+                    <input type="file" id="upload-contract-input" style="display: none;" accept=".pdf">
+                    <button class="btn btn-primary" id="edit-installment-btn" style="display: none;">
                         <i class="fas fa-edit"></i> Edit
                     </button>
                     <button class="modal_close">

@@ -27,7 +27,7 @@ function formatCurrency(amount, defaultValue = '..........') {
         return defaultValue;
     }
     // Using toLocaleString for formatting, assuming 'th-TH' locale for Baht symbol, though '฿' is hardcoded for consistency.
-    return `฿${number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return `${number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 /**
@@ -101,7 +101,7 @@ export async function generateContractPDF(installmentData, { asBlob = false } = 
 
     const productDescription = installment.product_description || '........................................................................................................................................';
     const productDetails = installment.product_name ?
-        `${installment.product_name} ราคา ${formatCurrency(installment.product_price)}` :
+        `${installment.product_name} ราคา ${formatCurrency(installment.product_price)} บาท` :
         '........................................................................................................................................';
 
     const downPayment = formatCurrency(installment.down_payment, '..........');
@@ -202,7 +202,7 @@ export async function generateContractPDF(installmentData, { asBlob = false } = 
             </div>
 
             <div class="section">
-                <strong>ข้อ 2. </strong>ผู้เช่าซื้อตกลงซื้อสินค้าดังกล่าว โดยแบ่งชำระราคาออกเป็นงวดละ <strong>${escapeHtml(monthlyPayment)}</strong> จำนวนงวดทั้งหมด <strong>${escapeHtml(termMonths)}</strong> งวด<br>
+                <strong>ข้อ 2. </strong>ผู้เช่าซื้อตกลงซื้อสินค้าดังกล่าว โดยแบ่งชำระราคาออกเป็นงวดละ <strong>${escapeHtml(monthlyPayment)}</strong>บาท จำนวนงวดทั้งหมด <strong>${escapeHtml(termMonths)}</strong> งวด<br>
                 เริ่มต้นชำระตั้งแต่วันที่ <strong>${escapeHtml(startDate)}</strong> จนถึง วันที่ <strong>${escapeHtml(endDate)}</strong>.
             </div>
 
