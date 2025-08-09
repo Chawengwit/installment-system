@@ -5,15 +5,8 @@ const router = Router();
 
 // GET /api/dashboard/stats
 router.get('/stats', async (req, res) => {
+    const { startDate, endDate } = req.query;
     try {
-        // Total Customers
-        const customerResult = await pool.query('SELECT COUNT(*) FROM customers');
-        const totalCustomers = parseInt(customerResult.rows[0].count, 10);
-
-        // Active Installments
-        const activeInstallmentsResult = await pool.query('SELECT COUNT(*) FROM installments WHERE status = \'active\'');
-        const activeInstallmentsCount = parseInt(activeInstallmentsResult.rows[0].count, 10);
-
         // Today Due Date Installments
         const todayDueDateResult = await pool.query(`
             SELECT COUNT(DISTINCT i.id)
@@ -36,17 +29,22 @@ router.get('/stats', async (req, res) => {
         const creditResult = await pool.query('SELECT SUM(credit_limit - used_amount) as available_credit FROM credit_cards');
         const availableCredit = parseFloat(creditResult.rows[0].available_credit || 0);
 
-        // Cash Flow (this month)
-        const cashFlowResult = await pool.query(`
-            SELECT SUM(paid_amount) as current_month_cash_flow
+        // Upcoming Payments
+        let upcomingQuery = `
+            SELECT SUM(amount) as upcoming_total
             FROM installment_payments
-            WHERE is_paid = true AND DATE_TRUNC('month', paid_date) = DATE_TRUNC('month', CURRENT_DATE);
-        `);
-        const cashFlow = parseFloat(cashFlowResult.rows[0].current_month_cash_flow || 0);
+            WHERE is_paid = false`;
+        const upcomingParams = [];
+
+        if (startDate && endDate) {
+            upcomingQuery += ` AND due_date BETWEEN $1 AND $2`;
+            upcomingParams.push(startDate, endDate);
+        }
+
+        const upcomingResult = await pool.query(upcomingQuery, upcomingParams);
+        const cashFlow = parseFloat(upcomingResult.rows[0].upcoming_total || 0);
 
         res.json({
-            totalCustomers,
-            activeInstallmentsCount,
             todayDueDateCount,
             overdueCount,
             availableCredit,

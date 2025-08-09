@@ -19,8 +19,6 @@ router.put('/:id/mark-paid', upload.single('slip_image'), async (req, res, next)
     const { id } = req.params;
     const { paid_amount, installment_id } = req.body;
 
-    console.log("AAAAA");
-
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
