@@ -26,6 +26,7 @@ class PageDashboard {
         this.selectedCustomerId = null;
         this.selectedCreditCardId = null;
         this.currentInstallmentId = null;
+        this.currentContractPath = null;
         this.startDate = null;
         this.endDate = null;
     }
@@ -339,9 +340,17 @@ class PageDashboard {
         $(window).on("scroll", debounce(this.handleScroll.bind(this), 100));
     }
 
-    async handleExportContract() {
+    async handleExportContract(event) {
+        const contractPath = $(event.currentTarget).data('contract-path');
+
+        if (contractPath) {
+            const downloadUrl = contractPath.replace('public/', '/');
+            window.open(downloadUrl, '_blank');
+            return;
+        }
+
         if (!this.currentInstallmentId) {
-            showNotification('No new installment plan to export.', 'error');
+            showNotification('No installment plan selected to export.', 'error');
             return;
         }
 
@@ -358,6 +367,46 @@ class PageDashboard {
         } catch (error) {
             console.error('Error exporting contract:', error);
             showNotification(error.message, 'error');
+        }
+    }
+
+    async generateAndUploadContract(installmentId, customerId) {
+        try {
+            showNotification('Generating and saving contract...', 'info');
+            // 1. Fetch full data for PDF
+            const response = await fetch(`/api/installments/${installmentId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch installment data for PDF generation.');
+            }
+            const installmentData = await response.json();
+
+            // 2. Generate PDF as a blob
+            const pdfBlob = await generateContractPDF(installmentData, { asBlob: true });
+            const pdfFile = new File([pdfBlob], `contract-installment-${installmentId}.pdf`, { type: 'application/pdf' });
+
+            // 3. Upload the PDF
+            const formData = new FormData();
+            formData.append('contractPdf', pdfFile);
+            formData.append('customerId', customerId);
+
+            const uploadResponse = await fetch(`/api/installments/${installmentId}/contract`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!uploadResponse.ok) {
+                throw new Error('Failed to upload contract.');
+            }
+
+            const uploadResult = await uploadResponse.json();
+            this.currentContractPath = uploadResult.path; // Save the path
+            showNotification('Contract saved successfully!', 'success');
+
+        } catch (error) {
+            console.error('Error generating or uploading contract:', error);
+            showNotification(error.message, 'error');
+            // Don't block the user flow if this fails. They can still generate it manually.
+            this.currentContractPath = null;
         }
     }
 
@@ -494,8 +543,6 @@ class PageDashboard {
         }
     }
 
-    ""
-
     
 
     clearAddPlanForm() {
@@ -504,6 +551,7 @@ class PageDashboard {
         $('#add-new-plan-modal .customer-option').removeClass('customer-option-selected');
         this.selectedCustomerId = null;
         this.currentInstallmentId = null; // Reset currentInstallmentId
+        this.currentContractPath = null;
 
         // Reset completion step text to default (for "create" mode)
         $('#step-6 .form-step_title').html('<span class="form-step_number">6</span> Plan Created Successfully');
@@ -549,6 +597,7 @@ class PageDashboard {
 
         const url = this.currentInstallmentId ? `/api/installments/${this.currentInstallmentId}` : '/api/installments';
         const method = this.currentInstallmentId ? 'PUT' : 'POST';
+        const isUpdate = !!this.currentInstallmentId;
 
         try {
             const response = await fetch(url, {
@@ -558,13 +607,17 @@ class PageDashboard {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || `Failed to ${this.currentInstallmentId ? 'update' : 'create'} installment plan`);
+                throw new Error(errorData.error || `Failed to ${isUpdate ? 'update' : 'create'} installment plan`);
             }
 
             const result = await response.json();
             this.currentInstallmentId = result.installmentId;
 
-            if (this.currentInstallmentId) {
+            if (!isUpdate) { // Only for new installments
+                await this.generateAndUploadContract(result.installmentId, result.customerId);
+            }
+
+            if (isUpdate) {
                 // It was an update
                 $('#step-6 .form-step_title').html('<span class="form-step_number">6</span> Plan Updated & Activated');
                 $('#step-6 .form-step_description').text('The installment plan has been successfully updated and activated.');
@@ -576,12 +629,12 @@ class PageDashboard {
                 $('#step-6 .complated-desc').text('The installment plan has been successfully created and is now active. You can view the details of the plan in the main dashboard.');
             }
 
-            showNotification(`Installment plan ${this.currentInstallmentId ? 'updated and activated' : 'created'} successfully!`, 'success');
+            showNotification(`Installment plan ${isUpdate ? 'updated and activated' : 'created'} successfully!`, 'success');
             this.fetchInstallments(true); // Refresh the installment list
             this.showStep(6);
 
         } catch (error) {
-            console.error(`Error ${this.currentInstallmentId ? 'updating' : 'creating'} installment plan:`, error);
+            console.error(`Error ${isUpdate ? 'updating' : 'creating'} installment plan:`, error);
             showNotification(error.message, 'error');
         }
     }
@@ -619,6 +672,10 @@ class PageDashboard {
             this.fetchCreditCardsForModal();
         } else if (stepNumber === 5) {
             this.updateReviewStep();
+        } else if (stepNumber === 6) {
+            if (this.currentContractPath) {
+                $('#export-contract-btn').data('contract-path', this.currentContractPath);
+            }
         }
 
         $('#add-new-plan-modal .progress-indicator_step').removeClass('progress-indicator_step-active progress-indicator_step-completed');

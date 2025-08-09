@@ -74,10 +74,15 @@ function calculateEndDate(startDateString, termMonths) {
 /**
  * Generates a contract PDF from installment data using jsPDF and html2canvas.
  * @param {object} installmentData The data for the installment plan, containing installment and customer details.
+ * @param {object} [options] Options for PDF generation.
+ * @param {boolean} [options.asBlob=false] If true, returns the PDF as a Blob instead of saving.
+ * @returns {Promise<Blob|undefined>}
  */
-export async function generateContractPDF(installmentData) {
+export async function generateContractPDF(installmentData, { asBlob = false } = {}) {
     const { jsPDF } = window.jspdf;
     const { installment, customer } = installmentData;
+
+    console.log("installmentData: >>", installmentData)
 
     // Create a hidden element to build the contract HTML for canvas conversion
     const contractElement = document.createElement('div');
@@ -90,9 +95,9 @@ export async function generateContractPDF(installmentData) {
     contractElement.style.color = '#333';
 
     // --- Prepare data for the contract using helper functions ---
-    const buyerName = customer.name || '__________________';
-    const buyerId = customer.id_card_number || '__________________';
-    const buyerPhone = customer.phone || '__________________';
+    const buyerName = customer.name || '....................';
+    const buyerId = customer.id_card_number || '....................';
+    const buyerPhone = customer.phone || '....................';
 
     const productDescription = installment.product_description || '........................................................................................................................................';
     const productDetails = installment.product_name ?
@@ -108,10 +113,10 @@ export async function generateContractPDF(installmentData) {
     const today = formatDate(new Date().toISOString());
 
 
-    //font-family: "TH Sarabun New", "Tahoma", sans-serif;
     const contractHTML = `
         <style>
             .contract {
+                font-family: "TH Sarabun New", "Tahoma", sans-serif;
                 font-size: 12px;
                 line-height: 1.6;
                 color: #000;
@@ -123,7 +128,7 @@ export async function generateContractPDF(installmentData) {
             }
 
             .contract .title {
-                font-size: 16px;
+                font-size: 14px;
                 font-weight: bold;
                 text-align: center;
                 margin-bottom: 12px;
@@ -166,7 +171,17 @@ export async function generateContractPDF(installmentData) {
                 padding-top: 40px; /* space for signature line */
                 border-top: 1px solid #000;
             }
-        
+
+            @media print {
+                body {
+                    background: #fff;
+                }
+                .contract {
+                    border: none;
+                    padding: 0;
+                    max-width: 100%;
+                }
+            }
         </style>
 
         <div class="contract" id="contractHtml">
@@ -180,45 +195,48 @@ export async function generateContractPDF(installmentData) {
             </div>
 
             <div class="section">
-                <strong>ข้อ 1. ผู้ขายและผู้เช่าซื้อตกลงซื้อขายสินค้า คือ</strong><br>
+                <strong>ข้อ 1. </strong>ผู้ขายและผู้เช่าซื้อตกลงซื้อขายสินค้า คือ<br>
                 ${productDetails.replace(/\n/g, '<br>')}
                 <div style="margin-top:8px"><strong>รายละเอียดตัวสินค้า (ถ้ามี)</strong></div>
                 ${productDescription.replace(/\n/g, '<br>')}
             </div>
 
-            <span class="section">
-                <strong>ข้อ 2.</strong> ผู้เช่าซื้อตกลงซื้อสินค้าดังกล่าว โดยแบ่งชำระราคาออกเป็นงวดละ <strong>${escapeHtml(monthlyPayment)}</strong> จำนวนงวดทั้งหมด <strong>${escapeHtml(termMonths)}</strong> งวด<br>
+            <div class="section">
+                <strong>ข้อ 2. </strong>ผู้เช่าซื้อตกลงซื้อสินค้าดังกล่าว โดยแบ่งชำระราคาออกเป็นงวดละ <strong>${escapeHtml(monthlyPayment)}</strong> จำนวนงวดทั้งหมด <strong>${escapeHtml(termMonths)}</strong> งวด<br>
                 เริ่มต้นชำระตั้งแต่วันที่ <strong>${escapeHtml(startDate)}</strong> จนถึง วันที่ <strong>${escapeHtml(endDate)}</strong>.
-            </span>
+            </div>
 
-            <span class="section">
-                <strong>ข้อ 3.</strong> หากมีการมัดจำ (เงินดาวน์) ในวันทำสัญญาผู้เช่าซื้อได้ชำระค่ามัดจำเป็นจำนวนเงิน <strong>${escapeHtml(downPayment)}</strong> บาท
-            </span>
+            <div class="section">
+                <strong>ข้อ 3. </strong>หากมีการมัดจำ (เงินดาวน์) ในวันทำสัญญาผู้เช่าซื้อได้ชำระค่ามัดจำเป็นจำนวนเงิน <strong>${escapeHtml(downPayment)}</strong> บาท
+            </div>
 
-            <span class="section">
-                <strong>ข้อ 4.</strong> ผู้ซื้อต้องชำระค่างวด จนถึงงวดสุดท้ายที่ได้ทำการตกลงซื้อขายไว้นั้น หากผู้เช่าซื้อเป็นผู้ผิดนัดชำระเงินดังกล่าว ผู้เช่าซื้อยินยอมดังนี้
+            <div class="section">
+                <strong>ข้อ 4. </strong>ผู้ซื้อต้องชำระค่างวด จนถึงงวดสุดท้ายที่ได้ทำการตกลงซื้อขายไว้นั้น หากผู้เช่าซื้อเป็นผู้ผิดนัดชำระเงินดังกล่าว ผู้เช่าซื้อยินยอมดังนี้
                 <ol>
                     <li>ส่งมอบสินค้าดังกล่าวคืนแก่ผู้ขายในสภาพพร้อมใช้งาน ผู้เช่าซื้อจะต้องส่งมอบด้วยตนเองหรือผ่านขนส่งโดยต้องรับผิดชอบค่าขนส่งเอง</li>
                     <li>ยินยอมให้ยึดเงินที่ได้ผ่อนชำระมาแล้วทั้งหมด และผู้ขายสามารถขายทอดสินค้าเพื่อนำเงินมาชำระส่วนที่เหลือ</li>
                     <li>หากขายสินค้าแล้ว จำนวนเงินไม่ถึงที่ตกลง ผู้ซื้อยินยอมให้ฟ้องร้องเรียกค่าส่วนต่างได้ และรับผิดชอบในค่าดำเนินการคดี</li>
                 </ol>
-            </span>
+            </div>
 
-            <span class="section" style="margin-top:18px">
+            <div class="section" style="margin-top:18px">
                 สัญญานี้ถูกทำขึ้นเป็นสองฉบับมีข้อความถูกต้องตรงกัน คู่สัญญาทั้งสองฝ่ายได้อ่านและเข้าใจเนื้อความของสัญญาแล้ว จึงลงลายมือชื่อพร้อมประทับตรา (ถ้ามี) ไว้ต่อหน้าพยานและเก็บสัญญาไว้ฝ่ายละฉบับ
-            </span>
+            </div>
 
             <div class="sign-row">
                 <div class="sign-box">
-                    ลงชื่อ ........................................ ผู้ขาย<br>
+                    ลงชื่อ ........................................ <br>
+                    ผู้ขาย<br>
                     (สิริพร อินต๊ะวัง)
                 </div>
                 <div class="sign-box">
-                    ลงชื่อ ........................................ ผู้เช่าซื้อ<br>
+                    ลงชื่อ ........................................ <br>
+                    ผู้เช่าซื้อ<br>
                     (${escapeHtml(buyerName)})
                 </div>
                 <div class="sign-box">
-                    ลงชื่อ ........................................ พยาน<br>
+                    ลงชื่อ ........................................ <br>
+                    พยาน<br>
                     (........................................)
                 </div>
             </div>
@@ -252,7 +270,12 @@ export async function generateContractPDF(installmentData) {
 
         // Add the image to the PDF and save it
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, newCanvasHeight);
-        pdf.save(`contract-${customer.name.replace(/\s/g, '_')}-${installment.id}.pdf`);
+
+        if (asBlob) {
+            return pdf.output('blob');
+        } else {
+            pdf.save(`contract-${customer.name.replace(/\s/g, '_')}-${installment.id}.pdf`);
+        }
 
     } catch (error) {
         console.error("Error generating PDF:", error);
