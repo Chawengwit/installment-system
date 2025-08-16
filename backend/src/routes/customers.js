@@ -143,9 +143,9 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/customers
-router.post('/', upload.single('idCard'), async (req, res) => {
+router.post('/', async (req, res) => {
     const { name, phone, address, id_card_number, nickname, line_id, facebook } = req.body;
-    const id_card_image = (req.file && req.file.path) ? '/uploads/' + basename(req.file.path) : null;
+    const id_card_image = null;
 
     if (!name || !id_card_number) {
         return res.status(400).json({ error: 'Name, and ID card number are required' });
