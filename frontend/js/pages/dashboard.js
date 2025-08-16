@@ -1270,7 +1270,7 @@ class PageDashboard {
             const statusBadge = this.createStatusBadge(installment.status);
             $('#view-status').html(statusBadge);
 
-            $('#view-start-date').text(new Date(installment.start_date).toLocaleDateString());
+            $('#view-start-date').text(new Date(installment.start_date).toLocaleDateString('en-GB'));
             $('#view-payment-due-day').text(installment.due_date);
             $('#view-late-fee').text(`฿${parseFloat(installment.late_fee || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
 
@@ -1297,7 +1297,7 @@ class PageDashboard {
                     paymentScheduleBody.append(`
                         <tr>
                             <td>${payment.term_number}</td>
-                            <td>${new Date(payment.due_date).toLocaleDateString()}</td>
+                            <td>${new Date(payment.due_date).toLocaleDateString('en-GB')}</td>
                             <td>฿${parseFloat(payment.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                             <td class="text-right">${actionsHtml}</td>
                         </tr>
