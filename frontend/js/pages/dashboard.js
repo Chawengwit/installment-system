@@ -34,7 +34,6 @@ class PageDashboard {
     init() {
         this.bindEvents();
         this.setupDateRangePicker();
-        this.fetchDashboardStats();
         this.fetchInstallments(true);
         this.setupCustomerModals();
         this.setupCreditCardModals();
