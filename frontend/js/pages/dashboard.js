@@ -59,7 +59,11 @@ class PageDashboard {
             const stats = await response.json();
 
             $('#today-due-date').text(stats.todayDueDateCount);
-            $('#overdue-installments').text(stats.overdueCount);
+            if (stats.overdueAmount > 0) {
+                $('#overdue-installments').text(`${stats.overdueCount} (฿${stats.overdueAmount.toLocaleString()})`);
+            } else {
+                $('#overdue-installments').text(stats.overdueCount);
+            }
             $('#available-credit').text(`฿${stats.availableCredit.toLocaleString()}`);
             $('#cash-flow').text(`฿${stats.cashFlow.toLocaleString()}`);
 

@@ -18,12 +18,15 @@ router.get('/stats', async (req, res) => {
 
         // Overdue Installments
         const overdueResult = await pool.query(`
-            SELECT COUNT(DISTINCT i.id)
+            SELECT
+                COUNT(DISTINCT i.id) as overdue_count,
+                SUM(ip.amount) as overdue_amount
             FROM installments i
             JOIN installment_payments ip ON i.id = ip.installment_id
             WHERE i.status = 'active' AND ip.is_paid = false AND ip.due_date < CURRENT_DATE;
         `);
-        const overdueCount = parseInt(overdueResult.rows[0].count, 10);
+        const overdueCount = parseInt(overdueResult.rows[0].overdue_count, 10);
+        const overdueAmount = parseFloat(overdueResult.rows[0].overdue_amount || 0);
 
         // Available Credit
         const creditResult = await pool.query('SELECT SUM(credit_limit - used_amount) as available_credit FROM credit_cards');
@@ -47,6 +50,7 @@ router.get('/stats', async (req, res) => {
         res.json({
             todayDueDateCount,
             overdueCount,
+            overdueAmount,
             availableCredit,
             cashFlow
         });
