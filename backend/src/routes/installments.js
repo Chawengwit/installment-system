@@ -41,11 +41,11 @@ router.get('/', async (req, res) => {
                 whereClause += ` AND i.status = 'non-active'`;
             } else if (status === 'completed') {
                 whereClause += ` AND i.status = 'completed'`;
-            } 
+            }
         }
 
-        if (startDate && endDate) {
-            whereClause += ` AND i.created_at BETWEEN $${params.length + 1} AND $${params.length + 2}`;
+        if (startDate && endDate && status !== 'today_duedate' && status !== 'over_due') {
+            whereClause += ` AND i.created_at::date >= $${params.length + 1} AND i.created_at::date <= $${params.length + 2}`;
             params.push(startDate, endDate);
         }
 
